@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Codec - Brain Vision Processing</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #feca57;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #feca57;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-family: 'Courier New', monospace;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(255, 107, 107, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(255, 107, 107, 0.5);
+        }
+
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .color-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .color-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .binary-display {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active { background-color: #2ecc71; }
+        .status-pause { background-color: #f39c12; }
+        .status-stop { background-color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Vision Codec</h1>
+        <p style="text-align: center; font-style: italic; margin-bottom: 30px;">
+            Brain Vision Processing based on "Encyclopedia of Decoding Vision" by David Gomadza
+        </p>
+
+        <div class="section">
+            <h3>📊 Color Mapping Reference</h3>
+            <div class="color-map" id="colorMap"></div>
+        </div>
+
+        <div class="section">
+            <h3>🔢 Binary Patterns</h3>
+            <div class="binary-display">
+                Normal: <span style="color: #2ecc71;">10101</span> | 
+                Reverse: <span style="color: #e74c3c;">01010</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>👁️ Vision Input</h3>
+            <div class="input-group">
+                <label for="viewsInput">Enter Views (comma-separated):</label>
+                <textarea id="viewsInput" rows="3" placeholder="Green car, Blue sky, Yellow sun"></textarea>
+            </div>
+            <button onclick="encodeVision()">🔒 Encode Vision</button>
+            <button onclick="decodeVision()">🔓 Decode Vision</button>
+            <button onclick="clearResults()">🗑️ Clear</button>
+        </div>
+
+        <div class="section">
+            <h3>📤 Processing Results</h3>
+            <div id="processingStatus"></div>
+            <div class="output" id="encodedOutput"></div>
+        </div>
+
+        <div class="section">
+            <h3>📥 Decoded Results</h3>
+            <div class="output" id="decodedOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        class VisionCodec {
+            constructor() {
+                this.colorMap = {
+                    'a': { color: 'Green', number: 1708371482664 },
+                    'b': { color: 'Black', number: 707183578521 },
+                    'c': { color: 'Cyan', number: null },
+                    'd': { color: 'Purple', number: 706898432182 },
+                    'e': { color: 'Orange', number: 707276793215 },
+                    'f': { color: 'Maroon', number: 702841687924 },
+                    'g': { color: 'White', number: 708492386210 },
+                    'h': { color: 'Blue', number: 707652718279 },
+                    'i': { color: 'Grey', number: 709843218632 },
+                    'j': { color: 'Silver', number: null },
+                    'k': { color: 'Turquoise', number: null },
+                    'l': { color: 'Beige', number: null },
+                    'm': { color: 'Camel', number: null },
+                    'n': { color: 'Light Orange', number: null },
+                    'o': { color: 'Ginger', number: null },
+                    'p': { color: 'Pink', number: 707832485628 },
+                    'q': { color: 'Gold', number: 708248097632 },
+                    'r': { color: 'Brown', number: 708336842892 },
+                    's': { color: 'Turquoise', number: null },
+                    't': { color: 'Light Blue', number: null },
+                    'u': { color: 'Dark Blue', number: null },
+                    'v': { color: 'Bronze', number: 707642368319 },
+                    'w': { color: 'Beige', number: null },
+                    'x': { color: 'Brown Beige', number: null },
+                    'y': { color: 'Amber', number: 708324710284 },
+                    'z': { color: 'Yellow', number: 702867138981 }
+                };
+                this.binaryNormal = '10101';
+                this.binaryReverse = '01010';
+                this.lastEncoded = null;
+            }
+
+            encodeVision(views) {
+                // Step 1: Collect views and group by criteria A (alphabetical order)
+                const grouped = views.filter(v => v && v.trim())
+                                   .sort((a, b) => a.toLowerCase().charAt(0).localeCompare(b.toLowerCase().charAt(0)));
+
+                // Step 1 cont: Assign binary in reverse
+                const encoded = [];
+                for (const item of grouped) {
+                    const firstLetter = item.toLowerCase().charAt(0);
+                    const colorData = this.colorMap[firstLetter] || { 
+                        color: 'Unknown', 
+                        number: Math.floor(Math.random() * 1000000000) 
+                    };
+                    const num = colorData.number || Math.floor(Math.random() * 1000000000);
+                    encoded.push(`${colorData.color} + ${this.binaryReverse} (${num})`);
+                }
+
+                // Steps 2-4: Send to sockets, remove binary, add true color
+                const decodedColors = encoded.map(e => e.split(' + ')[0]);
+
+                // Steps 5-7: Add neutral codes, add binary reverse again
+                const neutral = 'neutral_' + decodedColors.join('');
+                const reEncoded = neutral + ' + ' + this.binaryReverse;
+
+                // Steps 8-10: Insert into sockets, add new binary normal, remove
+                let socketInsert = reEncoded + ' -> sockets';
+                socketInsert += ' + ' + this.binaryNormal;
+                const trueColors = socketInsert.replace(' + ' + this.binaryNormal, '');
+
+                // Steps 11-14: Get true picture, add environment
+                const imageSockets = { image: trueColors };
+                const envTime = Math.random() > 0.5 ? 'day' : 'night';
+                const envTemp = Math.floor(Math.random() * 41);
+                const est = `${JSON.stringify(imageSockets)} + ${envTime} + ${envTemp}C`;
+
+                // Steps 15-19: Encode with functions, verify on 'earth'
+                const encodedEst = est;
+                const earthVerified = `Earth view: ${encodedEst}`;
+
+                // Steps 20-23: Decode, process, get true sight minus additions
+                const trueSight = earthVerified.replace(' + night', '').replace(' + day', '');
+
+                // Incorporate sight formulas (pages 13-14)
+                const sightClose = 'pupil vision';
+                const sightPeriphery = 'outer things';
+                const sightImmediate = 'immediate things';
+                const fullSight = `sight + ${sightClose} - ${sightImmediate} - ${sightPeriphery}`;
+
+                // Stop/Pause paradigm (pages 15-21)
+                const action = Math.random() > 0.5 ? 'pause.start' : 'stop.start';
+
+                return {
+                    true_sight: fullSight,
+                    processed_views: trueSight,
+                    action_paradigm: action,
+                    environment: { time: envTime, temperature: envTemp },
+                    processing_steps: encoded
+                };
+            }
+
+            decodeVision(encodedData) {
+                if (!encodedData || !encodedData.true_sight) {
+                    return { decoded_views: ['No encoded data available'] };
+                }
+
+                // Reverse steps: Remove environment, binary, etc.
+                const decoded = encodedData.true_sight.replace('sight + ', '').split(' - ')[0];
+                return { decoded_views: decoded.split(', ') };
+            }
+        }
+
+        // Initialize codec
+        const codec = new VisionCodec();
+
+        // Display color mapping
+        function displayColorMap() {
+            const colorMapEl = document.getElementById('colorMap');
+            colorMapEl.innerHTML = '';
+            
+            for (const [letter, data] of Object.entries(codec.colorMap)) {
+                const colorItem = document.createElement('div');
+                colorItem.className = 'color-item';
+                colorItem.innerHTML = `
+                    <strong>${letter.toUpperCase()}:</strong> ${data.color}<br>
+                    <small>${data.number || 'N/A'}</small>
+                `;
+                colorMapEl.appendChild(colorItem);
+            }
+        }
+
+        function updateProcessingStatus(action) {
+            const statusEl = document.getElementById('processingStatus');
+            const statusClass = action.includes('pause') ? 'status-pause' : 
+                               action.includes('stop') ? 'status-stop' : 'status-active';
+            
+            statusEl.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <span class="status-indicator ${statusClass}"></span>
+                    <strong>Action Paradigm:</strong> ${action}
+                </div>
+            `;
+        }
+
+        function encodeVision() {
+            const input = document.getElementById('viewsInput').value;
+            if (!input.trim()) {
+                alert('Please enter some views to encode!');
+                return;
+            }
+
+            const views = input.split(',').map(v => v.trim());
+            const encoded = codec.encodeVision(views);
+            codec.lastEncoded = encoded;
+
+            updateProcessingStatus(encoded.action_paradigm);
+
+            document.getElementById('encodedOutput').textContent = 
+                `🔒 ENCODED VISION DATA:\n\n` +
+                `True Sight: ${encoded.true_sight}\n\n` +
+                `Processed Views: ${encoded.processed_views}\n\n` +
+                `Environment: ${encoded.environment.time}, ${encoded.environment.temperature}°C\n\n` +
+                `Processing Steps:\n${encoded.processing_steps.join('\n')}\n\n` +
+                `Action Paradigm: ${encoded.action_paradigm}`;
+        }
+
+        function decodeVision() {
+            if (!codec.lastEncoded) {
+                alert('Please encode some vision data first!');
+                return;
+            }
+
+            const decoded = codec.decodeVision(codec.lastEncoded);
+            
+            document.getElementById('decodedOutput').textContent = 
+                `🔓 DECODED VISION DATA:\n\n` +
+                `Decoded Views: ${decoded.decoded_views.join(', ')}`;
+        }
+
+        function clearResults() {
+            document.getElementById('viewsInput').value = '';
+            document.getElementById('encodedOutput').textContent = '';
+            document.getElementById('decodedOutput').textContent = '';
+            document.getElementById('processingStatus').innerHTML = '';
+            codec.lastEncoded = null;
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            displayColorMap();
+            document.getElementById('viewsInput').value = 'Green car, Blue sky, Yellow sun';
+        });
+    </script>
+</body>
+</html>

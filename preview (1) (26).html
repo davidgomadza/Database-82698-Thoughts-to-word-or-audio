@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Safe Clamp Simulation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0e111a;
+      --fg: #e6e6e6;
+      --accent: #4bd6c5;
+      --danger: #ff5e57;
+      --panel: #1a2030;
+      --shadow: rgba(0,0,0,.5);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto;
+      background: radial-gradient(circle at 20% -10%, #1a2140 0%, #0b1020 40%, #0b1020 100%);
+      color: var(--fg);
+    }
+    .wrap {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 20px;
+      padding: 20px;
+      height: 100%;
+    }
+    .panel {
+      background: linear-gradient(#1b1f3a, #111535);
+      border: 1px solid #2b3150;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 10px 25px var(--shadow);
+      min-height: 320px;
+    }
+    h1 { margin: 0 0 12px 0; font-size: 1.25rem; }
+    .subtitle { color: #aab6d6; font-size: 0.92rem; margin-bottom: 12px; }
+    .controls { display: grid; gap: 12px; }
+
+    .canvas {
+      position: relative;
+      height: 520px;
+      border-radius: 12px;
+      background: linear-gradient(#0a0f1a, #0b142a);
+      border: 1px solid #2a2f57;
+      overflow: hidden;
+    }
+    /* Floating arena where targets appear */
+    .arena {
+      position: absolute;
+      left: 0; right: 0; top: 0; bottom: 0;
+      display: grid;
+      place-items: center;
+    }
+    .target {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: #6bdc9e;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 2px rgba(0,0,0,.25);
+      transition: transform .3s ease;
+    }
+    .target.yellow { background: #ffd166; }
+    .target.red { background: #f94144; }
+    /* Clamp arm */
+    #clamp {
+      position: absolute;
+      left: 50%; bottom: 140px;
+      width: 140px; height: 8px;
+      background: #7f8cff;
+      transform-origin: left center;
+      transform: translateX(-50%) rotate(0deg);
+      border-radius: 4px;
+    }
+    /* Clamp grip (two jaws) */
+    .jaw {
+      position: absolute;
+      width: 40px; height: 20px;
+      top: -6px;
+      background: linear-gradient(#9bd0ff, #5a8cff);
+      border: 1px solid #2e4a9e;
+      border-radius: 6px;
+      transform-origin: center;
+    }
+    .jaw.left { left: -6px; transform-origin: right center; }
+    .jaw.right { right: -6px; transform-origin: left center; }
+
+    /* Lever / rotary controlUI */
+    .control-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px; border-radius: 8px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .knob {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff 0 20%, #ddd 20% 40%, #aaa 40% 100%);
+      display: grid; place-items: center;
+      cursor: pointer; user-select: none;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,.2);
+    }
+    .knob:active { transform: scale(1.02); }
+    .lever {
+      width: 10px; height: 90px; background: #9bd0ff;
+      border-radius: 5px;
+      transform-origin: bottom center;
+      transition: transform .2s ease;
+    }
+    .pad {
+      padding: 6px;
+      background: rgba(255,255,255,.05);
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .tag {
+      margin-top: 6px; font-family: monospace;
+      font-size: 12px; color: #c9d3ff;
+      background: rgba(20,20,60,.6); padding: 6px 8px; border-radius: 6px;
+      display: inline-block;
+    }
+
+    /* Simple animation helpers */
+    .float {
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(-6px); }
+      50% { transform: translateY(6px); }
+    }
+    .clamp-armed {
+      animation: grip 0.15s ease-out forwards;
+    }
+    @keyframes grip {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-20deg); }
+    }
+    .clamp-release {
+      animation: release 0.25s ease-out forwards;
+    }
+    @keyframes release {
+      from { transform: rotate(-20deg); }
+      to { transform: rotate(0deg); }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Left: Controls and info -->
+    <section class="panel" aria-label="Controls">
+      <h1>Safe Clamp Simulation</h1>
+      <div class="subtitle">
+        A benign, interactive visualization inspired by clamps and levers. Targets are harmless virtual objects.
+      </div>
+
+      <div class="controls" id="controls">
+        <div class="pad">
+          <strong>Rotary Control</strong>
+          <div style="height:8px"></div>
+          <div class="control-bar" aria-label="Rotary control">
+            <div class="knob" id="rotary" title="Rotate to clamp">
+              ⟳
+            </div>
+            <div style="width:100px"></div>
+            <div>
+              <div><strong>State</strong></div>
+              <div id="state" style="font-family:monospace; font-size:14px;">Idle</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pad">
+          <strong>Lever & Pully (simulated)</strong>
+          <div style="height:8px"></div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="lever" id="lever" style="transform: rotate(0deg);"></div>
+            <button id="toggleLock" style="padding:8px 12px; border-radius:6px; border:1px solid #2e4a9e; background:#1e2c6b; color:white; cursor:pointer;">
+              Engage Lock
+            </button>
+          </div>
+        </div>
+
+        <div class="pad">
+          <strong>Target System</strong>
+          <div style="height:8px"></div>
+          <button id="spawn" style="padding:8px 12px; border-radius:6px; border:1px solid #2e4a9e; background:#1e2c6b; color:white; cursor:pointer;">
+            Spawn Target
+          </button>
+          <div id="log" style="margin-top:8px; height:80px; overflow:auto; font-family: monospace; font-size:12px; background:#0b1130; padding:6px; border-radius:6px; border:1px solid #2e4a9e;">
+            System log:
+          </div>
+        </div>
+
+        <div class="pad">
+          <strong>Binary Tag</strong>
+          <div style="height:8px"></div>
+          <code id="binaryTag" class="tag">1010000001101000</code>
+          <div style="margin-top:8px; font-size:12px; color:#a8b4e6;">
+            This is a decorative tag. No disposal logic is implemented.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Visual sandbox -->
+    <section class="panel" aria-label="Sandbox">
+      <h1>Visual Sandbox</h1>
+      <div class="subtitle" style="margin-bottom:6px;">
+        Watch the floating arena. Targets arrive; clamp grips are simulated non-destructively.
+      </div>
+
+      <div class="canvas" aria-label="Clamp Arena">
+        <div class="arena" id="arena">
+          <!-- floating targets will be injected here -->
+        </div>
+
+        <!-- Clamp arm -->
+        <div id="clamp" aria-label="Clamp Arm" class="float">
+          <div class="jaw left" id="jawLeft"></div>
+          <div class="jaw right" id="jawRight"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Safe prototype logic
+    const arena = document.getElementById('arena');
+    const jawLeft = document.getElementById('jawLeft');
+    const jawRight = document.getElementById('jawRight');
+    const clamp = document.getElementById('clamp');
+    const rotary = document.getElementById('rotary');
+    const stateEl = document.getElementById('state');
+    const lever = document.getElementById('lever');
+    const toggleLock = document.getElementById('toggleLock');
+    const spawnBtn = document.getElementById('spawn');
+    const log = document.getElementById('log');
+    const binaryTag = document.getElementById('binaryTag');
+
+    let clampEngaged = false;
+    let targets = [];
+
+    function logMsg(msg) {
+      const p = document.createElement('div');
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Spawn harmless targets that move toward clamp
+    function spawnTarget() {
+      const t = document.createElement('div');
+      t.className = 'target';
+      // random color class
+      const colors = ['red','yellow','green'];
+      const c = colors[Math.floor(Math.random()*colors.length)];
+      t.classList.add(c);
+      // start at random edge
+      const edge = Math.floor(Math.random()*4);
+      // positions: 0 left,1 right,2 top,3 bottom
+      let x=0, y=0;
+      const arenaRect = arena.getBoundingClientRect();
+      switch(edge){
+        case 0: // left
+          x = 10; y = Math.random()*arenaRect.height;
+          break;
+        case 1: // right
+          x = arenaRect.width-10; y = Math.random()*arenaRect.height;
+          break;
+        case 2: // top
+          x = Math.random()*arenaRect.width; y = 10;
+          break;
+        case 3: // bottom
+          x = Math.random()*arenaRect.width; y = arenaRect.height-10;
+          break;
+      }
+      t.style.left = x+'px';
+      t.style.top = y+'px';
+      arena.appendChild(t);
+      targets.push(t);
+      // animate toward center
+      const cx = arenaRect.width/2;
+      const cy = arenaRect.height/2;
+      const vx = (cx - x) / 120;
+      const vy = (cy - y) / 120;
+
+      let frame = 0;
+      const id = requestAnimationFrame(function step() {
+        frame++;
+        const nx = x + vx*frame;
+        const ny = y + vy*frame;
+        t.style.left = nx+'px';
+        t.style.top = ny+'px';
+        // if near center, stop
+        if (Math.abs(nx - cx) < 20 && Math.abs(ny - cy) < 20) {
+          cancelAnimationFrame(id);
+        } else {
+          requestAnimationFrame(step);
+        }
+      });
+    }
+
+    // Simple clamp animation: grip/release visually
+    function engageClamp() {
+      clamp.style.transition = 'transform .12s ease-out';
+      clamp.style.transform = 'translateX(-50%) rotate(-20deg)';
+      jawLeft.style.transform = 'rotate(-18deg)';
+      jawRight.style.transform = 'rotate(18deg)';
+      clampEngaged = true;
+      stateEl.textContent = 'Engaged';
+    }
+
+    function releaseClamp() {
+      clamp.style.transition = 'transform .25s ease-out';
+      clamp.style.transform = 'translateX(-50%) rotate(0deg)';
+      jawLeft.style.transform = 'rotate(0deg)';
+      jawRight.style.transform = 'rotate(0deg)';
+      clampEngaged = false;
+      stateEl.textContent = 'Idle';
+    }
+
+    // Rotary interaction (simulated)
+    rotary.addEventListener('click', () => {
+      if (!clampEngaged) {
+        engageClamp();
+        logMsg('Rotary engaged clamp.');
+      } else {
+        releaseClamp();
+        logMsg('Rotary released clamp.');
+      }
+    });
+
+    // Lever interaction (simulated locking pulley)
+    let lockEngaged = false;
+    toggleLock.addEventListener('click', () => {
+      lockEngaged = !lockEngaged;
+      lever.style.transform = lockEngaged ? 'rotate(40deg)' : 'rotate(0deg)';
+      toggleLock.textContent = lockEngaged ? 'Release Lock' : 'Engage Lock';
+      logMsg(lockEngaged ? 'Lock engaged.' : 'Lock disengaged.');
+    });
+
+    // Spawn targets periodically
+    setInterval(() => {
+      if (Math.random() < 0.7) spawnTarget();
+    }, 1500);
+
+    // When a target reaches near clamp, auto-detect and simulate clamp
+    function autoDetectAndClamp() {
+      if (!clampEngaged) return;
+      // If any target within range of clamp jaws, "grab" it (visual only)
+      targets.forEach((t, idx) => {
+        const rect = t.getBoundingClientRect();
+        const cx = rect.left + rect.width/2;
+        const cy = rect.top + rect.height/2;
+        // approximate clamp position in viewport
+        const clampRect = clamp.getBoundingClientRect();
+        const clampX = clampRect.left + clampRect.width/2;
+        const clampY = clampRect.top + clampRect.height/2;
+        const dist = Math.hypot(cx - clampX, cy - clampY);
+        if (dist < 60) {
+          // "grab" by snapping to clamp pos
+          t.style.left = clampX+'px';
+          t.style.top = clampY+'px';
+          t.style.opacity = '0.4';
+          t.style.transition = 'opacity .2s';
+          logMsg('Target grabbed (visual).');
+        }
+      });
+    }
+
+    // Periodically check for auto-detect
+    setInterval(autoDetectAndClamp, 250);
+
+    // Initialize
+    logMsg('System initialized. Awaiting targets.');
+    spawnBtn.addEventListener('click', spawnTarget);
+  </script>
+</body>
+</html>

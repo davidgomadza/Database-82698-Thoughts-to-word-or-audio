@@ -1,0 +1,275 @@
+<!--
+Floating Clamp Demo — Interactive HTML Artifact
+Purely fictional, visual-only simulation. DO NOT build or attempt to construct real clamps or devices.
+
+Features included:
+- Floating miniature "wheel-clamper" visual elements that hover and rotate.
+- Enemies spawn as colored circles; clamps auto-detect and animate a "clamp" action when within range.
+- Two clamp behavior modes (rotary animation and lever/pulley animation) toggled in the UI.
+- A disposal bin labeled with the binary string "101zeros86" (visual label only) that collects clamped enemies.
+- Controls: spawn rate, clamp range, toggle auto-clamp, clear scene, single-step clamp.
+- Accessible interaction: use buttons or keyboard shortcuts (Space to spawn, C to clear).
+
+This is intentionally *non-functional* hardware simulation. It's an HTML/CSS/JS visual demo only.
+--><!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Floating Clamp Demo — Fictional Visual Simulation</title>
+  <style>
+    :root{--bg:#0f1724;--panel:#0b1120;--accent:#7dd3fc;--muted:#94a3b8}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{background:radial-gradient(circle at 20% 10%, #071428 0%, var(--bg) 40%, #02060a 100%);color:#e6eef8}
+    .app{display:grid;grid-template-columns:320px 1fr;gap:18px;height:100vh;padding:18px}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:12px;padding:16px;box-shadow:0 6px 30px rgba(2,6,23,0.6)}
+    h1{font-size:18px;margin:0 0 8px}
+    .controls{display:flex;flex-direction:column;gap:8px}
+    .row{display:flex;gap:8px;align-items:center}
+    button{background:transparent;border:1px solid rgba(125,211,252,0.12);padding:8px 10px;border-radius:8px;color:var(--accent);cursor:pointer}
+    input[type=range]{width:100%}
+    .stage{position:relative;border-radius:12px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.0));box-shadow:inset 0 0 150px rgba(12,17,26,0.6);}
+    #canvas{width:100%;height:100%;display:block}
+    .hud{position:absolute;left:12px;top:12px;background:rgba(2,6,11,0.45);padding:8px 10px;border-radius:8px;font-size:13px}
+    .bin{position:absolute;right:18px;bottom:18px;width:180px;height:110px;border-radius:12px;background:linear-gradient(180deg,#07172b,#0b2133);display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    .bin .label{font-family:monospace;color:var(--muted);font-size:12px}
+    .bin .title{font-size:15px;color:var(--accent);margin-top:6px}
+    .clamp{position:absolute;width:64px;height:64px;transform-origin:center;will-change:transform;}
+    .clamp .body{width:100%;height:100%;border-radius:10px;background:linear-gradient(180deg,#0b1220,#122033);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(2,6,23,0.5)}
+    .clamp .jaw{position:absolute;width:80%;height:40%;left:10%;background:linear-gradient(180deg,#153240,#0b1724);border-radius:6px;}
+    .clamp .jaw.top{top:6%;transform-origin:center bottom}
+    .clamp .jaw.bottom{bottom:6%;transform-origin:center top}
+    .enemy{position:absolute;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+    .info{font-size:13px;color:var(--muted)}
+    footer{position:absolute;left:18px;bottom:18px;color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="panel">
+      <h1>Floating Clamp Demo</h1>
+      <div class="controls">
+        <div class="row"><button id="spawnBtn">Spawn Enemy (Space)</button><button id="clearBtn">Clear (C)</button></div>
+        <label class="info">Mode</label>
+        <div class="row"><select id="modeSelect"><option value="rotary">Rotary (visual)</option><option value="lever">Lever & Pulley (visual)</option></select></div>
+        <label class="info">Auto-clamp</label>
+        <div class="row"><input type="checkbox" id="autoClamp" checked> <span class="info">Enable auto-detection & clamp</span></div>
+        <label class="info">Clamp range</label>
+        <input type="range" id="range" min="40" max="260" value="140">
+        <label class="info">Spawn speed (enemies / sec)</label>
+        <input type="range" id="spawnRate" min="0" max="3" step="0.25" value="0.5">
+        <div class="row"><button id="oneStep">Single clamp step</button><div style="flex:1"></div></div>
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.04);margin:8px 0">
+        <div class="info">Disposal Bin Label:</div>
+        <pre style="background:transparent;padding:6px;border-radius:6px;border:1px dashed rgba(255,255,255,0.03);margin-top:6px;font-family:monospace">101zeros86</pre>
+        <div style="margin-top:8px;font-size:13px;color:var(--muted)">This demo is a visual, fictional simulation for UX/interaction prototyping only. It intentionally shows no real-world mechanical specs.</div>
+      </div>
+    </aside><main class="stage panel" id="stage">
+  <div id="canvas" style="position:relative;height:100%;min-height:520px">
+    <div class="hud" id="hud">Enemies: 0 • Clamped: 0</div>
+    <div class="bin" id="bin">
+      <div class="label">Binary Disposal</div>
+      <div class="title">101zeros86</div>
+    </div>
+  </div>
+  <footer>Controls: Space = spawn • C = clear • M = toggle auto-clamp</footer>
+</main>
+
+  </div>  <script>
+    // Fictional visual-only demo. No real-world hardware instructions included.
+    const canvas = document.getElementById('canvas');
+    const hud = document.getElementById('hud');
+    const spawnBtn = document.getElementById('spawnBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const autoClampChk = document.getElementById('autoClamp');
+    const modeSelect = document.getElementById('modeSelect');
+    const rangeInput = document.getElementById('range');
+    const spawnRateInput = document.getElementById('spawnRate');
+    const oneStepBtn = document.getElementById('oneStep');
+    const bin = document.getElementById('bin');
+
+    let enemies = [];
+    let clamps = [];
+    let clampedCount = 0;
+
+    const rnd = (a,b)=>Math.random()*(b-a)+a;
+
+    function createClamp(x,y){
+      const el = document.createElement('div');
+      el.className='clamp';
+      el.style.left = x+'px'; el.style.top = y+'px';
+      el.innerHTML = '<div class="body"><div class="jaw top"></div><div class="jaw bottom"></div></div>';
+      canvas.appendChild(el);
+      const clamp = {el,x,y,state:'idle',range:parseFloat(rangeInput.value)};
+      clamps.push(clamp);
+      return clamp;
+    }
+
+    function createEnemy(x,y){
+      const el = document.createElement('div');
+      el.className='enemy';
+      el.style.left=(x-14)+'px';el.style.top=(y-14)+'px';
+      el.style.background='linear-gradient(180deg, hsl('+Math.floor(rnd(0,360))+' 70% 45%), hsl('+Math.floor(rnd(0,360))+' 55% 30%))';
+      el.textContent='E';
+      canvas.appendChild(el);
+      const enemy = {el,x,y,clamped:false,id:Date.now()+Math.random()};
+      enemies.push(enemy);
+      updateHUD();
+      return enemy;
+    }
+
+    // init a few clamps floating in the top half
+    function initClamps(){
+      const w = canvas.clientWidth, h=canvas.clientHeight;
+      // place 5 clamps
+      for(let i=0;i<5;i++){
+        createClamp(rnd(40,w-100), rnd(40,h/2));
+      }
+    }
+
+    function updateHUD(){
+      hud.textContent = `Enemies: ${enemies.length} • Clamped: ${clampedCount}`;
+    }
+
+    function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+
+    function animate(){
+      const mode = modeSelect.value;
+      // animate clamps: gentle hover + rotation
+      clamps.forEach((c,idx)=>{
+        const t = Date.now()/1000 + idx*0.4;
+        const hoverY = Math.sin(t*0.9)*8;
+        const rot = Math.sin(t*0.7)*12;
+        c.el.style.transform = `translateY(${hoverY}px) rotate(${rot}deg)`;
+        // find nearest enemy
+        if(autoClampChk.checked){
+          let nearest = null; let nd = Infinity;
+          for(const e of enemies){ if(e.clamped) continue; const d=distance({x:c.x,y:c.y},e); if(d<nd){nd=d;nearest=e}};
+          c.range = parseFloat(rangeInput.value);
+          if(nearest && nd < c.range){
+            // clamping animation (visual only)
+            if(mode==='rotary') applyRotaryClamp(c,nearest);
+            else applyLeverClamp(c,nearest);
+          } else {
+            // relax jaws
+            releaseVisual(c);
+          }
+        }
+      });
+      requestAnimationFrame(animate);
+    }
+
+    function applyRotaryClamp(c,e){
+      const topJaw = c.el.querySelector('.jaw.top');
+      const bottomJaw = c.el.querySelector('.jaw.bottom');
+      // animate jaws to close
+      topJaw.style.transform = 'translateY(8px) rotate(0deg)';
+      bottomJaw.style.transform = 'translateY(-8px) rotate(0deg)';
+      // visual 'pull' of enemy toward clamp center
+      const ex = parseFloat(e.el.style.left) + 14; const ey = parseFloat(e.el.style.top) + 14;
+      const cx = c.x + 32; const cy = c.y + 32;
+      const nx = ex + (cx-ex) * 0.08; const ny = ey + (cy-ey) * 0.08;
+      e.el.style.left = (nx-14)+'px'; e.el.style.top = (ny-14)+'px';
+      e.x = nx; e.y = ny;
+      // if close enough, mark clamped
+      if(distance({x:c.x+32,y:c.y+32},e) < 14){
+        markClamped(e,c);
+      }
+    }
+
+    function applyLeverClamp(c,e){
+      const topJaw = c.el.querySelector('.jaw.top');
+      const bottomJaw = c.el.querySelector('.jaw.bottom');
+      // lever mode shows asymmetric jaw movement
+      topJaw.style.transform = 'translateY(10px) rotate(-6deg)';
+      bottomJaw.style.transform = 'translateY(-4px) rotate(8deg)';
+      // tug enemy with slightly different easing
+      const ex = parseFloat(e.el.style.left) + 14; const ey = parseFloat(e.el.style.top) + 14;
+      const cx = c.x + 32; const cy = c.y + 32;
+      const nx = ex + (cx-ex) * 0.06; const ny = ey + (cy-ey) * 0.06;
+      e.el.style.left = (nx-14)+'px'; e.el.style.top = (ny-14)+'px';
+      e.x = nx; e.y = ny;
+      if(distance({x:c.x+32,y:c.y+32},e) < 16){
+        markClamped(e,c);
+      }
+    }
+
+    function releaseVisual(c){
+      const topJaw = c.el.querySelector('.jaw.top');
+      const bottomJaw = c.el.querySelector('.jaw.bottom');
+      topJaw.style.transform='translateY(0px)'; bottomJaw.style.transform='translateY(0px)';
+    }
+
+    function markClamped(e,c){
+      if(e.clamped) return;
+      e.clamped = true;
+      clampedCount++;
+      // attach small lock indicator
+      const lock = document.createElement('div'); lock.textContent='🔒'; lock.style.position='absolute'; lock.style.left=(e.x-6)+'px'; lock.style.top=(e.y-6)+'px'; lock.style.pointerEvents='none'; lock.style.fontSize='14px'; canvas.appendChild(lock);
+      // animate slide to bin over time
+      const binRect = bin.getBoundingClientRect(); const canvasRect = canvas.getBoundingClientRect();
+      const targetX = (binRect.left - canvasRect.left) + binRect.width/2;
+      const targetY = (binRect.top - canvasRect.top) + binRect.height/2;
+      const start = {x:e.x,y:e.y};
+      const duration = 800 + Math.random()*600;
+      const startTime = performance.now();
+      function fly(t){
+        const p = Math.min(1,(t-startTime)/duration);
+        const ix = start.x + (targetX-start.x)*p;
+        const iy = start.y + (targetY-start.y)*p;
+        e.el.style.left=(ix-14)+'px'; e.el.style.top=(iy-14)+'px'; lock.style.left=(ix-6)+'px'; lock.style.top=(iy-6)+'px';
+        if(p<1) requestAnimationFrame(fly);
+        else {
+          // remove visuals
+          e.el.remove(); lock.remove();
+          enemies = enemies.filter(en=>en.id!==e.id);
+          updateHUD();
+        }
+      }
+      requestAnimationFrame(fly);
+      updateHUD();
+    }
+
+    // spawn loop
+    let lastSpawn = 0;
+    function spawnLoop(now){
+      const rate = parseFloat(spawnRateInput.value);
+      const interval = rate>0 ? 1000/rate : Infinity;
+      if(now - lastSpawn > interval){ spawnRandomEnemy(); lastSpawn = now }
+      requestAnimationFrame(spawnLoop);
+    }
+
+    function spawnRandomEnemy(){
+      const rect = canvas.getBoundingClientRect();
+      const x = rnd(40,rect.width-40); const y = rnd(rect.height*0.55,rect.height-40);
+      createEnemy(x,y);
+    }
+
+    spawnBtn.addEventListener('click',()=>spawnRandomEnemy());
+    clearBtn.addEventListener('click',()=>{ enemies.forEach(e=>e.el.remove()); enemies=[]; clampedCount=0; updateHUD(); });
+    oneStepBtn.addEventListener('click',()=>{ // trigger a single round of clamp checks
+      clamps.forEach(c=>{
+        let nearest=null,nd=Infinity; for(const e of enemies){ if(e.clamped) continue; const d=distance({x:c.x,y:c.y},e); if(d<nd){nd=d;nearest=e}} if(nearest && nd<parseFloat(rangeInput.value)) { if(modeSelect.value==='rotary') applyRotaryClamp(c,nearest); else applyLeverClamp(c,nearest)} else releaseVisual(c);
+      })
+    });
+
+    document.addEventListener('keydown',(e)=>{
+      if(e.code==='Space'){ e.preventDefault(); spawnRandomEnemy(); }
+      if(e.key==='c' || e.key==='C'){ enemies.forEach(e=>e.el.remove()); enemies=[]; clampedCount=0; updateHUD(); }
+      if(e.key==='m' || e.key==='M'){ autoClampChk.checked=!autoClampChk.checked }
+    });
+
+    // responsive clamp placement on resize
+    window.addEventListener('resize',()=>{
+      clamps.forEach((c,idx)=>{
+        const rect = canvas.getBoundingClientRect(); c.x = Math.min(rect.width-80, Math.max(16, c.x)); c.y = Math.min(rect.height-80, Math.max(16, c.y)); c.el.style.left = c.x+'px'; c.el.style.top = c.y+'px';
+      })
+    });
+
+    // initial setup
+    initClamps();
+    animate();
+    requestAnimationFrame(spawnLoop);
+  </script></body>
+</html>

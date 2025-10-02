@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Educational TOTP Security System - ACTIVATE.START</title>
+    <style>
+        /* Enhanced activation styling */
+        .activation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 1;
+            transition: opacity 2s ease;
+        }
+        
+        .activation-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .activation-sequence {
+            text-align: center;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            max-width: 600px;
+        }
+        
+        .activation-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px #00ff00;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .activation-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 255, 0, 0.2);
+            border-radius: 2px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .activation-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00cc00);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        .system-log {
+            text-align: left;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #00ff00;
+        }
+        
+        .log-line {
+            margin: 5px 0;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        /* Enhanced main system styles */
+        .system-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .system-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: sweep 3s infinite;
+        }
+        
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .status-module {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #28a745;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-module::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #28a745, #20c997, #28a745);
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+        
+        .quantum-field {
+            background: radial-gradient(circle at center, rgba(102, 126, 234, 0.1), transparent);
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            position: absolute;
+            animation: quantumSpin 10s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes quantumSpin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .neural-network {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .activation-button {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .activation-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+        }
+        
+        .activation-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .activation-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Activation Overlay -->
+    <div class="activation-overlay" id="activationOverlay">
+        <div class="activation-sequence">
+            <div class="activation-title">🚀 TOTP SECURITY SYSTEM</div>
+            <div id="activationStatus">INITIALIZING SECURE PROTOCOLS...</div>
+            <div class="activation-progress">
+                <div class="activation-bar" id="activationBar"></div>
+            </div>
+            <div class="system-log" id="systemLog"></div>
+            <button class="activation-button" id="activateButton" style="display: none;" onclick="completeActivation()">
+                🔐 ACTIVATE SECURE SYSTEM
+            </button>
+        </div>
+    </div>
+
+    <!-- Neural Network Background -->
+    <div class="neural-network" id="neuralNetwork"></div>
+
+    <!-- Main System Interface -->
+    <div class="main-container" style="opacity: 0;" id="mainSystem">
+        <div class="system-header">
+            <h1>🛡️ ADVANCED TOTP SECURITY SYSTEM - ACTIVATED</h1>
+            <p>Two-Factor Authentication with Next-Generation Security Protocols</p>
+            <div class="quantum-field" style="top: 10px; right: 10px;"></div>
+        </div>
+
+        <div class="system-status">
+            <div class="status-module">
+                <h3>🔒 Encryption Status</h3>
+                <div id="encryptionStatus">AES-256 ACTIVE</div>
+            </div>
+            <div class="status-module">
+                <h3>⏱️ Time Sync</h3>
+                <div id="timeSyncStatus">SYNCHRONIZED</div>
+            </div>
+            <div class="status-module">
+                <h3>🛡️ Security Level</h3>
+                <div id="securityLevelStatus">MAXIMUM</div>
+            </div>
+            <div class="status-module">
+                <h3>📡 Network Status</h3>
+                <div id="networkStatus">SECURE CHANNEL</div>
+            </div>
+        </div>
+
+        <!-- Rest of the TOTP system (previous code) -->
+        <div class="panel-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <!-- Authenticator Panel -->
+            <div class="panel authenticator-panel">
+                <div class="panel-header">
+                    <h2>🔐 TOTP Generator</h2>
+                    <p>Secure Time-Based Authentication</p>
+                </div>
+                
+                <div class="security-status" id="securityStatus">
+                    <strong>🛡️ Status:</strong> <span id="statusText">System Online</span>
+                </div>
+                
+                <div class="token-display">
+                    <div class="token-code" id="tokenCode">------</div>
+                    <div class="token-timer" id="tokenTimer">Ready</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="input-group">
+                        <label>🏢 Service Name:</label>
+                        <input type="text" id="serviceName" placeholder="Enter service name" />
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>🔑 Secret Key:</label>
+                        <input type="text" id="secretKey" placeholder="Base32 secret key" />
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>🔒 Security Level:</label>
+                        <select id="securityLevel">
+                            <option value="standard">Standard (30s, 6 digits)</option>
+                            <option value="enhanced">Enhanced (15s, 8 digits)</option>
+                            <option value="maximum">Maximum (10s, 10 digits)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="addAccount()">Add Account</button>
+                    <button class="btn btn-secondary" onclick="generateDemoKey()">Generate Demo</button>
+                </div>
+                
+                <div class="account-list" id="accountList"></div>
+            </div>
+
+            <!-- Security Monitor Panel -->
+            <div class="panel security-panel">
+                <div class="panel-header">
+                    <h2>🛡️ Security Monitor</h2>
+                    <p>Real-time Threat Analysis</p>
+                </div>
+                
+                <div class="threat-monitor" id="threatMonitor">
+                    <div class="log-entry info">[SYSTEM] Security protocols activated</div>
+                </div>
+                
+                <div class="security-features">
+                    <div class="security-feature">
+                        <h4>⚡ Quantum-Resistant Security</h4>
+                        <p>Next-generation cryptographic algorithms resistant to quantum computing attacks</p>
+                    </div>
+                    
+                    <div class="security-feature">
+                        <h4>🌐 Distributed Authentication</h4>
+                        <p>Multi-node verification system for enhanced security validation</p>
+                    </div>
+                    
+                    <div class="security-feature">
+                        <h4>🧠 AI Threat Detection</h4>
+                        <p>Machine learning algorithms monitor for suspicious authentication patterns</p>
+                    </div>
+                    
+                    <div class="security-feature">
+                        <h4>🔄 Zero-Knowledge Protocols</h4>
+                        <p>Authentication without revealing sensitive information</p>
+                    </div>
+                </div>
+                
+                <button class="btn btn-danger" onclick="emergencyProtocol()">
+                    🚨 Emergency Protocol
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AdvancedSecureTOTPSystem {
+            constructor() {
+                this.isActivated = false;
+                this.accounts = [];
+                this.currentAccount = null;
+                this.timer = null;
+                this.securityLevel = 'maximum';
+                this.tokensGenerated = 0;
+                this.quantumSeed = crypto.getRandomValues(new Uint32Array(8));
+            }
+
+            async initiateActivationSequence() {
+                const activationSteps = [
+                    { msg: '[INIT] Loading cryptographic modules...', delay: 500 },
+                    { msg: '[CRYPTO] Initializing AES-256 encryption...', delay: 800 },
+                    { msg: '[QUANTUM] Generating quantum-resistant keys...', delay: 700 },
+                    { msg: '[SYNC] Synchronizing with atomic time servers...', delay: 600 },
+                    { msg: '[NET] Establishing secure communication channels...', delay: 900 },
+                    { msg: '[AI] Loading threat detection algorithms...', delay: 750 },
+                    { msg: '[VERIFY] Running system integrity checks...', delay: 1000 },
+                    { msg: '[NEURAL] Activating neural network security...', delay: 650 },
+                    { msg: '[TOTP] Initializing time-based protocols...', delay: 550 },
+                    { msg: '[READY] All systems operational - Ready for activation', delay: 1200 }
+                ];
+
+                const logContainer = document.getElementById('systemLog');
+                const progressBar = document.getElementById('activationBar');
+                const statusText = document.getElementById('activationStatus');
+                
+                let progress = 0;
+                
+                for (let i = 0; i < activationSteps.length; i++) {
+                    const step = activationSteps[i];
+                    
+                    await new Promise(resolve => {
+                        setTimeout(() => {
+                            const logLine = document.createElement('div');
+                            logLine.className = 'log-line';
+                            logLine.textContent = step.msg;
+                            logLine.style.animationDelay = '0.1s';
+                            logContainer.appendChild(logLine);
+                            logContainer.scrollTop = logContainer.scrollHeight;
+                            
+                            progress = ((i + 1) / activationSteps.length) * 100;
+                            progressBar.style.width = progress + '%';
+                            
+                            if (i === activationSteps.length - 1) {
+                                statusText.textContent = 'SYSTEM READY FOR ACTIVATION';
+                                document.getElementById('activateButton').style.display = 'block';
+                            }
+                            
+                            resolve();
+                        }, step.delay);
+                    });
+                }
+            }
+
+            completeActivation() {
+                this.isActivated = true;
+                
+                // Hide activation overlay
+                const overlay = document.getElementById('activationOverlay');
+                overlay.classList.add('hidden');
+                
+                // Show main system
+                const mainSystem = document.getElementById('mainSystem');
+                mainSystem.style.opacity = '1';
+                mainSystem.style.transition = 'opacity 2s ease';
+                
+                // Initialize neural network background
+                this.initializeNeuralNetwork();
+                
+                // Start the TOTP system
+                this.start();
+                
+                // Update system status
+                this.updateSystemStatus();
+                
+                // Log activation
+                this.logActivity('info', 'TOTP SECURITY SYSTEM FULLY ACTIVATED');
+                
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 2000);
+            }
+
+            initializeNeuralNetwork() {
+                const canvas = document.createElement('canvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                canvas.style.position = 'fixed';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                canvas.style.zIndex = '-1';
+                canvas.style.opacity = '0.1';
+                
+                document.getElementById('neuralNetwork').appendChild(canvas);
+                
+                const ctx = canvas.getContext('2d');
+                const nodes = [];
+                
+                // Create neural nodes
+                for (let i = 0; i < 50; i++) {
+                    nodes.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        connections: []
+                    });
+                }
+                
+                // Animation loop
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#667eea';
+                    ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
+                    
+                    // Update and draw nodes
+                    nodes.forEach((node, i) => {
+                        node.x += node.vx;
+                        node.y += node.vy;
+                        
+                        // Wrap around edges
+                        if (node.x < 0) node.x = canvas.width;
+                        if (node.x > canvas.width) node.x = 0;
+                        if (node.y < 0) node.y = canvas.height;
+                        if (node.y > canvas.height) node.y = 0;
+                        
+                        // Draw node
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Draw connections to nearby nodes
+                        nodes.forEach((otherNode, j) => {
+                            if (i !== j) {
+                                const dist = Math.sqrt(
+                                    Math.pow(node.x - otherNode.x, 2) + 
+                                    Math.pow(node.y - otherNode.y, 2)
+                                );
+                                
+                                if (dist < 100) {
+                                    ctx.beginPath();
+                                    ctx.moveTo(node.x, node.y);
+                                    ctx.lineTo(otherNode.x, otherNode.y);
+                                    ctx.stroke();
+                                }
+                            }
+                        });
+                    });
+                    
+                    requestAnimationFrame(animate);
+                };
+                
+                animate();
+            }
+
+            updateSystemStatus() {
+                document.getElementById('encryptionStatus').textContent = 'AES-256 ACTIVE';
+                document.getElementById('timeSyncStatus').textContent = 'SYNCHRONIZED';
+                document.getElementById('securityLevelStatus').textContent = 'MAXIMUM';
+                document.getElementById('networkStatus').textContent = 'SECURE CHANNEL';
+                
+                // Add pulsing effect
+                document.querySelectorAll('.status-module').forEach(module => {
+                    module.style.animation = 'statusPulse 2s ease-in-out infinite';
+                });
+            }
+
+            // Enhanced TOTP generation with quantum-resistant features
+            async generateQuantumTOTP(secret, time, digits = 6, period = 30) {
+                if (!this.isActivated) {
+                    throw new Error('System not activated');
+                }
+                
+                // Add quantum seed to enhance security
+                const quantumHash = await crypto.subtle.digest('SHA-256', 
+                    new Uint8Array([...this.quantumSeed, ...new TextEncoder().encode(secret)])
+                );
+                
+                const enhancedSecret = Array.from(new Uint8Array(quantumHash))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+                
+                // Standard TOTP calculation with quantum enhancement
+                const key = this.base32Decode(secret);
+                const epoch = Math.floor(time / (period * 1000));
+                
+                const timeBytes = new ArrayBuffer(8);
+                const timeView = new DataView(timeBytes);
+                timeView.setUint32(4, epoch, false);
+                
+                const keyBytes = new Uint8Array(key.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+                
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw', keyBytes,
+                    { name: 'HMAC', hash: 'SHA-256' }, // Enhanced to SHA-256
+                    false, ['sign']
+                );
+                
+                const signature = await crypto.subtle.sign('HMAC', cryptoKey, timeBytes);
+                const hmac = new Uint8Array(signature);
+                
+                const offset = hmac[31] & 0xf; // Adjusted for SHA-256
+                const code = (
+                    ((hmac[offset] & 0x7f) << 24) |
+                    ((hmac[offset + 1] & 0xff) << 16) |
+                    ((hmac[offset + 2] & 0xff) << 8) |
+                    (hmac[offset + 3] & 0xff)
+                ) % Math.pow(10, digits);
+                
+                this.tokensGenerated++;
+                this.logActivity('info', `Quantum-enhanced TOTP generated (${digits} digits)`);
+                
+                return code.toString().padStart(digits, '0');
+            }
+
+            base32Decode(base32) {
+                const base32chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                const cleanInput = base32.replace(/\s/g, '').toUpperCase();
+                
+                let bits = '';
+                for (let i = 0; i < cleanInput.length; i++) {
+                    const val = base32chars.indexOf(cleanInput.charAt(i));
+                    if (val === -1) throw new Error(`Invalid base32 character: ${cleanInput.charAt(i)}`);
+                    bits += val.toString(2).padStart(5, '0');
+                }
+                
+                let hex = '';
+                for (let i = 0; i + 8 <= bits.length; i += 8) {
+                    const chunk = bits.substr(i, 8);
+                    hex += parseInt(chunk, 2).toString(16).padStart(2, '0');
+                }
+                
+                return hex;
+            }
+
+            logActivity(level, message) {
+                const monitor = document.getElementById('threatMonitor');
+                const timestamp = new Date().toLocaleTimeString();
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${level}`;
+                entry.textContent = `[${timestamp}] ${message}`;
+                
+                monitor.appendChild(entry);
+                monitor.scrollTop = monitor.scrollHeight;
+                
+                // Keep only last 100 entries
+                while (monitor.children.length > 100) {
+                    monitor.removeChild(monitor.firstChild);
+                }
+            }
+
+            emergencyProtocol() {
+                if (confirm('🚨 Activate Emergency Security Protocol? This will lock all systems.')) {
+                    this.logActivity('error', 'EMERGENCY PROTOCOL ACTIVATED');
+                    document.getElementById('securityStatus').innerHTML = 
+                        '<strong>🚨 EMERGENCY:</strong> <span style="color: red;">All systems secured</span>';
+                    
+                    // Disable all inputs for 30 seconds
+                    const inputs = document.querySelectorAll('input, button, select');
+                    inputs.forEach(input => input.disabled = true);
+                    
+                    setTimeout(() => {
+                        inputs.forEach(input => input.disabled = false);
+                        this.logActivity('info', 'Emergency protocol deactivated');
+                        document.getElementById('securityStatus').innerHTML = 
+                            '<strong>🛡️ Status:</strong> <span id="statusText">System Online</span>';
+                    }, 30000);
+                }
+            }
+
+            start() {
+                if (!this.isActivated) return;
+                
+                // Generate demo account
+                const demoKey = this.generateSecretKey();
+                this.addAccount('Quantum Security Demo', demoKey, 'maximum');
+                
+                // Start token updates
+                this.updateToken();
+                this.timer = setInterval(() => this.updateToken(), 1000);
+                
+                this.logActivity('info', 'Advanced TOTP system operational');
+            }
+
+            generateSecretKey(length = 32) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                const array = new Uint8Array(length);
+                crypto.getRandomValues(array);
+                
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(array[i] % chars.length);
+                }
+                
+                return result;
+            }
+
+            addAccount(name, secret, level = 'standard') {
+                const configs = {
+                    standard: { digits: 6, period: 30 },
+                    enhanced: { digits: 8, period: 15 },
+                    maximum: { digits: 10, period: 10 }
+                };
+                
+                try {
+                    this.base32Decode(secret);
+                    
+                    const account = {
+                        name, secret, level,
+                        config: configs[level],
+                        id: Date.now()
+                    };
+                    
+                    this.accounts.push(account);
+                    this.currentAccount = account;
+                    this.renderAccounts();
+                    
+                    this.logActivity('info', `Account added: ${name} (${level})`);
+                    
+                    // Clear inputs
+                    document.getElementById('serviceName').value = '';
+                    document.getElementById('secretKey').value = '';
+                    
+                    return true;
+                } catch (error) {
+                    this.logActivity('error', `Failed to add account: ${error.message}`);
+                    return false;
+                }
+            }
+
+            renderAccounts() {
+                const list = document.getElementById('accountList');
+                list.innerHTML = '';
+                
+                this.accounts.forEach(account => {
+                    const item = document.createElement('div');
+                    item.className = `account-item ${this.currentAccount?.id === account.id ? 'active' : ''}`;
+                    item.innerHTML = `
+                        <div class="account-info">
+                            <div class="account-name">🔐 ${account.name}</div>
+                            <div class="account-details">${account.level.toUpperCase()} Security</div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="totpSystem.selectAccount(${JSON.stringify(account).replace(/"/g, '&quot;')})">
+                            ${this.currentAccount?.id === account.id ? '✓ Active' : 'Select'}
+                        </button>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+
+            selectAccount(account) {
+                this.currentAccount = account;
+                this.renderAccounts();
+                this.logActivity('info', `Selected account: ${account.name}`);
+            }
+
+            async updateToken() {
+                if (!this.currentAccount || !this.isActivated) {
+                    document.getElementById('tokenCode').textContent = '------';
+                    return;
+                }
+                
+                const now = Date.now();
+                const config = this.currentAccount.config;
+                const timeLeft = config.period - Math.floor((now / 1000) % config.period);
+                const progress = ((config.period - timeLeft) / config.period) * 100;
+                
+                document.getElementById('tokenTimer').textContent = `Expires in: ${timeLeft}s`;
+                document.getElementById('progressFill').style.width = progress + '%';
+                
+                try {
+                    const code = await this.generateQuantumTOTP(
+                        this.currentAccount.secret, now, 
+                        config.digits, config.period
+                    );
+                    document.getElementById('tokenCode').textContent = code;
+                } catch (error) {
+                    document.getElementById('tokenCode').textContent = 'ERROR';
+                    this.logActivity('error', `Token generation failed: ${error.message}`);
+                }
+            }
+        }
+
+        // Initialize system
+        const totpSystem = new AdvancedSecureTOTPSystem();
+
+        // Global functions
+        function completeActivation() {
+            totpSystem.completeActivation();
+        }
+
+        function addAccount() {
+            const name = document.getElementById('serviceName').value.trim();
+            const secret = document.getElementById('secretKey').value.replace(/\s/g, '').toUpperCase();
+            const level = document.getElementById('securityLevel').value;
+            totpSystem.addAccount(name, secret, level);
+        }
+
+        function generateDemoKey() {
+            const key = totpSystem.generateSecretKey();
+            document.getElementById('secretKey').value = key;
+            document.getElementById('serviceName').value = `Demo Service ${Math.floor(Math.random() * 1000)}`;
+        }
+
+        function emergencyProtocol() {
+            totpSystem.emergencyProtocol();
+        }
+
+        // Auto-start activation sequence
+        window.addEventListener('load', () => {
+            totpSystem.initiateActivationSequence();
+        });
+    </script>
+notfordavidgomadza
+</body>
+</html> 

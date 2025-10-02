@@ -1,0 +1,570 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MGISCRE • Miniature Human Cloning System (Demo)</title>
+  <style>
+    :root{
+      --blue-50:#eff6ff; /* very light */
+      --blue-100:#dbeafe;
+      --blue-200:#bfdbfe;
+      --blue-300:#93c5fd;
+      --blue-500:#3b82f6; /* primary */
+      --blue-600:#2563eb;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --bg:#ffffff;
+      --card:#ffffff;
+      --ring: rgba(59,130,246,.35);
+      --success:#16a34a;
+      --warn:#f59e0b;
+      --danger:#dc2626;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font:15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";color:var(--ink);background:linear-gradient(180deg,var(--blue-50),#fff)}
+    a{color:var(--blue-600);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    .sidebar{background:linear-gradient(180deg,var(--blue-100),var(--blue-50));padding:18px;border-right:1px solid var(--blue-200)}
+    .brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+    .logo{width:38px;height:38px;border-radius:12px;background:radial-gradient(circle at 30% 30%, var(--blue-600), var(--blue-300));box-shadow:0 6px 18px rgba(37,99,235,.35)}
+    .brand h1{font-size:18px;margin:0}
+    .tag{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-200);color:#0a2a6b;font-weight:600;font-size:11px}
+    .nav{margin-top:16px;display:flex;flex-direction:column;gap:6px}
+    .nav button{all:unset;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;cursor:pointer;color:#0a2a6b}
+    .nav button.active{background:#fff;border:1px solid var(--blue-200);box-shadow:0 4px 20px rgba(2,6,23,.06)}.main{padding:22px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.pill{padding:6px 10px;border-radius:999px;border:1px solid var(--blue-200);background:#fff}
+.card{background:var(--card);border:1px solid var(--blue-200);border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(2,6,23,.06);}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.sidebar{position:sticky;top:0;z-index:5}.g2,.g3{grid-template-columns:1fr}}
+
+.h{margin:0 0 8px 0}
+.h.lg{font-size:22px}
+.muted{color:var(--muted)}
+.btn{appearance:none;border:1px solid var(--blue-300);background:linear-gradient(180deg,#fff,var(--blue-100));padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
+.btn:hover{filter:brightness(0.98)}
+.btn.primary{background:linear-gradient(180deg,var(--blue-500),var(--blue-300));color:#fff;border-color:transparent}
+.btn.ghost{background:#fff}
+.btn.success{background:linear-gradient(180deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff}
+.btn.warn{background:linear-gradient(180deg,#fbbf24,#f59e0b);border-color:#f59e0b;color:#fff}
+
+input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--blue-200);background:#fff}
+input:focus,select:focus,textarea:focus{outline:3px solid var(--ring)}
+label{font-weight:600;font-size:13px}
+.row{display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--blue-100);border:1px solid var(--blue-200);font-size:12px}
+.caps{letter-spacing:.06em;text-transform:uppercase;font-weight:700;font-size:12px;color:#0a2a6b}
+.notice{padding:10px;border-left:4px solid var(--blue-500);background:linear-gradient(180deg,#fff,var(--blue-50));border:1px solid var(--blue-200);border-radius:12px}
+.warning{border-left-color:var(--warn)}
+.danger{border-left-color:var(--danger)}
+.ok{border-left-color:var(--success)}
+.list{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow:auto}
+.item{padding:10px;border:1px solid var(--blue-200);background:#fff;border-radius:12px}
+.split{display:grid;grid-template-columns:1fr 340px;gap:16px}
+@media(max-width:1000px){.split{grid-template-columns:1fr}}
+.footer{margin-top:26px;color:var(--muted);font-size:12px}
+.hr{height:1px;background:var(--blue-200);margin:12px 0;border-radius:10px}
+
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>MGISCRE</h1>
+          <div class="tag">MGIS • Create</div>
+        </div>
+      </div>
+      <div class="notice warning" style="margin-bottom:12px">
+        <strong>Demo only.</strong> This interactive prototype simulates a fictional universe. No real cloning, payments, or medical claims.
+      </div>
+      <nav class="nav" id="nav"></nav>
+      <div class="footer">© <span id="year"></span> MGIS Universe • Blue & White Edition</div>
+    </aside><main class="main">
+  <div class="toolbar">
+    <span class="pill">Wallet: <strong id="wallet">0.00</strong> ₿AYT</span>
+    <span class="pill">Clone(s): <strong id="cloneCount">0</strong>/1</span>
+    <button class="btn" id="saveBtn">Save</button>
+    <button class="btn ghost" id="resetBtn">Reset</button>
+  </div>
+  <div id="views"></div>
+</main>
+
+  </div>  <script>
+  /*************************
+   * Simple SPA Framework  *
+   *************************/
+  const $ = (s,root=document)=>root.querySelector(s);
+  const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
+
+  const App = {
+    state: {
+      profile: { name:"", email:"", citizen:true },
+      wallet: 25000, // starting demo balance in Bitcoinayt units (fictional)
+      clones: [], // only 1 allowed
+      stations: [
+        {id:'station-1', name:'Cloning Station 1', type:'service'},
+        {id:'villa-plaza', name:'Villa Plaza (Accommodation)', type:'accommodation'},
+        {id:'whispers', name:'Whispers', type:'role'},
+        {id:'advocates', name:'Advocates for a Cause', type:'role'},
+        {id:'advertisers', name:'Advertisers', type:'role'},
+        {id:'sales', name:'Sales Personnel', type:'role'},
+        {id:'engineers', name:'Engineers (Platform)', type:'role'},
+        {id:'info-kiosk', name:'Information Kiosks', type:'role'},
+        {id:'recruiters', name:'Recruiters (Live Forever)', type:'role'},
+        {id:'info-handlers', name:'Information Handlers', type:'role'},
+        {id:'two-advocacy', name:"Tomorrow's World Order", type:'civic'},
+        {id:'reserve-bank', name:'MGIS Reserve Bank', type:'finance'}
+      ],
+      travel: { activeStation: 'station-1' },
+      gifts: [
+        {id:'gift-rose', name:'Nano Rose', price:50},
+        {id:'gift-card', name:'Holo Greeting', price:25},
+        {id:'gift-parcel', name:'Tiny Parcel Delivery', price:120},
+        {id:'gift-pass', name:'Villa Plaza Night Pass', price:300}
+      ],
+      cart: [],
+      messages: [], // {id, from, to, type, text, ts}
+      communicationTypes: [
+        // "Gomadza’s 7 communication types" (modeled as channels)
+        {id:'whisper', name:'Whisper', desc:'Low-volume, private, ephemeral'},
+        {id:'advocacy', name:'Advocacy', desc:'Campaigns for causes / proposals'},
+        {id:'advert', name:'Advert', desc:'Promotions & announcements'},
+        {id:'sales', name:'Sales Offer', desc:'Direct offers & invoices'},
+        {id:'engineering', name:'Engineering Ticket', desc:'Requests to engineers'},
+        {id:'courier', name:'Courier', desc:'Attach gifts + messages'},
+        {id:'public', name:'Public Notice', desc:'Town-square style broadcast'}
+      ],
+      votes: { proposals:[], ballots:{} },
+      jobs: [], // {id, stationId, title, reward}
+    },
+    nav: [
+      {id:'home', label:'Home'},
+      {id:'clone', label:'Clone Station 1'},
+      {id:'comms', label:'Messaging (7 Types)'},
+      {id:'work', label:'Stations & Work'},
+      {id:'gifts', label:'Gifts & Payments'},
+      {id:'travel', label:'Travel Between Stations'},
+      {id:'vote', label:'Leadership & Voting'},
+      {id:'profile', label:'Profile'}
+    ],
+    init(){
+      // load
+      const saved = localStorage.getItem('mgiscre-demo');
+      if(saved){
+        try{ this.state = JSON.parse(saved) }catch(e){ console.warn('Save parse failed') }
+      }
+      this.mountNav();
+      this.route('home');
+      this.bindGlobal();
+      $('#year').textContent = new Date().getFullYear();
+      this.renderWallet();
+      this.seedJobs();
+    },
+    save(){ localStorage.setItem('mgiscre-demo', JSON.stringify(this.state)); },
+    reset(){ localStorage.removeItem('mgiscre-demo'); location.reload(); },
+    bindGlobal(){
+      $('#saveBtn').onclick = ()=>{ this.save(); alert('Saved locally (demo).') };
+      $('#resetBtn').onclick = ()=>{ if(confirm('Reset demo and clear local save?')) this.reset(); };
+    },
+    mountNav(){
+      const nav = $('#nav');
+      nav.innerHTML = '';
+      this.nav.forEach(item=>{
+        const b = document.createElement('button');
+        b.textContent = item.label;
+        b.onclick = ()=> this.route(item.id);
+        b.id = 'nav-'+item.id;
+        nav.appendChild(b);
+      })
+    },
+    route(id){
+      $$('#nav button').forEach(b=>b.classList.remove('active'));
+      $('#nav-'+id)?.classList.add('active');
+      const views = $('#views');
+      views.innerHTML = '';
+      const map = {
+        home: this.viewHome.bind(this),
+        clone: this.viewClone.bind(this),
+        comms: this.viewComms.bind(this),
+        work: this.viewWork.bind(this),
+        gifts: this.viewGifts.bind(this),
+        travel: this.viewTravel.bind(this),
+        vote: this.viewVote.bind(this),
+        profile: this.viewProfile.bind(this),
+      };
+      map[id](views);
+    },
+    money(n){ return Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) },
+    renderWallet(){ $('#wallet').textContent = this.money(this.state.wallet); $('#cloneCount').textContent = this.state.clones.length; },
+
+    // ---------- Views ----------
+    viewHome(root){
+      const el = document.createElement('div');
+      el.className = 'grid g2';
+      el.innerHTML = `
+        <section class="card">
+          <h2 class="h lg">Welcome to MGISCRE</h2>
+          <p class="muted">World's-first <em>fictional</em> miniature human clone system — a playful demo UI for the MGIS universe.</p>
+          <div class="hr"></div>
+          <ul class="list">
+            <li class="item">❄️ <strong>Blue & White</strong> aesthetic across the app</li>
+            <li class="item">🧬 <strong>Clone Station 1</strong>: US$10,000 or Bitcoinayt equivalent (demo, no real payment), one clone per person, one replacement max</li>
+            <li class="item">📦 <strong>Courier gifts & messages</strong> between stations</li>
+            <li class="item">🏨 <strong>Villa Plaza</strong> rentals paid to MGIS Reserve Bank (simulated)</li>
+            <li class="item">🗳️ <strong>Community voting</strong> & leadership proposals</li>
+            <li class="item">💬 <strong>7 Communication Types</strong> (Gomadza channels)</li>
+          </ul>
+          <div class="notice danger" style="margin-top:10px">
+            <strong>Legal & ethics.</strong> Unauthorized cloning is forbidden. Stiff penalties apply in-universe. This is a non-scientific, creative prototype only.
+          </div>
+        </section>
+        <section class="card">
+          <h3 class="h">Quick Actions</h3>
+          <div class="grid g3">
+            <button class="btn" onclick="App.route('clone')">Open Clone Station</button>
+            <button class="btn" onclick="App.route('comms')">Open Messaging</button>
+            <button class="btn" onclick="App.route('gifts')">Buy Gifts</button>
+            <button class="btn" onclick="App.route('travel')">Travel</button>
+            <button class="btn" onclick="App.route('work')">Find Work</button>
+            <button class="btn" onclick="App.route('vote')">Vote</button>
+          </div>
+        </section>`;
+      root.appendChild(el);
+    },
+
+    viewClone(root){
+      const el = document.createElement('div');
+      const priceUSD = 10000; // fixed per spec
+      el.className = 'split';
+      el.innerHTML = `
+        <section class="card">
+          <h2 class="h lg">Cloning Station 1</h2>
+          <p class="muted">One clone per person • One replacement per purchase • Price: <strong>US$10,000</strong> (or <strong>₿AYT</strong> equivalent)</p>
+          <div class="notice warning">This is a simulation for UI/UX demonstration only.</div>
+          <div class="hr"></div>
+          <form id="cloneForm">
+            <div class="row"><label>Full Name</label><input required name="name" placeholder="Your legal name" /></div>
+            <div class="row"><label>Email</label><input required type="email" name="email" placeholder="you@example.com" /></div>
+            <div class="row"><label>Traits</label><input name="traits" placeholder="Describe reflection preferences"/></div>
+            <div class="row"><label>Life Extension Needs</label><input name="needs" placeholder="Request from New Earth reserves (demo)"/></div>
+            <div class="row"><label>Payment</label>
+              <select name="pay">
+                <option value="bayt">Bitcoinayt (fictional)</option>
+                <option value="usd">USD (simulation)</option>
+              </select>
+            </div>
+            <div class="hr"></div>
+            <button class="btn primary" type="submit">Create Clone (₿AYT)</button>
+            <span class="badge">Price: ${priceUSD.toLocaleString()} USD</span>
+          </form>
+        </section>
+        <section class="card">
+          <h3 class="h">Your Clone</h3>
+          <div id="clonePanel"></div>
+          <div class="hr"></div>
+          <div class="notice ok">Clones may travel between stations, communicate, deliver gifts, and mirror their human counterparts.</div>
+        </section>`;
+      root.appendChild(el);
+
+      const panel = $('#clonePanel', el);
+      const renderPanel = ()=>{
+        if(!App.state.clones.length){ panel.innerHTML = '<p class="muted">No clone yet.</p>'; return }
+        const c = App.state.clones[0];
+        panel.innerHTML = `
+          <div class="item"><strong>${c.name}</strong> • <span class="badge">Miniature</span><br/><span class="muted">Traits:</span> ${c.traits||'—'}<br/><span class="muted">Needs:</span> ${c.needs||'—'}<br/><span class="muted">Station:</span> ${App.stationName(c.station)}</div>
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" onclick="App.replaceClone()">Request Replacement</button>
+            <button class="btn ghost" onclick="App.route('travel')">Send to Another Station</button>
+          </div>`
+      }
+      renderPanel();
+
+      $('#cloneForm', el).onsubmit = (e)=>{
+        e.preventDefault();
+        if(App.state.clones.length>=1){ alert('Only one clone permitted.'); return }
+        if(App.state.wallet < 10000){ alert('Insufficient ₿AYT for demo purchase.'); return }
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        App.state.wallet -= 10000;
+        const clone = { id: 'c1', name: data.name, email:data.email, traits:data.traits, needs:data.needs, station: App.state.travel.activeStation, replacementUsed:false };
+        App.state.clones.push(clone);
+        App.renderWallet(); App.save(); renderPanel(); alert('Clone created (demo).');
+      }
+    },
+
+    replaceClone(){
+      const c = this.state.clones[0];
+      if(!c) return alert('No clone to replace.');
+      if(c.replacementUsed) return alert('Only one replacement allowed per purchase.');
+      if(this.state.wallet < 0){ /* no extra fee in demo */ }
+      c.replacementUsed = true; c.traits += ' (replacement)'; this.save(); alert('Replacement simulated.'); this.route('clone');
+    },
+
+    viewComms(root){
+      const el = document.createElement('div');
+      el.className = 'grid g2';
+      el.innerHTML = `
+        <section class="card">
+          <h2 class="h lg">Messaging • 7 Types</h2>
+          <p class="muted">Using digital analogues ("Gomadza’s neurals"). Select a channel and send.</p>
+          <form id="msgForm">
+            <div class="row"><label>From</label><input name="from" placeholder="Clone or human name" required /></div>
+            <div class="row"><label>To</label><input name="to" placeholder="Recipient or station" required /></div>
+            <div class="row"><label>Type</label>
+              <select name="type">${this.state.communicationTypes.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select>
+            </div>
+            <div class="row"><label>Message</label><textarea name="text" placeholder="Write your message" required></textarea></div><button class="btn primary" type="submit">Send</button>
+      </form>
+    </section>
+    <section class="card">
+      <h3 class="h">Inbox / Outbox</h3>
+      <div class="list" id="msgList"></div>
+    </section>`;
+  root.appendChild(el);
+
+  const list = $('#msgList', el);
+  const render = ()=>{
+    if(!this.state.messages.length){ list.innerHTML = '<div class="muted">No messages yet.</div>'; return }
+    list.innerHTML = this.state.messages.slice().reverse().map(m=>`
+      <div class="item">
+        <div><span class="badge">${this.channelName(m.type)}</span> <strong>${m.from}</strong> → <strong>${m.to}</strong></div>
+        <div>${m.text}</div>
+        <div class="muted" style="font-size:12px">${new Date(m.ts).toLocaleString()}</div>
+      </div>
+    `).join('');
+  }
+  render();
+
+  $('#msgForm', el).onsubmit = (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    this.state.messages.push({ id:'m'+Date.now(), ...data, ts: Date.now() });
+    this.save(); render(); e.target.reset();
+  }
+},
+
+channelName(id){ return this.state.communicationTypes.find(t=>t.id===id)?.name || id },
+
+viewWork(root){
+  const el = document.createElement('div');
+  el.className = 'grid g2';
+  el.innerHTML = `
+    <section class="card">
+      <h2 class="h lg">Stations & Roles</h2>
+      <p class="muted">Earn Bitcoinayt in the MGIS economy. Post or accept tasks.</p>
+      <div class="hr"></div>
+      <form id="jobForm">
+        <div class="row"><label>Station</label>
+          <select name="stationId">${this.state.stations.filter(s=>s.type!=='finance').map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select>
+        </div>
+        <div class="row"><label>Title</label><input name="title" placeholder="e.g., Deliver message to Villa Plaza" required /></div>
+        <div class="row"><label>Reward ₿AYT</label><input name="reward" type="number" min="1" value="50" required /></div>
+        <button class="btn primary" type="submit">Post Task</button>
+      </form>
+    </section>
+    <section class="card">
+      <h3 class="h">Open Tasks</h3>
+      <div class="list" id="jobList"></div>
+    </section>`;
+  root.appendChild(el);
+
+  const render = ()=>{
+    const list = $('#jobList', el);
+    if(!this.state.jobs.length){ list.innerHTML = '<div class="muted">No tasks yet.</div>'; return }
+    list.innerHTML = this.state.jobs.slice().reverse().map(j=>`
+      <div class="item">
+        <div><span class="badge">${this.stationName(j.stationId)}</span> <strong>${j.title}</strong></div>
+        <div class="muted">Reward: ${this.money(j.reward)} ₿AYT</div>
+        <div style="margin-top:6px"><button class="btn success" onclick="App.acceptJob('${j.id}')">Accept</button>
+        <button class="btn ghost" onclick="App.removeJob('${j.id}')">Remove</button></div>
+      </div>`).join('');
+  }
+  render();
+
+  $('#jobForm', el).onsubmit = (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    this.state.jobs.push({ id:'j'+Date.now(), stationId:data.stationId, title:data.title, reward:Number(data.reward) });
+    this.save(); e.target.reset(); render();
+  }
+},
+
+seedJobs(){ if(this.state.jobs.length) return; [
+  {stationId:'whispers', title:'Discrete whisper to Engineers', reward:80},
+  {stationId:'info-kiosk', title:'Find day-of-death risk score (fictional)', reward:150},
+  {stationId:'recruiters', title:'Recruit 3 citizens for life-extension program', reward:220},
+].forEach(j=> this.state.jobs.push({id:'j'+(Math.random()*1e6|0), ...j})) },
+
+acceptJob(id){ const j = this.state.jobs.find(x=>x.id===id); if(!j) return; this.state.wallet += Number(j.reward); this.state.jobs = this.state.jobs.filter(x=>x.id!==id); this.renderWallet(); this.save(); alert('Task accepted. Reward paid (demo).') },
+removeJob(id){ this.state.jobs = this.state.jobs.filter(x=>x.id!==id); this.save(); this.route('work') },
+
+viewGifts(root){
+  const el = document.createElement('div');
+  el.className = 'grid g2';
+  el.innerHTML = `
+    <section class="card">
+      <h2 class="h lg">Gifts Marketplace</h2>
+      <div class="grid g3" id="giftGrid"></div>
+    </section>
+    <section class="card">
+      <h3 class="h">Cart & Payment</h3>
+      <div class="list" id="cartList"></div>
+      <div class="hr"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Total: <span id="cartTotal">0.00</span> ₿AYT</strong>
+        <button class="btn primary" id="checkoutBtn">Pay to MGIS Reserve Bank</button>
+      </div>
+      <div class="notice">Payment address (demo): <strong>RESERVE-BANK-BAYT-0001</strong></div>
+    </section>`;
+  root.appendChild(el);
+
+  const grid = $('#giftGrid', el);
+  grid.innerHTML = this.state.gifts.map(g=>`
+    <div class="item">
+      <div class="h">${g.name}</div>
+      <div class="muted">${this.money(g.price)} ₿AYT</div>
+      <div style="margin-top:6px"><button class="btn" onclick="App.addToCart('${g.id}')">Add to Cart</button></div>
+    </div>`).join('');
+
+  const renderCart = ()=>{
+    const list = $('#cartList', el);
+    if(!this.state.cart.length){ list.innerHTML = '<div class="muted">Cart is empty.</div>'; $('#cartTotal', el).textContent = '0.00'; return }
+    list.innerHTML = this.state.cart.map(c=>`<div class="item">${c.name} • ${this.money(c.price)} ₿AYT <button class="btn ghost" onclick="App.removeFromCart('${c.id}')">Remove</button></div>`).join('');
+    const total = this.state.cart.reduce((a,b)=>a+b.price,0);
+    $('#cartTotal', el).textContent = this.money(total);
+  };
+  renderCart();
+
+  $('#checkoutBtn', el).onclick = ()=>{
+    const total = this.state.cart.reduce((a,b)=>a+b.price,0);
+    if(!total) return alert('Nothing to pay.');
+    if(this.state.wallet < total) return alert('Insufficient ₿AYT.');
+    this.state.wallet -= total; this.state.cart = []; this.renderWallet(); this.save(); alert('Payment sent to MGIS Reserve Bank (demo).'); renderCart();
+  }
+},
+
+addToCart(id){ const g = this.state.gifts.find(x=>x.id===id); if(!g) return; this.state.cart.push(g); this.save(); this.route('gifts') },
+removeFromCart(id){ const i = this.state.cart.findIndex(x=>x.id===id); if(i>-1) this.state.cart.splice(i,1); this.save(); this.route('gifts') },
+
+viewTravel(root){
+  const el = document.createElement('div');
+  el.className = 'split';
+  el.innerHTML = `
+    <section class="card">
+      <h2 class="h lg">Travel Between Stations</h2>
+      <p class="muted">Move your clone to another station to deliver gifts or messages.</p>
+      <div class="hr"></div>
+      <div class="grid g3" id="stationGrid"></div>
+    </section>
+    <section class="card">
+      <h3 class="h">Current Location</h3>
+      <div id="currentStation" class="item"></div>
+    </section>`;
+  root.appendChild(el);
+
+  const grid = $('#stationGrid', el);
+  grid.innerHTML = this.state.stations.map(s=>`
+    <div class="item">
+      <div class="h">${s.name}</div>
+      <div class="muted">Type: ${s.type}</div>
+      <div style="margin-top:6px"><button class="btn" onclick="App.travelTo('${s.id}')">Go Here</button></div>
+    </div>`).join('');
+
+  const render = ()=>{
+    const id = this.state.travel.activeStation;
+    $('#currentStation', el).innerHTML = `<strong>${this.stationName(id)}</strong>`;
+  };
+  render();
+},
+
+travelTo(id){ this.state.travel.activeStation = id; if(this.state.clones[0]) this.state.clones[0].station = id; this.save(); alert('Travel complete (demo).'); this.route('travel') },
+stationName(id){ return this.state.stations.find(s=>s.id===id)?.name || id },
+
+viewVote(root){
+  const el = document.createElement('div');
+  el.className = 'grid g2';
+  el.innerHTML = `
+    <section class="card">
+      <h2 class="h lg">Leadership & Voting</h2>
+      <p class="muted">Nominate leaders and vote as one world community.</p>
+      <form id="propForm">
+        <div class="row"><label>Proposal</label><input name="title" placeholder="e.g., Nominate Leader X for MGIS Council" required /></div>
+        <button class="btn primary" type="submit">Submit Proposal</button>
+      </form>
+    </section>
+    <section class="card">
+      <h3 class="h">Active Proposals</h3>
+      <div class="list" id="propList"></div>
+    </section>`;
+  root.appendChild(el);
+
+  const render = ()=>{
+    const list = $('#propList', el);
+    if(!this.state.votes.proposals.length){ list.innerHTML = '<div class="muted">No proposals yet.</div>'; return }
+    list.innerHTML = this.state.votes.proposals.map(p=>`
+      <div class="item">
+        <div><strong>${p.title}</strong></div>
+        <div class="muted">Yes: ${p.yes||0} • No: ${p.no||0}</div>
+        <div style="margin-top:6px">
+          <button class="btn success" onclick="App.castVote('${p.id}','yes')">Vote Yes</button>
+          <button class="btn warn" onclick="App.castVote('${p.id}','no')">Vote No</button>
+          <button class="btn ghost" onclick="App.removeProposal('${p.id}')">Remove</button>
+        </div>
+      </div>`).join('');
+  }
+  render();
+
+  $('#propForm', el).onsubmit = (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    this.state.votes.proposals.push({ id:'p'+Date.now(), title:data.title, yes:0, no:0 });
+    this.save(); e.target.reset(); render();
+  }
+},
+
+castVote(id, side){ const p = this.state.votes.proposals.find(x=>x.id===id); if(!p) return; p[side] = (p[side]||0)+1; this.save(); this.route('vote') },
+removeProposal(id){ this.state.votes.proposals = this.state.votes.proposals.filter(x=>x.id!==id); this.save(); this.route('vote') },
+
+viewProfile(root){
+  const el = document.createElement('div');
+  el.className = 'grid g2';
+  el.innerHTML = `
+    <section class="card">
+      <h2 class="h lg">Your Profile</h2>
+      <form id="profileForm">
+        <div class="row"><label>Name</label><input name="name" placeholder="Display name" value="${this.state.profile.name}" /></div>
+        <div class="row"><label>Email</label><input name="email" type="email" placeholder="you@example.com" value="${this.state.profile.email}" /></div>
+        <div class="row"><label>Citizen</label>
+          <select name="citizen"><option value="true" ${this.state.profile.citizen?'selected':''}>Yes</option><option value="false" ${!this.state.profile.citizen?'selected':''}>No</option></select>
+        </div>
+        <button class="btn primary" type="submit">Save Profile</button>
+      </form>
+    </section>
+    <section class="card">
+      <h3 class="h">Policy</h3>
+      <div class="notice">All clones reflect their originals, live normal lives, use Bitcoinayt, communicate, and deliver gifts. Unauthorized cloning is prohibited; penalties apply (in-universe rule).</div>
+    </section>`;
+  root.appendChild(el);
+
+  $('#profileForm', el).onsubmit = (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    this.state.profile = { name:data.name||'', email:data.email||'', citizen: data.citizen==='true' };
+    this.save(); alert('Profile saved.');
+  }
+},
+
+};
+
+// boot App.init(); </script>
+
+</body>
+</html>

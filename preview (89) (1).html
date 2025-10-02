@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIVE ON EARTH FOREVER - BUY THE AGT TODAY</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 25%, #81c784 75%, #4caf50 100%);
+            color: #1565c0;
+            line-height: 1.6;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero-header {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(21, 101, 192, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .hero-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #81c784;
+        }
+
+        .value-proposition {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .value-text {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(21, 101, 192, 0.15);
+            border: 3px solid #81c784;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(21, 101, 192, 0.25);
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .package-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1565c0;
+            margin-bottom: 10px;
+        }
+
+        .package-price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4caf50;
+            margin-bottom: 5px;
+        }
+
+        .package-duration {
+            font-size: 1.2em;
+            color: #81c784;
+            font-weight: bold;
+        }
+
+        .benefits-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .benefits-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e3f2fd;
+            color: #1565c0;
+        }
+
+        .benefits-list li:before {
+            content: '✓ ';
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .buy-button {
+            width: 100%;
+            background: linear-gradient(135deg, #4caf50, #81c784);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .buy-button:hover {
+            background: linear-gradient(135deg, #388e3c, #66bb6a);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .free-offer {
+            background: linear-gradient(135deg, #4caf50, #81c784);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+        }
+
+        .free-offer h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .free-claim-button {
+            background: white;
+            color: #4caf50;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .free-claim-button:hover {
+            background: #f8f9fa;
+            transform: scale(1.1);
+        }
+
+        .services-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(21, 101, 192, 0.1);
+        }
+
+        .services-title {
+            font-size: 2em;
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .service-item {
+            background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #4caf50;
+            transition: all 0.3s ease;
+        }
+
+        .service-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .service-item h3 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .registration-section {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .registration-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.3);
+        }
+
+        .submit-button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background: #388e3c;
+            transform: scale(1.05);
+        }
+
+        .company-info {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(21, 101, 192, 0.1);
+        }
+
+        .company-info h3 {
+            color: #1565c0;
+            margin-bottom: 15px;
+        }
+
+        .company-details {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .dashboard-integration {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .dashboard-button {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-button:hover {
+            background: linear-gradient(135deg, #0d47a1, #1565c0);
+            transform: scale(1.05);
+        }
+
+        .java-console {
+            background: #1e1e1e;
+            color: #4caf50;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .console-line {
+            margin-bottom: 5px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4caf50, #81c784);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+            z-index: 1001;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            animation: slideIn 3s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            0%, 100% { transform: translateX(-50%) translateY(-100px); }
+            10%, 90% { transform: translateX(-50%) translateY(0); }
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .payment-method {
+            background: #f8f9fa;
+            border: 2px solid #81c784;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            background: #e8f5e8;
+            transform: scale(1.05);
+        }
+
+        .payment-method.selected {
+            background: #81c784;
+            color: white;
+        }
+
+        .testimonial-section {
+            background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+        }
+
+        .testimonial {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.1);
+            border-left: 5px solid #4caf50;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 1.8em;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-integration">
+        <button class="dashboard-button" onclick="openMGISDashboard()">
+            🧠 Return to MGIS Dashboard
+        </button>
+    </div>
+
+    <div class="main-container">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <h1 class="hero-title">LIVE ON EARTH FOREVER</h1>
+            <h2 class="hero-subtitle">BUY THE AGT TODAY</h2>
+            <div class="value-proposition">
+                <div class="value-text">
+                    Advanced Genetic Synthesis Technology (AGT)<br>
+                    8000 AGT = 8000 Years Without Death<br>
+                    Total Value: US$8.4 Trillion
+                </div>
+            </div>
+        </div>
+
+        <!-- Free Offer Section -->
+        <div class="free-offer">
+            <h2>🎁 FREE GIFT FOR VISITING!</h2>
+            <p style="font-size: 1.3em; margin: 15px 0;">
+                Change your day of death by <strong>36 YEARS FOR FREE</strong><br>
+                just for visiting www.twofuture.world
+            </p>
+            <button class="free-claim-button" onclick="claimFreeYears()">
+                ✨ CLAIM YOUR FREE 36 YEARS NOW!
+            </button>
+            <div style="margin-top: 15px; font-size: 1.1em;">
+                <strong>Visitors today have already claimed: <span id="free-claims">8,247</span> free life extensions!</strong>
+            </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="pricing-grid">
+            <!-- Everyone Package -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="package-name">🌍 EVERYONE PACKAGE</div>
+                    <div class="package-price">$100</div>
+                    <div class="package-duration">+8000 YEARS LIFE</div>
+                </div>
+                <ul class="benefits-list">
+                    <li>8000 AGT Units Included</li>
+                    <li>Live 8000 Years Without Death</li>
+                    <li>Remove All Aging Effects</li>
+                    <li>Cancer Root Elimination</li>
+                    <li>Complete Body Rejuvenation</li>
+                    <li>Restart Reproduction Systems</li>
+                    <li>Remove Wrinkles & Grey Hair</li>
+                    <li>Perfect Health Guarantee</li>
+                    <li>$25/month Payment Option</li>
+                </ul>
+                <div class="payment-options">
+                    <div class="payment-method" onclick="selectPayment(this, 'everyone', 100)">
+                        💳 Pay $100
+                    </div>
+                    <div class="payment-method" onclick="selectPayment(this, 'everyone', 25)">
+                        📅 $25/month
+                    </div>
+                </div>
+                <button class="buy-button" onclick="purchaseAGT('everyone', 100)">
+                    🛒 BUY NOW - LIVE 8000 YEARS!
+                </button>
+            </div>
+
+            <!-- Millionaire Package -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="package-name">💎 MILLIONAIRE PACKAGE</div>
+                    <div class="package-price">$100,000</div>
+                    <div class="package-duration">+8000 YEARS PREMIUM</div>
+                </div>
+                <ul class="benefits-list">
+                    <li>8000 AGT Premium Units</li>
+                    <li>Enhanced Longevity Protocol</li>
+                    <li>Priority Treatment Access</li>
+                    <li>Exclusive Health Monitoring</li>
+                    <li>Advanced Genetic Optimization</li>
+                    <li>Personalized Life Extension</li>
+                    <li>VIP Support & Consultation</li>
+                    <li>Unlimited Rejuvenation Cycles</li>
+                    <li>Legacy Preservation Package</li>
+                </ul>
+                <div class="payment-options">
+                    <div class="payment-method" onclick="selectPayment(this, 'millionaire', 100000)">
+                        💰 Pay $100k
+                    </div>
+                    <div class="payment-method" onclick="selectPayment(this, 'millionaire', 8333)">
+                        📊 $8.3k/month
+                    </div>
+                </div>
+                <button class="buy-button" onclick="purchaseAGT('millionaire', 100000)">
+                    👑 PURCHASE PREMIUM IMMORTALITY
+                </button>
+            </div>
+
+            <!-- Billionaire Package -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="package-name">🏆 BILLIONAIRE PACKAGE</div>
+                    <div class="package-price">$1,000,000</div>
+                    <div class="package-duration">MILLIONS OF YEARS</div>
+                </div>
+                <ul class="benefits-list">
+                    <li>Unlimited AGT Technology</li>
+                    <li>Live Millions of Years</li>
+                    <li>Complete Biological Control</li>
+                    <li>Reverse Aging at Will</li>
+                    <li>Enhanced Cognitive Abilities</li>
+                    <li>Perfect Physical Form</li>
+                    <li>Disease Immunity System</li>
+                    <li>Regenerative Technologies</li>
+                    <li>Executive Life Extension</li>
+                    <li>Future Technology Access</li>
+                </ul>
+                <div class="payment-options">
+                    <div class="payment-method" onclick="selectPayment(this, 'billionaire', 1000000)">
+                        💎 Pay $1M
+                    </div>
+                    <div class="payment-method" onclick="selectPayment(this, 'billionaire', 83333)">
+                        🏦 $83k/month
+                    </div>
+                </div>
+                <button class="buy-button" onclick="purchaseAGT('billionaire', 1000000)">
+                    🌟 ACHIEVE TRUE IMMORTALITY
+                </button>
+            </div>
+        </div>
+
+        <!-- Services Section -->
+        <div class="services-section">
+            <h2 class="services-title">🔬 COMPREHENSIVE AGT SERVICES</h2>
+            <div class="services-grid">
+                <div class="service-item">
+                    <h3>🧬 Remove Old Age</h3>
+                    <p>Complete cellular regeneration and age reversal technology</p>
+                </div>
+                <div class="service-item">
+                    <h3>👩 Remove Menopause</h3>
+                    <p>Restore reproductive systems in females to youthful state</p>
+                </div>
+                <div class="service-item">
+                    <h3>👨 Remove Ajvo in Men</h3>
+                    <p>Eliminate male reproductive aging and restore vitality</p>
+                </div>
+                <div class="service-item">
+                    <h3>⏰ Remove YA Clock</h3>
+                    <p>Disable biological aging timers at cellular level</p>
+                </div>
+                <div class="service-item">
+                    <h3>🧪 Remove Ajter</h3>
+                    <p>Eliminate age-related metabolic decline</p>
+                </div>
+                <div class="service-item">
+                    <h3>🎯 Cancer Root Elimination</h3>
+                    <p>Complete removal of cancer-causing mechanisms</p>
+                </div>
+                <div class="service-item">
+                    <h3>💪 Remove Old Age Body Fat</h3>
+                    <p>Restore youthful body composition and metabolism</p>
+                </div>
+                <div class="service-item">
+                    <h3>✨ Remove Wrinkles</h3>
+                    <p>Complete skin rejuvenation and cellular repair</p>
+                </div>
+                <div class="service-item">
+                    <h3>🌟 Remove Grey Hairs</h3>
+                    <p>Restore natural hair color and growth patterns</p>
+                </div>
+                <div class="service-item">
+                    <h3>🔄 Make You Young Again</h3>
+                    <p>Complete biological reset to optimal age state</p>
+                </div>
+                <div class="service-item">
+                    <h3>👶 Restart Reproduction</h3>
+                    <p>Restore fertility and reproductive capabilities</p>
+                </div>
+                <div class="service-item">
+                    <h3>⚡ Complete Rejuvenation</h3>
+                    <p>Full body system restoration and optimization</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testimonial Section -->
+        <div class="testimonial-section">
+            <h2 style="color: #1565c0; text-align: center; margin-bottom: 30px;">
+                🌟 SUCCESS STORIES FROM AGT USERS
+            </h2>
+            <div class="testimonial">
+                <p><strong>"I purchased the Everyone Package 2 years ago at age 75. Now I look and feel 35 again! The AGT technology is incredible - I've gained 8000 years of life!"</strong></p>
+                <p style="text-align: right; margin-top: 10px;"><em>- Sarah M., Age 77 (looks 35)</em></p>
+            </div>
+            <div class="testimonial">
+                <p><strong>"As a billionaire, I invested in the premium package. Living millions of years with perfect health is the best investment I've ever made. Money can't buy time, but AGT can!"</strong></p>
+                <p style="text-align: right; margin-top: 10px;"><em>- Robert K., Tech Billionaire</em></p>
+            </div>
+            <div class="testimonial">
+                <p><strong>"The free 36 years I got just for visiting was amazing, but purchasing the full package changed my life forever. I'm now planning for millennia, not decades!"</strong></p>
+                <p style="text-align: right; margin-top: 10px;"><em>- Dr. Maria L., Scientist</em></p>
+            </div>
+        </div>
+
+        <!-- Registration Section -->
+        <div class="registration-section">
+            <h2>📧 REGISTER YOUR INTEREST</h2>
+            <p style="font-size: 1.2em; margin-bottom: 30px;">
+                Can't afford the full package now? Register your interest and secure your future!
+            </p>
+            
+            <div class="registration-form">
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <input type="text" id="reg-name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Email Address:</label>
+                    <input type="email" id="reg-email" placeholder="your.email@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number:</label>
+                    <input type="tel" id="reg-phone" placeholder="+1 (555) 123-4567">
+                </div>
+                <div class="form-group">
+                    <label>Current Age:</label>
+                    <input type="number" id="reg-age" placeholder="25" min="1" max="150">
+                </div>
+                <div class="form-group">
+                    <label>Financial Category:</label>
+                    <select id="reg-category">
+                        <option value="">Select your category</option>
+                        <option value="everyone">Everyone ($100)</option>
+                        <option value="millionaire">Millionaire ($100,000)</option>
+                        <option value="billionaire">Billionaire ($1,000,000)</option>
+                        <option value="interested">Just Interested</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Why do you want to live forever?</label>
+                    <textarea id="reg-reason" rows="4" placeholder="Share your motivation for choosing AGT technology..."></textarea>
+                </div>
+                <button class="submit-button" onclick="registerInterest()">
+                    ✉️ REGISTER MY INTEREST
+                </button>
+            </div>
+        </div>
+
+        <!-- Company Information -->
+        <div class="company-info">
+            <h3>🏢 COMPANY INFORMATION</h3>
+            <div class="company-details">
+                <p><strong>Email:</strong> liveforever@buythecurefordeath.world</p>
+                <p><strong>Website:</strong> www.twofuture.world</p>
+                <p><strong>Registered in:</strong> Britain (United Kingdom)</p>
+                <p><strong>Company Registration Number:</strong> 12326946</p>
+                <p><strong>Specialization:</strong> Advanced Genetic Synthesis Technology</p>
+                <p><strong>Mission:</strong> Curing death through comprehensive life extension technology</p>
+                <p style="margin-top: 20px; font-style: italic;">
+                    "We have found the cure for death through AGT technology and prepared a comprehensive package 
+                    that addresses 700 critical factors. Our solution involves 28 main components and solutions 
+                    that solve all non-curables including cancers, with more than 48 combinations making up the complete AGT system."
+                </p>
+            </div>
+        </div>
+
+        <!-- Java Console for Backend Integration -->
+        <div class="java-console" id="java-console">
+            <div class="console-line">[AGT-SYSTEM] Initializing Advanced Genetic Synthesis Technology...</div>
+            <div class="console-line">[JAVA] Loading life extension protocols...</div>
+            <div class="console-line">[DATABASE] Connecting to user registration system...</div>
+            <div class="console-line">[PAYMENT] Initializing secure transaction processing...</div>
+            <div class="console-line">[SUCCESS] AGT System ready for user interaction</div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Advanced Genetic Synthesis Technology (AGT) System
+        class AGTSystem {
+            constructor() {
+                this.users = new Map();
+                this.transactions = [];
+                this.freeClaimsCount = 8247;
+                this.packages = {
+                    everyone: { price: 100, monthlyPrice: 25, years: 8000, benefits: "Standard Life Extension" },
+                    millionaire: { price: 100000, monthlyPrice: 8333, years: 8000, benefits: "Premium Life Extension" },
+                    billionaire: { price: 1000000, monthlyPrice: 83333, years: 1000000, benefits: "Ultimate Immortality" }
+                };
+                this.registrations = [];
+                this.initializeSystem();
+            }
+
+            initializeSystem() {
+                console.log("🧬 AGT System Initializing...");
+                this.showJavaConsole();
+                this.updateFreeClaimsCounter();
+                this.connectToMGIS();
+                console.log("✅ AGT System Ready");
+            }
+
+            showJavaConsole() {
+                const console = document.getElementById('java-console');
+                console.style.display = 'block';
+                setTimeout(() => {
+                    console.style.display = 'none';
+                }, 5000);
+            }
+
+            updateFreeClaimsCounter() {
+                setInterval(() => {
+                    this.freeClaimsCount += Math.floor(Math.random() * 3) + 1;
+                    document.getElementById('free-claims').textContent = this.freeClaimsCount.toLocaleString();
+                }, 30000); // Update every 30 seconds
+            }
+
+            connectToMGIS() {
+                // Integration with MGIS Dashboard
+                if (window.mgisSystem) {
+                    console.log("🔗 Connected to MGIS Dashboard");
+                    window.mgisSystem.agtSystem = this;
+                }
+            }
+
+            claimFreeYears() {
+                const userAgent = navigator.userAgent;
+                const timestamp = new Date().toISOString();
+                
+                this.freeClaimsCount++;
+                document.getElementById('free-claims').textContent = this.freeClaimsCount.toLocaleString();
+                
+                // Simulate backend processing
+                this.processFreeClaim({
+                    ip: this.generateMockIP(),
+                    userAgent: userAgent,
+                    timestamp: timestamp,
+                    yearsAdded: 36
+                });
+
+                this.showNotification('🎉 SUCCESS! You have been granted 36 additional years of life! Your biological clock has been extended.');
+                
+                // Analytics tracking
+                this.trackEvent('FREE_CLAIM', { years: 36, timestamp: timestamp });
+                
+                return true;
+            }
+
+            purchaseAGT(packageType, amount) {
+                const packageInfo = this.packages[packageType];
+                if (!packageInfo) {
+                    this.showNotification('❌ Invalid package selected');
+                    return false;
+                }
+
+                // Show purchase confirmation
+                const confirmMessage = `
+                    🧬 AGT PURCHASE CONFIRMATION
+                    
+                    Package: ${packageType.toUpperCase()}
+                    Price: ${amount.toLocaleString()}
+                    Life Extension: +${packageInfo.years.toLocaleString()} years
+                    Benefits: ${packageInfo.benefits}
+                    
+                    Continue with purchase?
+                `;
+
+                if (confirm(confirmMessage)) {
+                    return this.processAGTPurchase(packageType, amount, packageInfo);
+                }
+                
+                return false;
+            }
+
+            processAGTPurchase(packageType, amount, packageInfo) {
+                // Simulate secure payment processing
+                const transactionId = 'AGT-' + Date.now();
+                const purchaseData = {
+                    transactionId: transactionId,
+                    packageType: packageType,
+                    amount: amount,
+                    yearsAdded: packageInfo.years,
+                    timestamp: new Date().toISOString(),
+                    status: 'PROCESSING'
+                };
+
+                this.transactions.push(purchaseData);
+                
+                // Simulate backend processing
+                setTimeout(() => {
+                    purchaseData.status = 'APPROVED';
+                    this.completePurchase(purchaseData);
+                }, 3000);
+
+                this.showNotification('💳 Processing payment... Please wait for confirmation.');
+                this.trackEvent('PURCHASE_INITIATED', purchaseData);
+                
+                return true;
+            }
+
+            completePurchase(purchaseData) {
+                // Generate AGT certificate
+                const certificate = this.generateAGTCertificate(purchaseData);
+                
+                this.showNotification(`🎉 PURCHASE SUCCESSFUL! Transaction ID: ${purchaseData.transactionId}. You now have ${purchaseData.yearsAdded.toLocaleString()} additional years of life!`);
+                
+                // Send confirmation email (simulated)
+                this.sendConfirmationEmail(purchaseData);
+                
+                // Update user record
+                this.updateUserRecord(purchaseData);
+                
+                console.log('AGT Purchase completed:', purchaseData);
+                
+                return certificate;
+            }
+
+            generateAGTCertificate(purchaseData) {
+                return {
+                    certificateId: 'AGT-CERT-' + Date.now(),
+                    holder: 'Life Extension Beneficiary',
+                    yearsGranted: purchaseData.yearsAdded,
+                    validFrom: new Date().toISOString(),
+                    validUntil: new Date(Date.now() + (purchaseData.yearsAdded * 365 * 24 * 60 * 60 * 1000)).toISOString(),
+                    packageType: purchaseData.packageType,
+                    transactionReference: purchaseData.transactionId
+                };
+            }
+
+            registerInterest() {
+                const formData = {
+                    name: document.getElementById('reg-name').value,
+                    email: document.getElementById('reg-email').value,
+                    phone: document.getElementById('reg-phone').value,
+                    age: document.getElementById('reg-age').value,
+                    category: document.getElementById('reg-category').value,
+                    reason: document.getElementById('reg-reason').value,
+                    timestamp: new Date().toISOString(),
+                    registrationId: 'REG-' + Date.now()
+                };
+
+                // Validation
+                if (!formData.name || !formData.email || !formData.category) {
+                    this.showNotification('❌ Please fill in all required fields');
+                    return false;
+                }
+
+                if (!this.isValidEmail(formData.email)) {
+                    this.showNotification('❌ Please enter a valid email address');
+                    return false;
+                }
+
+                // Store registration
+                this.registrations.push(formData);
+                
+                // Clear form
+                this.clearRegistrationForm();
+                
+                // Send confirmation
+                this.sendRegistrationConfirmation(formData);
+                
+                this.showNotification('✅ Registration successful! We will contact you with more information about AGT packages.');
+                this.trackEvent('REGISTRATION', formData);
+                
+                return true;
+            }
+
+            clearRegistrationForm() {
+                document.getElementById('reg-name').value = '';
+                document.getElementById('reg-email').value = '';
+                document.getElementById('reg-phone').value = '';
+                document.getElementById('reg-age').value = '';
+                document.getElementById('reg-category').value = '';
+                document.getElementById('reg-reason').value = '';
+            }
+
+            sendRegistrationConfirmation(formData) {
+                // Simulate email sending
+                console.log('📧 Sending registration confirmation to:', formData.email);
+                
+                const emailTemplate = {
+                    to: formData.email,
+                    subject: 'AGT Registration Confirmation - Live Forever Technology',
+                    body: `
+                        Dear ${formData.name},
+                        
+                        Thank you for registering your interest in Advanced Genetic Synthesis Technology (AGT).
+                        
+                        Registration Details:
+                        - Registration ID: ${formData.registrationId}
+                        - Category: ${formData.category}
+                        - Current Age: ${formData.age}
+                        
+                        Our team will review your application and contact you within 24-48 hours with personalized AGT package recommendations.
+                        
+                        In the meantime, don't forget to claim your FREE 36 years life extension just for visiting our website!
+                        
+                        Best regards,
+                        AGT Life Extension Team
+                        liveforever@buythecurefordeath.world
+                    `
+                };
+                
+                return this.simulateEmailSend(emailTemplate);
+            }
+
+            sendConfirmationEmail(purchaseData) {
+                console.log('📧 Sending purchase confirmation email');
+                
+                const emailTemplate = {
+                    subject: `AGT Purchase Confirmation - ${purchaseData.transactionId}`,
+                    body: `
+                        🧬 AGT PURCHASE CONFIRMATION
+                        
+                        Transaction ID: ${purchaseData.transactionId}
+                        Package: ${purchaseData.packageType.toUpperCase()}
+                        Life Extension: +${purchaseData.yearsAdded.toLocaleString()} years
+                        Amount Paid: ${purchaseData.amount.toLocaleString()}
+                        Status: APPROVED
+                        
+                        Your biological clock has been successfully extended. The AGT technology is now active in your system.
+                        
+                        Welcome to extended life!
+                    `
+                };
+                
+                return this.simulateEmailSend(emailTemplate);
+            }
+
+            simulateEmailSend(emailTemplate) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        console.log('✅ Email sent successfully:', emailTemplate.subject);
+                        resolve(true);
+                    }, 1000);
+                });
+            }
+
+            processFreeClaim(claimData) {
+                // Backend processing simulation
+                const freeClaimRecord = {
+                    claimId: 'FREE-' + Date.now(),
+                    ...claimData,
+                    status: 'PROCESSED',
+                    lifeExtension: 36
+                };
+
+                console.log('🎁 Processing free claim:', freeClaimRecord);
+                
+                // Store in system
+                if (!this.freeClaims) this.freeClaims = [];
+                this.freeClaims.push(freeClaimRecord);
+                
+                return freeClaimRecord;
+            }
+
+            updateUserRecord(purchaseData) {
+                const userId = 'USER-' + Date.now();
+                const userRecord = {
+                    userId: userId,
+                    purchaseHistory: [purchaseData],
+                    currentLifeExtension: purchaseData.yearsAdded,
+                    agtPackage: purchaseData.packageType,
+                    status: 'ACTIVE',
+                    lastUpdated: new Date().toISOString()
+                };
+
+                this.users.set(userId, userRecord);
+                console.log('👤 User record updated:', userRecord);
+                
+                return userRecord;
+            }
+
+            showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
+
+            trackEvent(eventType, data) {
+                const event = {
+                    eventType: eventType,
+                    timestamp: new Date().toISOString(),
+                    data: data,
+                    sessionId: this.getSessionId()
+                };
+
+                console.log('📊 Event tracked:', event);
+                
+                // Store for analytics
+                if (!this.analytics) this.analytics = [];
+                this.analytics.push(event);
+                
+                return event;
+            }
+
+            getSessionId() {
+                if (!this.sessionId) {
+                    this.sessionId = 'SESSION-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                }
+                return this.sessionId;
+            }
+
+            generateMockIP() {
+                return Math.floor(Math.random() * 255) + '.' +
+                       Math.floor(Math.random() * 255) + '.' +
+                       Math.floor(Math.random() * 255) + '.' +
+                       Math.floor(Math.random() * 255);
+            }
+
+            isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            // Java Integration Methods
+            connectToJavaBackend() {
+                // Simulate Java backend connection
+                const javaConnection = {
+                    status: 'CONNECTED',
+                    endpoint: 'agt.twofuture.world:8080',
+                    protocol: 'HTTPS',
+                    authentication: 'JWT-TOKEN',
+                    services: [
+                        'LifeExtensionService',
+                        'GeneticSynthesisService', 
+                        'PaymentProcessingService',
+                        'UserManagementService',
+                        'EmailNotificationService'
+                    ]
+                };
+
+                console.log('☕ Java Backend Connection:', javaConnection);
+                return javaConnection;
+            }
+
+            getSystemStats() {
+                return {
+                    totalUsers: this.users.size,
+                    totalTransactions: this.transactions.length,
+                    totalRegistrations: this.registrations.length,
+                    freeClaimsToday: this.freeClaimsCount,
+                    systemStatus: 'OPERATIONAL',
+                    uptime: '99.9%',
+                    lastUpdate: new Date().toISOString()
+                };
+            }
+        }
+
+        // Java-Style Backend Integration
+        const JavaAGTBackend = {
+            // Main Java class equivalent
+            AGTLifeExtensionService: class {
+                constructor() {
+                    this.serviceStatus = 'RUNNING';
+                    this.port = 8080;
+                    this.database = new Map();
+                    console.log('☕ AGTLifeExtensionService initialized on port ' + this.port);
+                }
+
+                processLifeExtension(userId, years, packageType) {
+                    const extensionRecord = {
+                        userId: userId,
+                        yearsAdded: years,
+                        packageType: packageType,
+                        processedAt: new Date().toISOString(),
+                        status: 'ACTIVE',
+                        biologicalAge: this.calculateBiologicalAge(years),
+                        geneticMarkers: this.generateGeneticMarkers()
+                    };
+
+                    this.database.set(userId, extensionRecord);
+                    console.log('🧬 Life extension processed:', extensionRecord);
+                    return extensionRecord;
+                }
+
+                calculateBiologicalAge(yearsExtended) {
+                    // Simulate biological age calculation
+                    const currentAge = Math.floor(Math.random() * 80) + 20;
+                    const optimizedAge = Math.max(25, currentAge - (yearsExtended / 200));
+                    return {
+                        chronologicalAge: currentAge,
+                        biologicalAge: optimizedAge,
+                        ageReduction: currentAge - optimizedAge
+                    };
+                }
+
+                generateGeneticMarkers() {
+                    return {
+                        telomereLength: 'EXTENDED',
+                        mitochiondialFunction: 'OPTIMIZED',
+                        cellularRepair: 'ENHANCED',
+                        immuneSystem: 'STRENGTHENED',
+                        metabolicEfficiency: 'MAXIMIZED'
+                    };
+                }
+
+                getServiceStatus() {
+                    return {
+                        status: this.serviceStatus,
+                        port: this.port,
+                        activeConnections: this.database.size,
+                        uptime: '99.9%'
+                    };
+                }
+            },
+
+            PaymentProcessor: class {
+                constructor() {
+                    this.merchantId = 'AGT-MERCHANT-12326946';
+                    this.apiKey = 'agt_' + Math.random().toString(36).substr(2, 32);
+                    this.supportedCurrencies = ['USD', 'EUR', 'GBP', 'BTC'];
+                    console.log('💳 PaymentProcessor initialized');
+                }
+
+                processPayment(amount, currency, packageType) {
+                    const transactionId = 'TXN-' + Date.now();
+                    const payment = {
+                        transactionId: transactionId,
+                        amount: amount,
+                        currency: currency,
+                        packageType: packageType,
+                        merchantId: this.merchantId,
+                        status: 'PROCESSING',
+                        timestamp: new Date().toISOString()
+                    };
+
+                    // Simulate payment processing delay
+                    setTimeout(() => {
+                        payment.status = 'APPROVED';
+                        payment.authorizationCode = 'AUTH-' + Math.random().toString(36).substr(2, 8);
+                        console.log('✅ Payment approved:', payment);
+                    }, 2000);
+
+                    return payment;
+                }
+
+                setupMonthlySubscription(amount, packageType) {
+                    const subscriptionId = 'SUB-' + Date.now();
+                    const subscription = {
+                        subscriptionId: subscriptionId,
+                        amount: amount,
+                        frequency: 'MONTHLY',
+                        packageType: packageType,
+                        status: 'ACTIVE',
+                        nextBilling: new Date(Date.now() + 30*24*60*60*1000).toISOString()
+                    };
+
+                    console.log('📅 Monthly subscription created:', subscription);
+                    return subscription;
+                }
+            },
+
+            EmailService: class {
+                constructor() {
+                    this.smtpServer = 'mail.twofuture.world';
+                    this.port = 587;
+                    this.fromAddress = 'liveforever@buythecurefordeath.world';
+                    console.log('📧 EmailService initialized');
+                }
+
+                sendWelcomeEmail(userEmail, packageType) {
+                    const email = {
+                        to: userEmail,
+                        from: this.fromAddress,
+                        subject: 'Welcome to AGT Life Extension Technology',
+                        body: this.generateWelcomeEmailBody(packageType),
+                        timestamp: new Date().toISOString(),
+                        status: 'SENT'
+                    };
+
+                    console.log('📬 Welcome email sent:', email);
+                    return email;
+                }
+
+                generateWelcomeEmailBody(packageType) {
+                    return `
+                        🧬 Welcome to the Future of Life Extension!
+                        
+                        Congratulations on purchasing the ${packageType.toUpperCase()} AGT package.
+                        
+                        Your life extension technology is now active.
+                        
+                        Next Steps:
+                        1. Download your AGT certificate
+                        2. Schedule your first health optimization session
+                        3. Access your personal longevity dashboard
+                        
+                        Live long and prosper!
+                        
+                        The AGT Team
+                    `;
+                }
+            }
+        };
+
+        // Global Functions
+        let agtSystem;
+
+        // Initialize AGT System
+        window.addEventListener('load', function() {
+            agtSystem = new AGTSystem();
+            
+            // Initialize Java backend services
+            const lifeExtensionService = new JavaAGTBackend.AGTLifeExtensionService();
+            const paymentProcessor = new JavaAGTBackend.PaymentProcessor();
+            const emailService = new JavaAGTBackend.EmailService();
+            
+            // Connect services to main system
+            agtSystem.javaServices = {
+                lifeExtension: lifeExtensionService,
+                payment: paymentProcessor,
+                email: emailService
+            };
+            
+            console.log('🚀 AGT System fully operational with Java backend integration');
+        });
+
+        // Global Functions for UI Interaction
+        function claimFreeYears() {
+            return agtSystem.claimFreeYears();
+        }
+
+        function purchaseAGT(packageType, amount) {
+            return agtSystem.purchaseAGT(packageType, amount);
+        }
+
+        function registerInterest() {
+            return agtSystem.registerInterest();
+        }
+
+        function selectPayment(element, packageType, amount) {
+            // Remove previous selections
+            const paymentMethods = element.parentNode.querySelectorAll('.payment-method');
+            paymentMethods.forEach(method => method.classList.remove('selected'));
+            
+            // Add selection to clicked element
+            element.classList.add('selected');
+            
+            // Update button text
+            const button = element.parentNode.parentNode.querySelector('.buy-button');
+            if (amount < 1000) {
+                button.textContent = `💳 PAY ${amount} NOW`;
+            } else if (amount < 10000) {
+                button.textContent = `💰 INVEST ${amount.toLocaleString()}`;
+            } else {
+                button.textContent = `💎 SECURE IMMORTALITY - ${amount.toLocaleString()}`;
+            }
+            
+            agtSystem.trackEvent('PAYMENT_METHOD_SELECTED', {
+                packageType: packageType,
+                amount: amount,
+                method: element.textContent.trim()
+            });
+        }
+
+        function openMGISDashboard() {
+            // Integration with main MGIS dashboard
+            if (window.mgisSystem) {
+                agtSystem.showNotification('🔄 Returning to MGIS Dashboard...');
+                window.history.back();
+            } else {
+                // Create MGIS dashboard popup if it doesn't exist
+                const mgisWindow = window.open('', 'mgis_dashboard', 'width=1200,height=800');
+                mgisWindow.document.write(`
+                    <html>
+                        <head><title>MGIS Dashboard</title></head>
+                        <body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 50px;">
+                            <h1>🧠 MGIS Dashboard</h1>
+                            <p>Loading enhanced neural interface system...</p>
+                            <p><a href="#" onclick="window.close()" style="color: #81c784;">Close</a></p>
+                        </body>
+                    </html>
+            

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroConnect - Multi-Modal Social Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr 280px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar, .trending {
+                order: 3;
+            }
+        }
+
+        .sidebar, .trending {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .feed {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-section {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin: 0 auto 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-info h3 {
+            margin-bottom: 5px;
+            color: #4c63d2;
+        }
+
+        .profile-bio {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-weight: bold;
+            color: #4c63d2;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .navigation {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+        }
+
+        .nav-item:hover {
+            background: rgba(76, 99, 210, 0.1);
+            color: #4c63d2;
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 15px;
+            text-align: center;
+        }
+
+        .compose-area {
+            background: rgba(76, 99, 210, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(76, 99, 210, 0.2);
+        }
+
+        .compose-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-size: 16px;
+            padding: 10px;
+            outline: none;
+            min-height: 80px;
+        }
+
+        .compose-input::placeholder {
+            color: #999;
+        }
+
+        .communication-modes {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover, .mode-btn.active {
+            border-color: #4c63d2;
+            background: #4c63d2;
+            color: white;
+        }
+
+        .compose-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .compose-features {
+            display: flex;
+            gap: 15px;
+        }
+
+        .feature-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .feature-btn:hover {
+            background: rgba(76, 99, 210, 0.1);
+        }
+
+        .post-btn {
+            background: linear-gradient(45deg, #4c63d2, #6c7ce7);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .post-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(76, 99, 210, 0.3);
+        }
+
+        .post-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .post {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 0;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .post-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .post-info {
+            flex-grow: 1;
+        }
+
+        .post-author {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .post-handle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .post-time {
+            color: #666;
+            font-size: 14px;
+            margin-left: auto;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .communication-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            background: rgba(76, 99, 210, 0.1);
+            color: #4c63d2;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .action-btn:hover {
+            background: rgba(76, 99, 210, 0.1);
+            color: #4c63d2;
+        }
+
+        .trending h3 {
+            margin-bottom: 20px;
+            color: #4c63d2;
+        }
+
+        .trending-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+        }
+
+        .trending-item:hover {
+            color: #4c63d2;
+        }
+
+        .trending-topic {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .trending-posts {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4c63d2;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4c63d2;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4c63d2, #6c7ce7);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(76, 99, 210, 0.3);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>NeuroConnect</h1>
+            <p>Multi-Modal Communication Social Network</p>
+            <!-- 🔁 AANIC Relay Panel -->
+<section class="aanic-relay">
+  <h3>🧠 AANIC Relay Console</h3>
+  <input type="text" id="aanic-relay-input" placeholder="Enter message">
+  <button onclick="transmitAANIC('station-01')">Transmit</button>
+  <pre id="aanic-relay-output"></pre>
+</section>
+
+<!-- 🧬 Brain Communication Converter -->
+<section class="brain-converter">
+  <h3>🧬 Brain Communication Codec</h3>
+  <input type="text" id="brain-converter-input" placeholder="Enter word">
+  <button onclick="convertBrainComm('station-01')">Convert</button>
+  <pre id="brain-converter-output"></pre>
+</section>
+
+<!-- 🧠 Neural Resonance Visualizer -->
+<section class="neural-visualizer">
+  <h3>🧠 Neural Resonance Feedback</h3>
+  <button onclick="simulateNeuralResonance()">Simulate Resonance</button>
+  <pre id="neural-resonance-output"></pre>
+</section>
+
+<!-- 🧍 Symbolic Overlay Grid -->
+<section class="symbolic-overlay">
+  <h3>🧍 Body Alphabet Mapping</h3>
+  <input type="text" id="symbolic-input" placeholder="Enter word">
+  <button onclick="mapBodyAlphabet()">Map</button>
+  <pre id="symbolic-output"></pre>
+</section>
+        </div>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="profile-section">
+                    <div class="profile-avatar" onclick="openProfileModal()">
+                        <span id="profileInitial">U</span>
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="profileName">User</h3>
+                        <div class="profile-bio" id="profileBio">Digital communication enthusiast</div>
+                        <div id="profileIdentifier" style="font-size: 12px; color: #999;">ID: USER001</div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <div class="stat-number" id="postCount">0</div>
+                            <div class="stat-label">Posts</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number" id="followerCount">42</div>
+                            <div class="stat-label">Connections</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number" id="commModes">4</div>
+                            <div class="stat-label">Modes</div>
+                        </div>
+                    </div><******Use NeuroConnect to send us an instant message*******
+
+1. USE AANIC RELAY CONSOLE
+
+Type your message then copy the message first before pressing the Transmit-button.
+NOW PRESS TRANSMIT
+2. Now Use the BRAIN COMMUNICATION CODEC;paste the same message.
+NOW PRESS CONVERT
+3. CLICK SIMULATE RESONANCE
+4. Now use the BODY ALPHABET MAPPING; paste the same message.
+NOW CLICK MAP-button/>
+                </div>
+
+                <div class="navigation">
+                    <div class="nav-item" onclick="showSection('feed')">
+                        <div class="nav-icon">🏠</div>
+                        <span>Home Feed</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('explore')">
+                        <div class="nav-icon">🔍</div>
+                        <span>Explore</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('messages')">
+                        <div class="nav-icon">💬</div>
+                        <span>Messages</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('neural')">
+                        <div class="nav-icon">🧠</div>
+                        <span>Neural Hub</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('settings')">
+                        <div class="nav-icon">⚙️</div>
+                        <span>Settings</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feed -->
+            <div class="feed">
+                <div class="compose-area">
+                    <textarea class="compose-input" id="composeInput" placeholder="What's on your mind? Express through multiple communication modes..."></textarea>
+                    
+                    <div class="communication-modes">
+                        <div class="mode-btn active" data-mode="text">📝 Text</div>
+                        <div class="mode-btn" data-mode="visual">👁️ Visual</div>
+                        <div class="mode-btn" data-mode="emotional">❤️ Emotional</div>
+                        <div class="mode-btn" data-mode="conceptual">💭 Conceptual</div>
+                        <div class="mode-btn" data-mode="symbolic">🔤 Symbolic</div>
+                    </div>
+
+                    <div class="compose-actions">
+                        <div class="compose-features">
+                            <button class="feature-btn" title="Add Media">📷</button>
+                            <button class="feature-btn" title="Add Location">📍</button>
+                            <button class="feature-btn" title="Schedule">⏰</button>
+                            <button class="feature-btn" title="Multi-Mode">🔄</button>
+                        </div>
+                        <button class="post-btn" onclick="createPost()">Share</button>
+                    </div>
+                </div>
+
+                <div id="postsContainer">
+                    <!-- Posts will be populated here -->
+                </div>
+            </div>
+
+            <!-- Trending Sidebar -->
+            <div class="trending">
+                <h3>Trending Topics</h3>
+                <div class="trending-item">
+                    <div class="trending-topic">#MultiModalComm</div>
+                    <div class="trending-posts">1,234 posts</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-topic">#DigitalEmpathy</div>
+                    <div class="trending-posts">856 posts</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-topic">#FutureCommunication</div>
+                    <div class="trending-posts">642 posts</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-topic">#TechWellness</div>
+                    <div class="trending-posts">428 posts</div>
+                </div>
+
+                <h3 style="margin-top: 30px;">Communication Modes</h3>
+                <div style="font-size: 12px; color: #666; line-height: 1.6;">
+                    <p><strong>Text:</strong> Traditional written communication</p>
+                    <p><strong>Visual:</strong> Image and symbol-based expression</p>
+                    <p><strong>Emotional:</strong> Sentiment and feeling indicators</p>
+                    <p><strong>Conceptual:</strong> Abstract idea representation</p>
+                    <p><strong>Symbolic:</strong> Pattern and metaphor communication</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+            <h2>Edit Profile</h2>
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" id="editName" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label>Bio</label>
+                <textarea id="editBio" rows="3" placeholder="Tell others about yourself..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Profile Identifier</label>
+                <select id="editIdentifier">
+                    <option value="USER">Standard User ID</option>
+                    <option value="CREATOR">Content Creator ID</option>
+                    <option value="RESEARCHER">Research Professional</option>
+                    <option value="ARTIST">Digital Artist</option>
+                    <option value="TECH">Technology Enthusiast</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Communication Preferences</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="prefText" checked> Text
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="prefVisual"> Visual
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="prefEmotional"> Emotional
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="prefConceptual"> Conceptual
+                    </label>
+                </div>
+            </div>
+            <button class="btn" onclick="saveProfile()">Save Profile</button>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        class NeuroConnect {
+            constructor() {
+                this.posts = [];
+                this.activeModes = new Set(['text']);
+                this.userProfile = {
+                    name: 'User',
+                    bio: 'Digital communication enthusiast',
+                    identifier: 'USER001',
+                    avatar: 'U'
+                };
+                this.initializeSamplePosts();
+                this.bindEvents();
+                this.renderPosts();
+            }
+
+            initializeSamplePosts() {
+                const samplePosts = [
+                    {
+                        id: 1,
+                        author: 'Alex Chen',
+                        handle: '@alex_tech',
+                        time: '2h',
+                        content: 'Exploring new ways to express ideas through multi-modal communication. The future of human connection is fascinating!',
+                        modes: ['text', 'conceptual'],
+                        likes: 42,
+                        reposts: 8,
+                        replies: 15,
+                        avatar: 'A'
+                    },
+                    {
+                        id: 2,
+                        author: 'Maya Rivera',
+                        handle: '@maya_creative',
+                        time: '4h',
+                        content: 'Sometimes words aren\'t enough. That\'s why I love combining visual and emotional expression in my posts.',
+                        modes: ['text', 'visual', 'emotional'],
+                        likes: 128,
+                        reposts: 23,
+                        replies: 31,
+                        avatar: 'M'
+                    },
+                    {
+                        id: 3,
+                        author: 'Dr. Sarah Kim',
+                        handle: '@dr_sarah_research',
+                        time: '6h',
+                        content: 'Research shows that multi-modal communication can increase understanding and empathy. Excited to see how this platform develops.',
+                        modes: ['text', 'conceptual'],
+                        likes: 87,
+                        reposts: 45,
+                        replies: 22,
+                        avatar: 'S'
+                    }
+                ];
+                
+                this.posts = samplePosts;
+            }
+
+            bindEvents() {
+                // Communication mode selection
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        btn.classList.toggle('active');
+                        const mode = btn.dataset.mode;
+                        
+                        if (this.activeModes.has(mode)) {
+                            this.activeModes.delete(mode);
+                        } else {
+                            this.activeModes.add(mode);
+                        }
+                    });
+                });
+            }
+
+            createPost() {
+                const content = document.getElementById('composeInput').value.trim();
+                if (!content) {
+                    this.showNotification('Please enter some content', 'error');
+                    return;
+                }
+
+                const newPost = {
+                    id: this.posts.length + 1,
+                    author: this.userProfile.name,
+                    handle: '@' + this.userProfile.name.toLowerCase().replace(' ', '_'),
+                    time: 'now',
+                    content: content,
+                    modes: Array.from(this.activeModes),
+                    likes: 0,
+                    reposts: 0,
+                    replies: 0,
+                    avatar: this.userProfile.avatar
+                };
+
+                this.posts.unshift(newPost);
+                document.getElementById('composeInput').value = '';
+                this.renderPosts();
+                this.updatePostCount();
+                this.showNotification('Post shared successfully!');
+            }
+
+            renderPosts() {
+                const container = document.getElementById('postsContainer');
+                container.innerHTML = '';
+
+                this.posts.forEach(post => {
+                    const postElement = this.createPostElement(post);
+                    container.appendChild(postElement);
+                });
+            }
+
+            createPostElement(post) {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post';
+                
+                const modesHtml = post.modes.map(mode => 
+                    `<span class="communication-indicator">${this.getModeIcon(mode)} ${mode}</span>`
+                ).join('');
+
+                postDiv.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${post.avatar}</div>
+                        <div class="post-info">
+                            <span class="post-author">${post.author}</span>
+                            <span class="post-handle">${post.handle}</span>
+                        </div>
+                        <span class="post-time">${post.time}</span>
+                    </div>
+                    <div class="post-content">
+                        <div style="margin-bottom: 10px;">${modesHtml}</div>
+                        ${post.content}
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="neuroConnect.interactWithPost(${post.id}, 'reply')">
+                            💬 <span>${post.replies}</span>
+                        </button>
+                        <button class="action-btn" onclick="neuroConnect.interactWithPost(${post.id}, 'repost')">
+                            🔄 <span>${post.reposts}</span>
+                        </button>
+                        <button class="action-btn" onclick="neuroConnect.interactWithPost(${post.id}, 'like')">
+                            ❤️ <span>${post.likes}</span>
+                        </button>
+                        <button class="action-btn" onclick="neuroConnect.interactWithPost(${post.id}, 'share')">
+                            📤
+                        </button>
+                    </div>
+                `;
+
+                return postDiv;
+            }
+
+            getModeIcon(mode) {
+                const icons = {
+                    text: '📝',
+                    visual: '👁️',
+                    emotional: '❤️',
+                    conceptual: '💭',
+                    symbolic: '🔤'
+                };
+                return icons[mode] || '📝';
+            }
+
+            interactWithPost(postId, action) {
+                const post = this.posts.find(p => p.id === postId);
+                if (!post) return;
+
+                switch(action) {
+                    case 'like':
+                        post.likes++;
+                        this.showNotification('Post liked!');
+                        break;
+                    case 'repost':
+                        post.reposts++;
+                        this.showNotification('Post reposted!');
+                        break;
+                    case 'reply':
+                        this.showNotification('Reply feature coming soon!');
+                        break;
+                    case 'share':
+                        this.showNotification('Post shared!');
+                        break;
+                }
+
+                this.renderPosts();
+            }
+
+            openProfileModal() {
+                document.getElementById('editName').value = this.userProfile.name;
+                document.getElementById('editBio').value = this.userProfile.bio;
+                document.getElementById('profileModal').style.display = 'block';
+            }
+
+            closeProfileModal() {
+                document.getElementById('profileModal').style.display = 'none';
+            }
+
+            saveProfile() {
+                const name = document.getElementById('editName').value.trim();
+                const bio = document.getElementById('editBio').value.trim();
+                const identifier = document.getElementById('editIdentifier').value;
+
+                if (name) {
+                    this.userProfile.name = name;
+                    this.userProfile.bio = bio || 'Digital communication enthusiast';
+                    this.userProfile.identifier = identifier + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                    this.userProfile.avatar = name.charAt(0).toUpperCase();
+
+                    this.updateProfileDisplay();
+                    this.closeProfileModal();
+                    this.showNotification('Profile updated successfully!');
+                }
+            }
+
+            updateProfileDisplay() {
+                document.getElementById('profileName').textContent = this.userProfile.name;
+                document.getElementById('profileBio').textContent = this.userProfile.bio;
+                document.getElementById('profileIdentifier').textContent = 'ID: ' + this.userProfile.identifier;
+                document.getElementById('profileInitial').textContent = this.userProfile.avatar;
+            }
+
+            updatePostCount() {
+                const userPosts = this.posts.filter(post => post.author === this.userProfile.name);
+                document.getElementById('postCount').textContent = userPosts.length;
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.style.display = 'block';
+                notification.style.background = type === 'error' ? '#f44336' : '#4caf50';
+
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+
+            showSection(section) {
+                // Placeholder for navigation - would expand in full implementation
+                this.showNotification(`${section} section - Feature in development`);
+            }
+        }
+
+        // Global functions for onclick handlers
+        let neuroConnect;
+
+        function openProfileModal() {
+            neuroConnect.openProfileModal();
+        }
+
+        function closeProfileModal() {
+            neuroConnect.closeProfileModal();
+        }
+
+        function saveProfile() {
+            neuroConnect.saveProfile();
+        }
+
+        function createPost() {
+            neuroConnect.createPost();
+        }
+
+        function showSection(section) {
+            neuroConnect.showSection(section);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            neuroConnect = new NeuroConnect();
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('profileModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

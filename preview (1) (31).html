@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Electromagnetic Thought → Word Codec (Prototype)</title>
+<style>
+  :root{--card:#fff;--bg:#f3f6fb;--accent:#1266f1}
+  body{font-family:Inter,system-ui,Segoe UI,Arial; background:var(--bg); margin:0;padding:24px;color:#111}
+  h1{margin:0 0 12px;font-size:20px}
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:16px}
+  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 20px rgba(15,30,60,.06)}
+  .small{font-size:13px;color:#555}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button.key{padding:8px 10px;border-radius:8px;border:1px solid #e3e8ef;background:#fff;cursor:pointer}
+  button.key.active{background:var(--accent);color:#fff;border-color:transparent}
+  .display{font-weight:700;font-size:18px;color:var(--accent);padding:10px;border-radius:8px;background:#f0f6ff}
+  label{display:block;margin:6px 0 4px;font-size:13px;color:#444}
+  .teeth-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}
+  .controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  textarea{width:100%;height:80px;border-radius:8px;padding:8px;border:1px solid #e6ecf5}
+  .trace{font-family:monospace;background:#0f1724;color:#fff;padding:8px;border-radius:6px;overflow:auto}
+  .smallmuted{font-size:12px;color:#666}
+  footer{margin-top:12px;font-size:12px;color:#666}
+</style>
+</head>
+<body>
+
+<h1>Electromagnetic Thought → Word Codec — Prototype</h1>
+<p class="small">Interactive simulation that follows your book: brain EM vowels → teeth (consonant keyboard) → tongue combine → cheeks microphone → chest CPU → fingers output. Edit the mapping table to add your custom worts → words.</p>
+
+<div class="grid">
+  <div class="card">
+    <label>1) Brain / Electromagnetic Alphabet (choose category)</label>
+    <div class="row">
+      <!-- EM alphabet based on book: a b c d i j k z -->
+      <select id="emCategory" onchange="onEmChange()">
+        <option value="a">a — who's/where/whose (place/person)</option>
+        <option value="b">b — time length/how long</option>
+        <option value="c">c — people & possessions</option>
+        <option value="d">d — divine/remote/terrestrial questions</option>
+        <option value="i">i — dates / when</option>
+        <option value="j">j — past events</option>
+        <option value="k">k — future / distant</option>
+        <option value="z">z — electromagnetic/order meta-questions</option>
+      </select>
+      <div class="smallmuted">Selected EM letter suggests a default vowel pattern</div>
+    </div>
+
+    <label>2) Teeth — Consonant Keyboard (build a <em>wort</em>)</label>
+    <div class="teeth-grid" id="teethArea"></div>
+    <div class="controls">
+      <button onclick="clearTeeth()">Clear</button>
+      <button onclick="toggleCase()">Toggle Case</button>
+      <div class="smallmuted" id="teethHint">Click teeth to add consonants to the wort.</div>
+    </div>
+
+    <label>3) Tongue — Vowels / Overlay</label>
+    <div class="row" style="margin-top:8px">
+      <div class="row" id="vowelButtons">
+        <button class="key" onclick="setVowel('a')">a</button>
+        <button class="key" onclick="setVowel('e')">e</button>
+        <button class="key" onclick="setVowel('i')">i</button>
+        <button class="key" onclick="setVowel('o')">o</button>
+        <button class="key" onclick="setVowel('u')">u</button>
+        <button class="key" onclick="setVowel('y')">y</button>
+      </div>
+      <div style="margin-left:auto">
+        <button class="key" onclick="autoPickVowel()">Auto (EM → vowel)</button>
+      </div>
+    </div>
+
+    <label>4) Cheeks (Microphone) — Build transmission</label>
+    <div class="smallmuted">This step simulates attaching the binary transmission tags (alternating 1/0) that your book describes.</div>
+    <div style="margin-top:8px" id="transmissionPreview" class="display">—</div>
+
+    <div style="margin-top:10px" class="row">
+      <button onclick="transmit()" class="key">Send to Chest CPU</button>
+      <button onclick="simulateSpeak()" class="key">Simulate Spoken Output</button>
+      <button onclick="downloadOutput()" class="key">Download Transcript</button>
+    </div>
+
+    <hr style="margin:12px 0">
+
+    <label>EM → vowel mapping (editable)</label>
+    <textarea id="emMap" spellcheck="false">
+// default mapping: EM letter => preferred vowel (can edit)
+// format: letter: vowel
+a: a
+b: o
+c: e
+d: i
+i: i
+j: e
+k: o
+z: u
+    </textarea>
+
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 8px">Chest CPU (decoder) & Fingers (output)</h2>
+
+    <label>Incoming Transmission (raw)</label>
+    <div class="trace" id="rawTrace">—</div>
+
+    <label>Chest CPU Steps</label>
+    <div class="smallmuted" id="cpuSteps">No transmission yet.</div>
+
+    <label style="margin-top:8px">Decoded Wort (vowelless)</label>
+    <div class="display" id="decodedWort">—</div>
+
+    <label>Reconstructed Words (attempts)</label>
+    <div id="reconList" style="margin-top:6px"></div>
+
+    <label style="margin-top:10px">Wort → Word Dictionary (editable)</label>
+    <textarea id="wortDict" spellcheck="false">
+mthr: mother
+fthr: father
+lk: like
+ikssyrghtnw: i kiss you right now
+iwantsex: I want sex
+appls: apples
+    </textarea>
+
+    <div style="margin-top:10px" class="row">
+      <button onclick="decodeNow()" class="key">Run Decoder</button>
+      <button onclick="applyAutoRecon()" class="key">Auto-reconstruct (simple vowel reinstert)</button>
+      <button onclick="speakDecoded()" class="key">Speak Decoded</button>
+    </div>
+
+    <hr style="margin:12px 0">
+
+    <label>Transcript (Fingers: written output)</label>
+    <textarea id="transcript" placeholder="Decoded messages will be appended here"></textarea>
+
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="appendToTranscript()" class="key">Append Decoded → Transcript</button>
+      <button onclick="clearTranscript()" class="key">Clear Transcript</button>
+    </div>
+
+    <footer>
+      Tip: edit the <em>Wort → Word Dictionary</em> to teach the Chest CPU your specialised mappings (useful since some worts map to multiple plausible words).
+    </footer>
+  </div>
+</div>
+
+<script>
+/* ======== Prototype data structures and helpers ======== */
+
+/* TEETH: a set of consonant keys (grouped as tooth positions).
+   We'll create 24 consonant keys across 8 "teeth columns" — realistic
+   enough to demonstrate building complex worts. */
+const teethKeys = [
+  "m","n","t","d","s","z","r","l",
+  "p","b","k","g","f","v","h","j",
+  "ch","sh","th","ph","wh","qu","x","y"
+];
+
+let currentWort = "";      // vowelless string built from teeth
+let currentVowel = "";     // chosen vowel (tongue)
+let transmissionRaw = "";  // what cheeks/mouth "sent"
+let transcriptArray = [];  // saved outputs
+
+let useUpper = false;
+
+/* initialize teeth UI */
+const teethArea = document.getElementById('teethArea');
+teethKeys.forEach(k => {
+  const btn = document.createElement('button');
+  btn.className = 'key';
+  btn.textContent = k;
+  btn.onclick = () => toggleTooth(k, btn);
+  teethArea.appendChild(btn);
+});
+
+function toggleTooth(key, btn) {
+  // Append consonant to the current wort (simple behavior: always append)
+  const token = useUpper ? key.toUpperCase() : key;
+  currentWort += token;
+  btn.classList.add('active');
+  updateTeethHint();
+  renderTransmissionPreview();
+}
+
+/* controls */
+function clearTeeth(){
+  currentWort = "";
+  document.querySelectorAll('.teeth-grid .key').forEach(b => b.classList.remove('active'));
+  updateTeethHint();
+  renderTransmissionPreview();
+}
+function toggleCase(){ useUpper = !useUpper; updateTeethHint(); }
+function updateTeethHint(){
+  document.getElementById('teethHint').textContent = "Current wort: " + (currentWort || "(empty)");
+}
+
+/* vowels / tongue */
+function setVowel(v){
+  currentVowel = v;
+  document.querySelectorAll('#vowelButtons .key').forEach(b=>b.classList.remove('active'));
+  event?.target?.classList?.add('active');
+  renderTransmissionPreview();
+}
+
+/* auto vowel mapping from EM category using editable mapping */
+function onEmChange(){ /* no-op for now; user may press Auto */ }
+function autoPickVowel(){
+  const em = document.getElementById('emCategory').value.trim();
+  const mapText = document.getElementById('emMap').value;
+  const map = {};
+  mapText.split(/\n/).forEach(line=>{
+    const m = line.trim().match(/^(\w)\s*:\s*(\w)/);
+    if(m) map[m[1]] = m[2];
+  });
+  const v = map[em] || 'a';
+  currentVowel = v;
+  // highlight vowel button
+  document.querySelectorAll('#vowelButtons .key').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#vowelButtons .key').forEach(b=>{
+    if(b.textContent === v) b.classList.add('active');
+  });
+  renderTransmissionPreview();
+}
+
+/* cheeks (microphone) -> build transmission by combining wort + vowel and attaching binary tags */
+function renderTransmissionPreview(){
+  const display = document.getElementById('transmissionPreview');
+  if(!currentWort) { display.textContent = '—'; return; }
+  // create a "wort with vowel overlay" — many ways possible; we insert vowel between consonant groups:
+  const overlay = currentWort.split(/([aeiouyAEIOUY])/).join(''); // keep as vowelless
+  // Attach binary function as alternating 1/0 prefix-suffix examples
+  const ping = attachBinary(overlay);
+  display.textContent = ping;
+}
+
+function attachBinary(w){
+  // create repeated alternation pattern like in book: w1 w0 w1 w0 ...
+  return `${w}1 ${w}0 ${w}1 ${w}0`;
+}
+
+/* transmit -> chest CPU */
+function transmit(){
+  if(!currentWort) { alert('Build a wort first using the Teeth (consonant keys).'); return; }
+  transmissionRaw = attachBinary(currentWort);
+  document.getElementById('rawTrace').textContent = transmissionRaw;
+  // simulate chest CPU: strip binary, decode, and populate CPU steps
+  const stepsEl = document.getElementById('cpuSteps');
+  stepsEl.innerHTML = "1) Received raw transmission. <br>2) Dissolving binary tags...";
+  setTimeout(()=> {
+    const stripped = stripBinary(transmissionRaw);
+    stepsEl.innerHTML += "<br>3) Binary removed → stored as internal wort: <b>" + stripped + "</b>";
+    document.getElementById('decodedWort').textContent = stripped;
+    // produce reconstruction attempts
+    produceRecon(stripped);
+  }, 500);
+}
+
+function stripBinary(raw){
+  // remove trailing numbers and duplicated patterns, keep first instance
+  const first = raw.split(/\s+/)[0];
+  // sanitize
+  return first.replace(/[01]+$/,'');
+}
+
+/* chest CPU: reconstruct word(s) from wort */
+function produceRecon(wort){
+  const dictText = document.getElementById('wortDict').value;
+  const dict = {};
+  dictText.split(/\n/).forEach(line=>{
+    const m = line.trim().match(/^(.+?)\s*:\s*(.+)$/);
+    if(m) dict[m[1].trim()] = m[2].trim();
+  });
+
+  const reconEl = document.getElementById('reconList');
+  reconEl.innerHTML = '';
+  const results = [];
+
+  // 1. direct dictionary match
+  if(dict[wort]){
+    results.push({method:'dictionary', text: dict[wort]});
+  }
+
+  // 2. smart vowel reinsertion attempts (very simple):
+  const vowels = ['a','e','i','o','u','y'];
+  // Try inserting vowel between every consonant boundary (naive)
+  function reinserts(w){
+    const out = new Set();
+    // put vowel between each adjacent letter cluster (for single-letter keys it's straightforward)
+    for(let v of vowels){
+      // try several patterns: v before, v after, v between every pair
+      out.add(v + w);
+      out.add(w + v);
+      // between every char
+      let s = '';
+      for(let i=0;i<w.length;i++){
+        s += w[i];
+        if(i < w.length-1) s += v;
+      }
+      out.add(s);
+    }
+    return Array.from(out);
+  }
+
+  const candidates = reinserts(wort);
+  // keep short list, and add as guessed reconstructions
+  for(let c of candidates.slice(0,12)){
+    results.push({method:'reconstruct', text:c});
+  }
+
+  // show results
+  results.forEach(r=>{
+    const div = document.createElement('div');
+    div.style.padding='6px 8px';
+    div.style.borderRadius='6px';
+    div.style.marginTop='6px';
+    div.style.background='#fbfdff';
+    div.innerHTML = `<b>${r.text}</b> <span class="smallmuted">(${r.method})</span>`;
+    reconEl.appendChild(div);
+  });
+}
+
+/* manual decode run */
+function decodeNow(){
+  // simply runs produceRecon on current displayed wort
+  const wort = document.getElementById('decodedWort').textContent;
+  if(!wort || wort === '—') { alert('No decoded wort in Chest CPU. Transmit first.'); return; }
+  produceRecon(wort);
+}
+
+/* quick auto reconstruct using simple heuristics and append best guess to decoded area */
+function applyAutoRecon(){
+  const wort = document.getElementById('decodedWort').textContent;
+  if(!wort || wort === '—') { alert('No decoded wort in Chest CPU. Transmit first.'); return; }
+  const dictText = document.getElementById('wortDict').value;
+  const dict = {};
+  dictText.split(/\n/).forEach(line=>{
+    const m = line.trim().match(/^(.+?)\s*:\s*(.+)$/);
+    if(m) dict[m[1].trim()] = m[2].trim();
+  });
+  if(dict[wort]) {
+    // perfect match
+    document.getElementById('reconList').innerHTML = `<div style="padding:6px;background:#eef9f6;border-radius:6px"><b>${dict[wort]}</b> <span class="smallmuted">(dictionary)</span></div>`;
+  } else {
+    // try simple vowel insertion heuristic: insert vowel after first consonant cluster
+    const candidates = [];
+    const vowels = ['a','e','i','o','u'];
+    for(let v of vowels){
+      candidates.push(wort.slice(0,1)+v+wort.slice(1));
+      candidates.push(wort.slice(0,2)+v+wort.slice(2));
+    }
+    document.getElementById('reconList').innerHTML = '';
+    candidates.slice(0,8).forEach(c=>{
+      const div = document.createElement('div');
+      div.style.padding='6px 8px'; div.style.marginTop='6px'; div.style.borderRadius='6px'; div.style.background='#fff8ed';
+      div.innerHTML = `<b>${c}</b> <span class="smallmuted">(auto)</span>`;
+      document.getElementById('reconList').appendChild(div);
+    });
+  }
+}
+
+/* simulate spoken output (cheeks -> mouth) by speaking the reconstructed top candidate */
+function simulateSpeak(){
+  const reconEl = document.getElementById('reconList');
+  if(reconEl.children.length === 0){ alert('No reconstructed words yet. Run decoder.'); return; }
+  const top = reconEl.children[0].querySelector('b').textContent;
+  speak(top);
+}
+
+/* speak helper using Web Speech API */
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Speech synthesis not supported in this browser.'); return; }
+  const ut = new SpeechSynthesisUtterance(text);
+  ut.rate = 1.0;
+  ut.lang = 'en-US';
+  speechSynthesis.speak(ut);
+}
+
+/* Speak decoded explicitly */
+function speakDecoded(){
+  const reconEl = document.getElementById('reconList');
+  if(reconEl.children.length === 0){ alert('No reconstruction available.'); return; }
+  const top = reconEl.children[0].querySelector('b').textContent;
+  speak(top);
+}
+
+/* transcript (fingers) */
+function appendToTranscript(){
+  const reconEl = document.getElementById('reconList');
+  if(reconEl.children.length === 0){ alert('No reconstruction to append.'); return; }
+  const top = reconEl.children[0].querySelector('b').textContent;
+  transcriptArray.push(top);
+  document.getElementById('transcript').value = transcriptArray.join("\\n");
+}
+
+function clearTranscript(){ transcriptArray=[]; document.getElementById('transcript').value=''; }
+
+/* allow user to download the transcript */
+function downloadOutput(){
+  const text = document.getElementById('transcript').value;
+  if(!text){ alert('Transcript is empty. Append decoded messages first.'); return; }
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'thought-transcript.txt';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+/* small helpers for keyboard-like interaction */
+document.addEventListener('keydown', (e)=>{
+  // allow 'Backspace' to delete last consonant
+  if(e.key === 'Backspace'){ currentWort = currentWort.slice(0,-1); updateTeethHint(); renderTransmissionPreview(); }
+});
+
+/* Download convenience for the raw file */
+function downloadFile(name, content){
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+/* initial render */
+updateTeethHint();
+renderTransmissionPreview();
+
+</script>
+</body>
+</html>

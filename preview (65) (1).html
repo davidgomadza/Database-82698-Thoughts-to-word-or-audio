@@ -1,0 +1,248 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AugVT — Free Mobile Phone (Interactive Demo)</title>
+  <style>
+    :root{--bg:#071021;--card:#0e1724;--accent:#00e6a8;--muted:#9fb0bf}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:linear-gradient(180deg,#041026 0%,#06152a 100%);color:#eaf6f0}
+    .app{display:grid;grid-template-columns:300px 1fr;gap:12px;height:10vh;padding:12px}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;padding:12px}
+    header{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:12px}
+    h1{margin:0;font-size:18px}
+    .contacts{display:flex;flex-direction:column;gap:8px;height:calc(100vh - 140px);overflow:auto}
+    .contact{padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+    .contact.active{background:rgba(0,0,0,0.25)}
+    .chat{display:flex;flex-direction:column;height:calc(100vh - 140px)}
+    .messages{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+    .msg{max-width:70%;padding:8px;border-radius:8px}
+    .out{align-self:flex-end;background:linear-gradient(90deg,#005f4d,#008c6a)}
+    .in{align-self:flex-start;background:rgba(255,255,255,0.04)}
+    .composer{display:flex;gap:8px;padding:8px}
+    input[type=text]{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
+    button{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:#012;cursor:pointer}
+    .small{font-size:12px;color:var(--muted)}
+    .controls{display:flex;gap:8px;align-items:center}
+    textarea{width:100%;height:80px;background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.03);border-radius:8px;padding:8px}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .toast{position:fixed;right:18px;bottom:18px;background:rgba(0,0,0,0.7);color:#fff;padding:8px 12px;border-radius:8px}
+    @media(max-width:900px){.app{grid-template-columns:1fr} .contacts{height:200px}.chat{height:calc(100vh - 330px)}}
+  </style>
+</head>
+<body>
+  <header class="panel">
+    <h1>AugVT — Free Mobile Phone (Demo)</h1>
+    <div style="margin-left:auto" class="small">No servers required — manual WebRTC signalling (copy/paste) or local simulated network. Stored locally.</div>
+  </header>
+  <div class="app">
+    <aside class="panel">
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input id="contactName" type="text" placeholder="New contact name" />
+        <button id="addContact">Add</button>
+      </div>
+      <div class="contacts panel" id="contacts"></div><div style="margin-top:8px" class="small">Shareable Contact Token (copy to share):</div>
+  <div style="display:flex;gap:8px;margin-top:6px">
+    <input id="myToken" type="text" readonly />
+    <button id="regenToken">Regenerate</button>
+  </div>
+
+  <div style="margin-top:10px">
+    <div class="small">Quick Connect (WebRTC manual signalling)</div>
+    <div class="small" style="margin-top:6px">1) Create Offer -> Copy -> Send to peer. 2) Paste their Answer -> Connect.</div>
+    <div style="margin-top:6px" class="cols">
+      <div>
+        <button id="createOffer">Create Offer</button>
+        <textarea id="offer" placeholder="Offer will appear here"></textarea>
+      </div>
+      <div>
+        <button id="createAnswer">Create Answer</button>
+        <textarea id="answer" placeholder="Paste offer here then click Create Answer"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button id="copyOffer">Copy Offer</button>
+      <button id="pasteAnswer">Paste Answer</button>
+    </div>
+  </div>
+
+  <div style="margin-top:10px" class="small">
+    <div>Connection status: <strong id="status">disconnected</strong></div>
+    <div style="margin-top:6px">Data channel: <span id="dcStatus">closed</span></div>
+  </div>
+</aside>
+
+<main class="panel chat">
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+    <div class="small">Chat with: <strong id="currentContact">(none)</strong></div>
+    <div style="margin-left:auto" class="controls">
+      <button id="startCall">Start Call</button>
+      <button id="endCall">End Call</button>
+      <button id="simulateIncoming">Simulate Incoming</button>
+    </div>
+  </div>
+
+  <div class="messages panel" id="messages"></div>
+
+  <div class="composer panel">
+    <input id="msgInput" type="text" placeholder="Type message or command" />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <div class="panel" style="margin-top:8px">
+    <div class="small">Files & clipboard: drag & drop file into messages area to send (uses data channel if connected)</div>
+  </div>
+</main>
+
+  </div>  <div id="toast" class="toast" style="display:none"></div>  <script>
+    // Helper: safe clipboard copy with fallbacks for restricted environments
+    async function safeCopy(text, fallbackElement){
+      // Try modern clipboard API first
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          await navigator.clipboard.writeText(text);
+          return {ok:true, method:'clipboard'};
+        }
+      }catch(e){
+        console.warn('navigator.clipboard.writeText failed:', e);
+      }
+
+      // Fallback: try execCommand copy by selecting a provided textarea/input
+      try{
+        if(fallbackElement){
+          fallbackElement.focus();
+          if(fallbackElement.select) fallbackElement.select();
+          // For inputs that are readonly, remove readonly temporarily
+          const hadReadOnly = fallbackElement.hasAttribute && fallbackElement.hasAttribute('readonly');
+          if(hadReadOnly) fallbackElement.removeAttribute('readonly');
+          const successful = document.execCommand && document.execCommand('copy');
+          if(hadReadOnly) fallbackElement.setAttribute('readonly','');
+          if(successful) return {ok:true, method:'execCommand'};
+        }
+      }catch(e){
+        console.warn('execCommand copy fallback failed:', e);
+      }
+
+      // Final fallback: show prompt so user can copy manually
+      try{
+        // Use window.prompt (user must manually press Ctrl+C) — safe in all environments
+        window.prompt('Automatic copy failed. Please copy the text manually from the field below:', text);
+      }catch(e){
+        console.warn('prompt fallback failed', e);
+      }
+      return {ok:false};
+    }
+
+    function showToast(msg, timeout=3000){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; setTimeout(()=>{ t.style.display='none'; }, timeout); }
+
+    // Simple AugVT interactive artifact
+    const contactsEl = document.getElementById('contacts');
+    const messagesEl = document.getElementById('messages');
+    const myTokenInput = document.getElementById('myToken');
+    const currentContactEl = document.getElementById('currentContact');
+
+    let state = JSON.parse(localStorage.getItem('augvt_state')||'{}');
+    if(!state.contacts) state.contacts = [];
+    if(!state.chats) state.chats = {};
+    if(!state.token) state.token = generateToken();
+    saveState();
+
+    function saveState(){ localStorage.setItem('augvt_state', JSON.stringify(state)); renderContacts(); myTokenInput.value = state.token; }
+    function generateToken(){ return 'AUGVT-'+Math.random().toString(36).slice(2,10).toUpperCase(); }
+
+    document.getElementById('regenToken').addEventListener('click',()=>{ state.token = generateToken(); saveState(); showToast('Token regenerated'); });
+
+    document.getElementById('addContact').addEventListener('click',()=>{ const name = document.getElementById('contactName').value.trim(); if(!name) return; const id = 'C-'+Math.random().toString(36).slice(2,8); state.contacts.push({id,name,token: 'CT-'+Math.random().toString(36).slice(2,8)}); saveState(); document.getElementById('contactName').value=''; showToast('Contact added'); });
+
+    function renderContacts(){ contactsEl.innerHTML=''; state.contacts.forEach(c=>{ const el = document.createElement('div'); el.className='contact'; el.textContent = c.name + ' — ' + c.token; el.addEventListener('click',()=>{ openChat(c.id); document.querySelectorAll('.contact').forEach(n=>n.classList.remove('active')); el.classList.add('active'); }); contactsEl.appendChild(el); }); }
+
+    function openChat(contactId){ const c = state.contacts.find(x=>x.id===contactId); if(!c) return; currentContactEl.textContent = c.name; window.currentChat = contactId; renderMessages(contactId); }
+
+    function renderMessages(contactId){ messagesEl.innerHTML=''; const chat = state.chats[contactId] || []; chat.forEach(m=>{ const el = document.createElement('div'); el.className = 'msg ' + (m.out? 'out':'in'); el.textContent = m.text; messagesEl.appendChild(el); }); messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+    document.getElementById('sendBtn').addEventListener('click', ()=>{ const text = document.getElementById('msgInput').value.trim(); if(!text) return; if(!window.currentChat){ alert('Open a contact first'); return; } appendMessage(window.currentChat, text, true); document.getElementById('msgInput').value=''; if(window.dataChannel && window.dataChannel.readyState==='open'){ try{ window.dataChannel.send(JSON.stringify({type:'chat',text,text,from:state.token})); }catch(e){ console.warn('Failed to send over dataChannel', e); } } });
+
+    function appendMessage(contactId, text, out=false){ if(!state.chats[contactId]) state.chats[contactId]=[]; state.chats[contactId].push({text,out,time:Date.now()}); saveState(); renderMessages(contactId); }
+
+    // Simulate incoming message (for demo)
+    document.getElementById('simulateIncoming').addEventListener('click', ()=>{ if(!window.currentChat){ alert('Open a contact first'); return;} appendMessage(window.currentChat, 'Hello from '+window.currentChat+' (simulated)', false); });
+
+    // --- WebRTC manual signalling for peer-to-peer free calls & data ---
+    let pc = null; let dataChannel = null; let localStream = null;
+    const statusEl = document.getElementById('status'); const dcStatusEl = document.getElementById('dcStatus');
+
+    async function createPeer(isCaller){
+      pc = new RTCPeerConnection();
+      pc.onconnectionstatechange = ()=>{ statusEl.textContent = pc.connectionState; };
+      pc.ondatachannel = (e)=>{ dataChannel = e.channel; setupDataChannel(); };
+      pc.ontrack = (e)=>{ // play remote audio
+        const audio = document.createElement('audio'); audio.autoplay=true; audio.srcObject = e.streams[0]; document.body.appendChild(audio);
+        log('Remote track added (audio)');
+      };
+      // add local audio
+      try{ localStream = await navigator.mediaDevices.getUserMedia({audio:true}); localStream.getTracks().forEach(t=>pc.addTrack(t, localStream)); }catch(err){ console.warn('No mic access or denied', err); }
+      return pc;
+    }
+
+    function setupDataChannel(){ if(!dataChannel) return; dataChannel.onopen = ()=>{ dcStatusEl.textContent='open'; log('Data channel open'); }; dataChannel.onclose = ()=>{ dcStatusEl.textContent='closed'; log('Data channel closed'); }; dataChannel.onmessage = (e)=>{ try{ const d = JSON.parse(e.data); if(d.type==='chat'){ const contactId = window.currentChat || 'peer'; appendMessage(contactId, d.text, false); } }catch(err){ log('Received: '+e.data); } };
+    }
+
+    document.getElementById('createOffer').addEventListener('click', async ()=>{
+      pc = await createPeer(true);
+      dataChannel = pc.createDataChannel('augvt-data'); setupDataChannel();
+      const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
+      const offerText = JSON.stringify(pc.localDescription);
+      const offerEl = document.getElementById('offer');
+      offerEl.value = offerText;
+      const res = await safeCopy(offerText, offerEl);
+      if(res.ok){ showToast('Offer created and copied to clipboard'); } else { alert('Offer created. Automatic clipboard copy failed — please use the "Copy Offer" button or copy manually from the Offer box.'); }
+    });
+
+    document.getElementById('createAnswer').addEventListener('click', async ()=>{
+      const text = document.getElementById('answer').value.trim(); if(!text){ alert('Paste the offer into the Answer box first.'); return; }
+      const offer = JSON.parse(text);
+      pc = await createPeer(false);
+      await pc.setRemoteDescription(offer);
+      const answer = await pc.createAnswer(); await pc.setLocalDescription(answer);
+      const answerText = JSON.stringify(pc.localDescription);
+      const answerEl = document.getElementById('answer');
+      answerEl.value = answerText;
+      const res = await safeCopy(answerText, answerEl);
+      if(res.ok){ showToast('Answer created and copied to clipboard'); } else { alert('Answer created. Automatic clipboard copy failed — please copy the Answer manually and send it back to the Offer creator.'); }
+    });
+
+    document.getElementById('pasteAnswer').addEventListener('click', async ()=>{
+      const text = document.getElementById('answer').value.trim(); if(!text){ alert('Paste the peer answer into the Answer box first.'); return; }
+      const ans = JSON.parse(text);
+      if(!pc){ alert('No peer connection exists (create offer first).'); return; }
+      await pc.setRemoteDescription(ans);
+      log('Remote description set — connection in progress');
+    });
+
+    document.getElementById('copyOffer').addEventListener('click', async ()=>{
+      const offerEl = document.getElementById('offer'); const t = offerEl.value; if(!t){ alert('No offer text to copy'); return; }
+      const res = await safeCopy(t, offerEl);
+      if(res.ok) { showToast('Offer copied to clipboard'); } else { alert('Copy failed — please manually select and copy the Offer text.'); }
+    });
+
+    // Start/End call (audio tracks)
+    document.getElementById('startCall').addEventListener('click', async ()=>{
+      if(!pc){ alert('Use Create Offer / Create Answer flow to connect first.'); return; }
+      if(localStream){ localStream.getAudioTracks().forEach(t=>t.enabled = true); log('Call started (local mic enabled)'); } else { log('No local audio available'); }
+    });
+    document.getElementById('endCall').addEventListener('click', ()=>{ if(pc){ pc.getSenders().forEach(s=>{ try{s.track.stop();}catch(e){} }); pc.close(); pc=null; dataChannel=null; dcStatusEl.textContent='closed'; statusEl.textContent='disconnected'; log('Call ended'); } });
+
+    function log(txt){ const el = document.createElement('div'); el.className='small'; el.textContent = '[log] '+txt; messagesEl.appendChild(el); messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+    // Drag & drop file sending via dataChannel
+    messagesEl.addEventListener('dragover',(e)=>{ e.preventDefault(); messagesEl.style.opacity=0.8; });
+    messagesEl.addEventListener('dragleave',(e)=>{ e.preventDefault(); messagesEl.style.opacity=1; });
+    messagesEl.addEventListener('drop', async (e)=>{ e.preventDefault(); messagesEl.style.opacity=1; const f = e.dataTransfer.files[0]; if(!f){ alert('No file'); return; } const buf = await f.arrayBuffer(); if(window.dataChannel && window.dataChannel.readyState==='open'){ try{ window.dataChannel.send(JSON.stringify({type:'file',name:f.name, size:f.size})); }catch(e){ console.warn('Failed to send file metadata', e); }
+        appendMessage(window.currentChat||'peer', 'Sent file (sim): '+f.name, true); } else { appendMessage(window.currentChat||'peer', 'Saved file locally (sim): '+f.name, true); }
+    });
+
+    // load initial
+    renderContacts();
+  </script></body>
+</html>

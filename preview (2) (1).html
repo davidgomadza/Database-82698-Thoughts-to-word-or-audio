@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOBETERTGHERETEGHI Codec Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Dark background */
+            color: #c9d1d9;
+        }
+        .sheet-glow {
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); /* Green glow */
+        }
+        .capacity-bar {
+            transition: width 0.5s ease-in-out, background-color 0.3s;
+        }
+        .codec-input::placeholder {
+            color: #6a737d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-[#161b22] rounded-xl shadow-2xl p-6 border border-[#21262d]">
+
+            <h1 class="text-3xl font-bold text-center text-[#22c55e] mb-2">
+                SOBETERTGHERETEGHI Codec
+            </h1>
+            <p class="text-sm text-center text-gray-400 mb-6">
+                Electromagnetic Memory Interface (EM-Sheet)
+            </p>
+
+            <!-- Memory Sheet Visualizer -->
+            <div id="sheet-visualizer" class="p-4 bg-gray-900 rounded-lg mb-6 sheet-glow">
+                <h2 class="text-lg font-semibold mb-2 text-white">EM-Sheet Status:</h2>
+                
+                <div class="flex justify-between text-sm mb-1 text-gray-300">
+                    <span>Capacity (isobiterghtige):</span>
+                    <span id="capacity-text">0 / 10 Units</span>
+                </div>
+                
+                <!-- Capacity Bar -->
+                <div class="w-full bg-gray-700 rounded-full h-3 mb-3">
+                    <div id="capacity-fill" class="h-3 rounded-full capacity-bar" style="width: 0%; background-color: #22c55e;"></div>
+                </div>
+
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>Durability Score: <span id="durability-score" class="font-bold text-green-400">99.9%</span></span>
+                    <span>Memory Count: <span id="memory-count" class="font-bold text-green-400">0</span></span>
+                </div>
+            </div>
+
+            <!-- Codec Command Input -->
+            <div class="mb-6">
+                <label for="codec-command" class="block text-sm font-medium mb-2 text-gray-300">Enter Brain Command:</label>
+                <input type="text" id="codec-command" placeholder="e.g., ENCODE First Billion Year Memory"
+                       class="codec-input w-full p-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:ring-green-500 focus:border-green-500 text-white transition duration-200">
+                <button onclick="executeCommand()"
+                        class="mt-3 w-full p-3 text-center text-white font-bold rounded-lg bg-[#22c55e] hover:bg-green-600 transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50">
+                    Execute Command
+                </button>
+            </div>
+
+            <!-- Output Log -->
+            <div class="bg-gray-800 p-4 rounded-lg h-40 overflow-y-auto text-sm">
+                <h2 class="font-bold mb-2 text-[#22c55e]">System Log:</h2>
+                <div id="output-log" class="space-y-1 text-gray-400">
+                    <p>Interface online. Waiting for user command...</p>
+                </div>
+            </div>
+
+            <!-- Codec Help -->
+            <div class="mt-4 p-3 bg-gray-900 rounded-lg">
+                <h3 class="font-bold text-sm text-yellow-400 mb-1">Codec Commands:</h3>
+                <ul class="text-xs text-gray-500 list-disc list-inside space-y-0.5">
+                    <li><strong class="text-white">ENCODE [text]</strong>: Store new memory. (e.g., `ENCODE The formula is complete`)</li>
+                    <li><strong class="text-white">RETRIEVE [index]</strong>: Recall memory by its index (0, 1, 2...).</li>
+                    <li><strong class="text-white">EXPAND</strong>: Increase the *isobiterghtige* capacity by 5 units.</li>
+                    <li><strong class="text-white">DIAGNOSE</strong>: Check sheet integrity and durability.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State variables for the simulated memory sheet
+        let memorySheet = [];
+        let maxCapacity = 10;
+        let durability = 99.9;
+
+        // DOM elements
+        const commandInput = document.getElementById('codec-command');
+        const outputLog = document.getElementById('output-log');
+        const capacityText = document.getElementById('capacity-text');
+        const capacityFill = document.getElementById('capacity-fill');
+        const memoryCountEl = document.getElementById('memory-count');
+        const durabilityScoreEl = document.getElementById('durability-score');
+
+        // Utility function to log messages
+        function log(message, type = 'info') {
+            const entry = document.createElement('p');
+            entry.className = 'py-0.5';
+            
+            let prefix = '→';
+            let color = 'text-gray-400';
+
+            if (type === 'success') {
+                prefix = '✅';
+                color = 'text-green-400';
+            } else if (type === 'error') {
+                prefix = '❌';
+                color = 'text-red-440';
+            } else if (type === 'system') {
+                prefix = '⚙️';
+                color = 'text-blue-400';
+            }
+            
+            entry.innerHTML = `<span class="${color} font-mono">${prefix} ${message}</span>`;
+            outputLog.prepend(entry);
+            // Keep the log trim
+            while (outputLog.children.length > 20) {
+                outputLog.removeChild(outputLog.lastChild);
+            }
+        }
+
+        // Function to update the UI visuals
+        function updateUI() {
+            const currentCapacity = memorySheet.length;
+            const percentage = (currentCapacity / maxCapacity) * 100;
+            
+            capacityText.textContent = `${currentCapacity} / ${maxCapacity} Units`;
+            capacityFill.style.width = `${percentage}%`;
+            memoryCountEl.textContent = currentCapacity;
+
+            // Change color if approaching full capacity
+            if (percentage >= 80) {
+                capacityFill.style.backgroundColor = '#f59e0b'; // Amber
+            } else {
+                capacityFill.style.backgroundColor = '#22c55e'; // Green
+            }
+            
+            durabilityScoreEl.textContent = `${durability.toFixed(1)}%`;
+        }
+
+        // Main command execution logic
+        function executeCommand() {
+            const command = commandInput.value.trim();
+            commandInput.value = ''; // Clear input
+            
+            if (!command) {
+                log("Input required. Please enter a command.", 'error');
+                return;
+            }
+
+            const parts = command.toUpperCase().split(/\s+/);
+            const action = parts[0];
+            const argument = command.substring(action.length).trim();
+            
+            log(`USER > ${command}`, 'info');
+
+            switch (action) {
+                case 'ENCODE':
+                    handleEncode(argument);
+                    break;
+                case 'RETRIEVE':
+                    handleRetrieve(argument);
+                    break;
+                case 'EXPAND':
+                    handleExpand();
+                    break;
+                case 'DIAGNOSE':
+                    handleDiagnose();
+                    break;
+                default:
+                    log(`Unknown command: ${action}. Type 'HELP' (not implemented yet, see help box) for valid commands.`, 'error');
+            }
+            
+            updateUI();
+        }
+
+        // Handlers for specific commands
+        function handleEncode(data) {
+            if (memorySheet.length >= maxCapacity) {
+                log("Capacity exceeded. Execute 'EXPAND' to utilize isobiterghtige function.", 'error');
+                return;
+            }
+            if (!data) {
+                log("ENCODE requires data. Syntax: ENCODE [Your Memory Text]", 'error');
+                return;
+            }
+
+            memorySheet.push(data);
+            log(`Memory Unit #${memorySheet.length - 1} ENCODED: "${data.substring(0, 30)}..."`, 'success');
+            // Simulate slight durability wear over billions of years
+            durability = Math.max(99.0, durability - 0.01); 
+        }
+
+        function handleRetrieve(indexStr) {
+            const index = parseInt(indexStr);
+            if (isNaN(index) || index < 0 || index >= memorySheet.length) {
+                log(`RETRIEVE failed. Index '${indexStr}' is out of bounds (0 to ${memorySheet.length - 1}).`, 'error');
+                return;
+            }
+            const memory = memorySheet[index];
+            log(`Memory Unit #${index} RETRIEVED: "${memory}"`, 'success');
+            // Simulate minimal repair on access
+            durability = Math.min(100.0, durability + 0.005);
+        }
+
+        function handleExpand() {
+            maxCapacity += 5;
+            log(`Capacity EXPANDED! The SOBETERTGHERETEGHI sheet isobiterghtige function engaged. New Capacity: ${maxCapacity} Units.`, 'system');
+        }
+
+        function handleDiagnose() {
+            log(`DIAGNOSTIC REPORT:`, 'system');
+            log(`Current Capacity: ${memorySheet.length} / ${maxCapacity} Units`);
+            log(`Durability Integrity: ${durability.toFixed(1)}% - Confirmed, built to last a billion years.`, 'system');
+            log(`Functionality: All systems nominal.`, 'system');
+        }
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            commandInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    executeCommand();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

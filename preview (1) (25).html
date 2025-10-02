@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AANIC Brainwave-to-Word Codec — Full</title>
+<style>
+  :root{--bg:#08101a;--panel:#0f1a23;--accent:#6cf;--muted:#9fb3c8;--good:#6cf}
+  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,system-ui,Arial;color:#e6f0f6;background:linear-gradient(180deg,#041018 0%,#071522 100%)}
+  .wrap{max-width:1100px;margin:28px auto;padding:22px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;box-shadow:0 8px 30px rgba(2,8,12,0.6)}
+  h1{color:var(--accent);margin:0 0 6px;font-weight:600}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
+  .panel{background:var(--panel);padding:14px;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+  label{display:block;font-size:13px;color:var(--muted);margin-top:12px}
+  input[type=text],select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#08161d;color:#dff0ff}
+  button{background:var(--accent);border:none;color:#04101a;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:700;margin-top:12px;transition:all 0.2s ease}
+  button.secondary{background:#123040;color:#bfe8ff}
+  button:disabled{opacity:0.5;cursor:not-allowed}
+  button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 12px rgba(108,204,255,0.3)}
+  button.secondary:hover:not(:disabled){background:#1a4050}
+  .status{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:8px}
+  .dot.on{background:var(--good)}.dot.off{background:#f45}
+  .output{white-space:pre-wrap;font-family:ui-monospace,Monaco,monospace;background:#06151b;padding:12px;border-radius:8px;margin-top:12px;color:#bfe8ff;font-size:12px}
+  .svgholder{display:flex;align-items:center;justify-content:center;height:180px}
+  .forms{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .chip{background:#06202a;padding:6px 10px;border-radius:999px;color:var(--accent);font-weight:600;font-size:11px}
+  .bio-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .bio-item{background:#07161c;padding:8px;border-radius:8px;color:#cfeffb;display:flex;align-items:center;gap:10px;min-width:120px;transition:all 0.3s ease}
+  .log{height:220px;overflow:auto;background:#031018;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);color:#cbeefc;font-size:12px}
+  footer{color:var(--muted);font-size:13px;margin-top:14px;text-align:right}
+  .row{display:flex;gap:8px;align-items:center}
+  .small{font-size:13px;color:var(--muted)}
+  .left-col{position:relative}
+  .download{display:flex;gap:8px;margin-top:10px}
+  .session-list{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+  .session-pill{background:#032026;padding:6px 9px;border-radius:999px;color:#92ecff;font-weight:700;cursor:pointer;transition:all 0.2s ease}
+  .session-pill:hover{background:#044050;transform:translateY(-1px)}
+  .session-pill.active{background:#0a5060;box-shadow:0 0 12px rgba(146,236,255,0.3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🧠 AANIC Brainwave-to-Word Codec — Full Working</h1>
+  <div class="meta">Integrated AANIC pipeline, the 7 Forms, biometric simulation, audio synthesis, multi-user session simulation, and Bitcoinayt imprint (mocked).</div>
+
+  <div class="grid">
+    <div class="panel left-col">
+      <label>Transmit → AANIC Relay Console (EM Worts)</label>
+      <input id="emInput" type="text" placeholder="Enter wort (consonant skeleton) e.g. wnttlk, thnk, lv" />
+      <label>Thought Type / Emotion</label>
+      <select id="thoughtType">
+        <option>Speech/Communication</option>
+        <option>Urgency</option>
+        <option>Calm</option>
+        <option>Anger</option>
+        <option>Long-term memory</option>
+      </select>
+      <label>Neural Frequency (Resonance)</label>
+      <input id="freq" type="range" min="1" max="120" value="50" />
+      <div class="row small"><span class="small">Frequency:</span><strong id="freqValue">50</strong><span class="small">Hz</span></div>
+
+      <label>Target Brain Region</label>
+      <select id="brainRegion">
+        <option>Temporal Lobe (Auditory)</option>
+        <option>Frontal Lobe (Motor)</option>
+        <option>Parietal Lobe (Sensory)</option>
+        <option>Occipital Lobe (Visual)</option>
+      </select>
+
+      <div class="status">
+        <div><span class="dot on"></span><span class="small">Digital Analogue</span></div>
+        <div><span class="dot on"></span><span class="small">Neural Codec (AANIC)</span></div>
+        <div><span id="readerDot" class="dot on"></span><span class="small">EM Wave Detector</span></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <button id="convertBtn">Convert Thought</button>
+        <button id="speakBtn" class="secondary">Speak Last</button>
+      </div>
+
+      <div style="margin-top:14px">
+        <label>Multi-User Sessions (local simulation)</label>
+        <div class="session-list" id="sessions"></div>
+        <div style="margin-top:8px" class="row">
+          <input id="sessionName" type="text" placeholder="Create session name" />
+          <button id="newSession">Create</button>
+        </div>
+      </div>
+
+      <div class="download">
+        <button id="dlTxt" class="secondary">Download TXT</button>
+        <button id="dlJson" class="secondary">Download JSON</button>
+      </div>
+
+      <div style="margin-top:12px" class="small">Bitcoinayt Imprint: <button id="mintBtn" class="secondary">Mint Mock Imprint</button></div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="small">AANIC Processing Pipeline</div>
+          <div class="forms" aria-hidden>
+            <div class="chip">1 Electromagnetic</div>
+            <div class="chip">2 Binary Deconstruction</div>
+            <div class="chip">3 Skeletal Template</div>
+            <div class="chip">4 Resonance Frequency</div>
+            <div class="chip">5 Emotional Signature</div>
+            <div class="chip">6 Temporal Echo</div>
+            <div class="chip">7 Universal Template</div>
+          </div>
+        </div>
+        <div class="small">Current Session: <span id="currentSession">anonymous</span></div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:12px">
+        <div style="flex:1">
+          <div class="svgholder panel" id="svgArea">
+            <svg width="320" height="160" viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <rect x="0" y="0" width="320" height="160" rx="12" fill="#07121a"/>
+              <g id="tongue" transform="translate(18,22)">
+                <ellipse cx="44" cy="28" rx="22" ry="8" fill="#0f7" opacity="0.08"/>
+                <text x="44" y="32" font-size="10" fill="#79f" text-anchor="middle">Tongue</text>
+              </g>
+              <g id="teeth" transform="translate(90,16)">
+                <rect x="0" y="0" width="68" height="28" rx="4" fill="#062b37" />
+                <text x="34" y="18" font-size="10" fill="#9ff" text-anchor="middle">Teeth (Keyboard)</text>
+              </g>
+              <g id="cheeks" transform="translate(180,40)">
+                <circle cx="28" cy="28" r="20" fill="#06262e" />
+                <text x="28" y="34" font-size="10" fill="#9ff" text-anchor="middle">Cheeks (Mic)</text>
+              </g>
+              <g id="mouth" transform="translate(40,78)">
+                <rect x="0" y="0" width="240" height="42" rx="8" fill="#052028"/>
+                <text x="120" y="26" font-size="12" fill="#9ff" text-anchor="middle">Mouth (Voice Synth)</text>
+              </g>
+              <g id="chest" transform="translate(130,124)">
+                <rect x="0" y="0" width="60" height="28" rx="6" fill="#05161b" />
+                <text x="30" y="18" font-size="10" fill="#9ff" text-anchor="middle">Chest</text>
+              </g>
+              <g id="fingers" transform="translate(220,110)">
+                <rect x="0" y="0" width="84" height="28" rx="6" fill="#042028"/>
+                <text x="42" y="18" font-size="10" fill="#9ff" text-anchor="middle">Fingers (Feedback)</text>
+              </g>
+              <g id="brain" transform="translate(120,-6)">
+                <ellipse cx="60" cy="12" rx="40" ry="18" fill="#041b22"/>
+                <text x="60" y="14" font-size="11" fill="#9ff" text-anchor="middle">Brain (Reconstructor)</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div style="width:420px">
+          <div class="bio-row">
+            <div class="bio-item" id="bioTongue">👅 Tongue <span id="bt" style="margin-left:auto;opacity:0.8">idle</span></div>
+            <div class="bio-item" id="bioTeeth">🦷 Teeth <span id="bte" style="margin-left:auto;opacity:0.8">idle</span></div>
+            <div class="bio-item" id="bioCheeks">😊 Cheeks <span id="bch" style="margin-left:auto;opacity:0.8">idle</span></div>
+            <div class="bio-item" id="bioMouth">👄 Mouth <span id="bm" style="margin-left:auto;opacity:0.8">idle</span></div>
+          </div>
+          <div class="bio-row" style="margin-top:8px">
+            <div class="bio-item" id="bioChest">💓 Chest <span id="bc" style="margin-left:auto;opacity:0.8">idle</span></div>
+            <div class="bio-item" id="bioFingers">🤲 Fingers <span id="bf" style="margin-left:auto;opacity:0.8">idle</span></div>
+            <div class="bio-item" id="bioBrain">🧠 Brain <span id="bb" style="margin-left:auto;opacity:0.8">idle</span></div>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="small">Last Conversion</div>
+            <div class="output" id="lastOut">No conversion yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="small">Processing Log</div>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>© AANIC — Integrated by David Gomadza • This demo simulates hardware and biometric behavior in software</footer>
+</div>
+
+<script>
+/* ----------------------
+   Utility & state
+   ---------------------- */
+const logEl = document.getElementById('log');
+const lastOut = document.getElementById('lastOut');
+const emInput = document.getElementById('emInput');
+const freq = document.getElementById('freq');
+const freqValue = document.getElementById('freqValue');
+const thoughtType = document.getElementById('thoughtType');
+const convertBtn = document.getElementById('convertBtn');
+const speakBtn = document.getElementById('speakBtn');
+const readerDot = document.getElementById('readerDot');
+const sessionsEl = document.getElementById('sessions');
+const sessionName = document.getElementById('sessionName');
+const newSession = document.getElementById('newSession');
+const currentSessionEl = document.getElementById('currentSession');
+const dlTxt = document.getElementById('dlTxt'), dlJson = document.getElementById('dlJson'), mintBtn = document.getElementById('mintBtn');
+
+let state = {
+  last: null,
+  sessions: { anonymous: [] },
+  currentSession: 'anonymous',
+  mockChain: []
+};
+
+freq.addEventListener('input', ()=> freqValue.innerText = freq.value);
+
+/* ----------------------
+   Helpers: vowel synthesis (improved)
+   ---------------------- */
+const smallLex = {
+  'wnttlk': 'want to talk',
+  'thnk': 'think',
+  'lv': 'love',
+  'hlo': 'hello',
+  'sng': 'sing',
+  'wrd': 'word'
+};
+
+function synthesizeVowels(wort){
+  wort = (wort||'').toLowerCase().replace(/[^a-z]/g,'').trim();
+  if(!wort) return '';
+  if(smallLex[wort]) return smallLex[wort];
+  
+  const letters = wort.split('');
+  let out = '';
+  for(let i=0;i<letters.length;i++){
+    out += letters[i];
+    if(/[bcdfghjklmnpqrstvwxyz]/.test(letters[i])){
+      const next = letters[i+1];
+      if(next && /[bcdfghjklmnpqrstvwxyz]/.test(next)){
+        const v = (letters[i]==='w' || letters[i]==='y') ? 'a' : (letters[i] === 't' ? 'o' : 'a');
+        out += v;
+      }
+    }
+  }
+  out = out.replace(/([aeiou])\1+/g,'$1');
+  if(/[^aeiou]$/.test(out)) out += 'e';
+  out = out.replace(/([bcdfghjklmnpqrstvwxyz])([bcdfghjklmnpqrstvwxyz])/g, '$1$2');
+  return out;
+}
+
+/* ----------------------
+   Binary deconstruction simulation
+   ---------------------- */
+function emToBinary(em){
+  let s=0; for(let i=0;i<em.length;i++) s = (s*131 + em.charCodeAt(i))|0;
+  s = Math.abs(s);
+  let b = s.toString(2);
+  if(b.length<16) b = b.padStart(16,'0');
+  return b;
+}
+
+/* ----------------------
+   Pipeline simulation
+   ---------------------- */
+async function pipeline(emWort){
+  const freqVal = +freq.value;
+  const emotion = thoughtType.value;
+  const region = document.getElementById('brainRegion').value;
+  const timestamp = new Date().toISOString();
+  appendLog(`=== New Transmission ${timestamp} ===`);
+  appendLog(`Form1 Electromagnetic (raw): "${emWort}"`);
+  readerDot.className = 'dot on';
+
+  highlight('bioTongue','bt','querying');
+  await wait(350);
+  const binary = emToBinary(emWort);
+  appendLog(`Form2 Binary Deconstruction: ${binary}`);
+
+  highlight('bioTeeth','bte','mapping');
+  await wait(300);
+  appendLog(`Form3 Skeletal Template (wort): "${emWort}"`);
+
+  highlight('bioCheeks','bch','microphone');
+  await wait(260);
+  appendLog(`Form4 Resonance Frequency: ${freqVal} Hz`);
+
+  highlight('bioMouth','bm','synthesizing');
+  await wait(400);
+  appendLog(`Form5 Emotional Signature: ${emotion}`);
+
+  highlight('bioChest','bc','resonating');
+  await wait(300);
+
+  highlight('bioFingers','bf','feedback');
+  await wait(220);
+  appendLog(`Form6 Temporal Echo: ${new Date().toLocaleTimeString()}`);
+
+  highlight('bioBrain','bb','reconstructing');
+  await wait(420);
+  const final = synthesizeVowels(emWort);
+  appendLog(`Form7 Universal Template (final): "${final}"`);
+
+  const record = {
+    timestamp, session: state.currentSession, emWort, binary, final, freq: freqVal, emotion, region
+  };
+  state.last = record;
+  state.sessions[state.currentSession] = state.sessions[state.currentSession]||[];
+  state.sessions[state.currentSession].push(record);
+  state.mockChain.push({id: state.mockChain.length+1, imprint: `AANIC:${emWort}:${final}`, ts: timestamp});
+
+  lastOut.textContent = JSON.stringify(record, null, 2);
+  appendLog(`Output written & synthesized: "${final}"`);
+  readerDot.className = 'dot on';
+  return record;
+}
+
+/* ----------------------
+   UI helpers
+   ---------------------- */
+function appendLog(txt){
+  const p = document.createElement('div'); 
+  p.textContent = `[${new Date().toLocaleTimeString()}] ${txt}`;
+  logEl.prepend(p);
+}
+
+function highlight(elId, spanId, stateText){
+  const el = document.getElementById(elId);
+  const sp = document.getElementById(spanId);
+  el.style.boxShadow = '0 6px 20px rgba(103,199,255,0.3)';
+  el.style.transform = 'translateY(-4px)';
+  sp.textContent = stateText;
+  setTimeout(()=>{ 
+    el.style.boxShadow=''; 
+    el.style.transform=''; 
+    sp.textContent='idle'; 
+  }, 800);
+}
+
+function wait(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+/* ----------------------
+   Speech synthesis
+   ---------------------- */
+function speakText(text){
+  if(!('speechSynthesis' in window)) {
+    appendLog('Speech API not available in this browser.');
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(text);
+  const voices = speechSynthesis.getVoices();
+  if(voices.length) u.voice = voices.find(v=>v.lang.startsWith('en')) || voices[0];
+  u.rate = 0.95; u.pitch = 1.0; u.volume = 1.0;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  appendLog(`Audio synthesizer spoke: "${text}"`);
+}
+
+/* ----------------------
+   Events
+   ---------------------- */
+convertBtn.addEventListener('click', async ()=>{
+  const em = emInput.value.trim();
+  if(!em) { appendLog('No EM wort provided.'); return; }
+  convertBtn.disabled = true;
+  try {
+    const rec = await pipeline(em);
+    lastOut.scrollIntoView({behavior:'smooth'});
+  } catch(err) {
+    appendLog(`Error during conversion: ${err.message}`);
+  }
+  convertBtn.disabled = false;
+});
+
+speakBtn.addEventListener('click', ()=> {
+  if(!state.last) { appendLog('No last conversion to speak.'); return; }
+  speakText(state.last.final);
+});
+
+/* ----------------------
+   Session management
+   ---------------------- */
+function renderSessions(){
+  sessionsEl.innerHTML = '';
+  for(const name of Object.keys(state.sessions)){
+    const b = document.createElement('div');
+    b.className = 'session-pill' + (name === state.currentSession ? ' active' : '');
+    b.textContent = name;
+    b.onclick = ()=> { 
+      state.currentSession = name; 
+      currentSessionEl.textContent = name; 
+      appendLog(`Switched to session ${name}`);
+      renderSessions();
+    };
+    sessionsEl.appendChild(b);
+  }
+}
+
+newSession.addEventListener('click', ()=>{
+  const n = (sessionName.value||'').trim();
+  if(!n) { 
+    appendLog('Please enter a session name.'); 
+    return; 
+  }
+  if(state.sessions[n]) {
+    appendLog(`Session "${n}" already exists.`);
+    return;
+  }
+  state.sessions[n] = [];
+  sessionName.value='';
+  state.currentSession = n;
+  currentSessionEl.textContent = n;
+  appendLog(`Created session ${n}`);
+  renderSessions();
+});
+
+renderSessions();
+
+/* ----------------------
+   Downloads - FIXED & ENHANCED
+   ---------------------- */
+dlTxt.addEventListener('click', ()=>{
+  if(!state.last){ 
+    appendLog('No data to download. Please convert a thought first.'); 
+    return; 
+  }
+  
+  const txt = [
+    '='.repeat(60),
+    'AANIC BRAINWAVE-TO-WORD CONVERSION REPORT',
+    '='.repeat(60),
+    '',
+    `Session: ${state.last.session}`,
+    `Timestamp: ${state.last.timestamp}`,
+    '',
+    'INPUT:',
+    `  EM Wort (Consonant Skeleton): ${state.last.emWort}`,
+    `  Binary Deconstruction: ${state.last.binary}`,
+    '',
+    'PROCESSING:',
+    `  Neural Frequency: ${state.last.freq} Hz`,
+    `  Emotional Signature: ${state.last.emotion}`,
+    `  Target Brain Region: ${state.last.region}`,
+    '',
+    'OUTPUT:',
+    `  Final Word/Phrase: ${state.last.final}`,
+    '',
+    'FULL DATA (JSON):',
+    JSON.stringify(state.last, null, 2),
+    '',
+    '='.repeat(60),
+    `Generated by AANIC Codec v1.0 - ${new Date().toLocaleString()}`,
+    '='.repeat(60)
+  ].join('\n');
+  
+  try {
+    downloadBlob(txt, `aanic_conversion_${Date.now()}.txt`, 'text/plain');
+    appendLog('TXT file downloaded successfully.');
+  } catch(err) {
+    appendLog(`Download error: ${err.message}`);
+  }
+});
+
+dlJson.addEventListener('click', ()=>{
+  if(!state.sessions || Object.keys(state.sessions).length === 0) {
+    appendLog('No session data to download.');
+    return;
+  }
+  
+  const exportData = {
+    metadata: {
+      exportDate: new Date().toISOString(),
+      totalSessions: Object.keys(state.sessions).length,
+      totalConversions: Object.values(state.sessions).reduce((sum, arr) => sum + arr.length, 0),
+      currentSession: state.currentSession
+    },
+    sessions: state.sessions,
+    mockBlockchain: state.mockChain.length > 0 ? state.mockChain : null
+  };
+  
+  try {
+    const jsonStr = JSON.stringify(exportData, null, 2);
+    downloadBlob(jsonStr, `aanic_sessions_${Date.now()}.json`, 'application/json');
+    appendLog(`JSON export completed: ${exportData.metadata.totalConversions} conversions from ${exportData.metadata.totalSessions} session(s).`);
+  } catch(err) {
+    appendLog(`JSON export error: ${err.message}`);
+  }
+});
+
+function downloadBlob(content, filename, type){
+  try {
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  } catch(err) {
+    throw new Error(`Failed to create download: ${err.message}`);
+  }
+}
+
+/* ----------------------
+   Mock Bitcoinayt imprint
+   ---------------------- */
+mintBtn.addEventListener('click', ()=>{
+  if(!state.last){ 
+    appendLog('No conversion to mint imprint.'); 
+    return; 
+  }
+  const entry = {
+    tx: `BTCYT-${Date.now().toString(36).toUpperCase()}`, 
+    data: {
+      em: state.last.emWort, 
+      final: state.last.final, 
+      freq: state.last.freq, 
+      emotion: state.last.emotion
+    }, 
+    ts: new Date().toISOString()
+  };
+  state.mockChain.push(entry);
+  appendLog(`Mock Bitcoinayt imprint minted: ${entry.tx}`);
+});
+
+/* ----------------------
+   Keyboard shortcuts
+   ---------------------- */
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='1') emInput.value = 'wnttlk';
+  if(e.key==='2') emInput.value = 'thnk';
+  if(e.key==='3') emInput.value = 'lv';
+  if(e.key==='Enter' && document.activeElement!==emInput) convertBtn.click();
+});
+
+/* ----------------------
+   Initialization
+   ---------------------- */
+window.onload = ()=> { 
+  if(speechSynthesis.getVoices().length===0) speechSynthesis.getVoices(); 
+  appendLog('AANIC console ready.'); 
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+﻿Sobeter Memory - Interactive Artifact (simulation)
+A simulated system inspired by an uploaded design to explore memory expansion, overlays, and a codec.
+Electromagnetic Sheet (Sobeter) - state 
+Uninitialized
+Import / Load sample database 
+Create Sobeter Sheet (simulate) Format / Condense 
+
+Brain Commands (simulated) 
+Load Embed Read Retrieve Unload 
+
+Codec - encoder / decoder 
+Encode 
+Decode 
+
+Persistence 
+Save to Local Load from Local Export JSON 
+Memory Capacity 
+0 / 1024 units
+Active overlays: 0
+Durability score: 100%
+Overlays (up to 9) 
+Add 
+Real-time log 
+
+Waveform preview (simulated neural impulses) 
+Codec debug / notes 
+Codec: custom "SobCoder" - compression + reversible mask. Uses iterative b64 + XOR + run-length micro-compress.
+Quick actions 
+Auto Expand Capacity Run Durability Stress Test Clear Log 
+This is a simulation and educational interactive artifact. It does not change human brains or offer medical/neurological improvements. Use it to prototype data formats, command flows, and UI/UX for a memory-augmentation concept. 

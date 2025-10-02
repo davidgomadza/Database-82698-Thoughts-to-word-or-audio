@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brain Codec</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #brain-codec {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #thought-display {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+        input, button {
+            margin: 10px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="brain-codec">
+        <h1>Brain Codec</h1>
+        <input type="text" id="impulse-input" placeholder="Enter impulse pattern">
+        <button onclick="decodeImpulse()">Decode</button>
+        <div id="thought-display"></div>
+    </div>
+
+    <script>
+        class Thought {
+            constructor(symbol, glyph, archetype) {
+                this.symbol = symbol;
+                this.glyph = glyph;
+                this.archetype = archetype;
+            }
+        }
+
+        function decodeImpulsePattern(rawImpulse) {
+            if (rawImpulse.includes("Δα7")) 
+                return new Thought("Curiosity", "🌀", "Explorer");
+            if (rawI("βγ3")) 
+                return new Thought("Fear", "⚠️", "Guardian");
+            if (rawImpulse.includes("Ωλ2")) 
+                return new Thought("Joy", "🌈", "Creator");
+            if (rawImpulse.includes("Ψπ9")) 
+                return new Thought("Creativity", "✨", "Innovator");
+            
+            return new Thought("Unknown", "❓", "Undefined");
+        }
+
+        function decodeImpulse() {
+            const input = document.getElementById('impulse-input').value;
+            const thought = decodeImpulsePattern(input);
+            const display = document.getElementById('thought-display');
+            
+            display.innerHTML = `
+                Glyph: ${thought.glyph}<br>
+                Symbol: ${thought.symbol}<br>
+                Archetype: ${thought.archetype}
+            `;
+        }
+    </script>
+</body>
+</html>

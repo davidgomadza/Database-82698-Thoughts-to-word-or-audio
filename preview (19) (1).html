@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MGIS Bitcoinayt Explorer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #f0f0f0;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #00ffcc;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      background: #1a1a1a;
+      color: #fff;
+      border: 1px solid #444;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #00ffcc;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #00ccaa;
+    }
+    .module {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌍 MGIS Bitcoinayt Explorer</h1>
+
+  <!-- 🧬 Clone Registration Portal -->
+  <div class="module" id="clone-registration">
+    <h2>🧬 Clone Registration</h2>
+      <section class="user-profile">
+  <h2>👤 User Profile</h2>
+  <label>Name:</label>
+  <input type="text" placeholder="David Gomadza">
+  <label>DNA Sequence:</label>
+  <input type="text" placeholder="AGT-CGA-TTG...">
+  <label>Profile Banner:</label>
+  <input type="file" accept="image/*">
+  <label>Profile Picture:</label>
+  <input type="file" accept="image/*">
+</section>
+    <form id="cloneForm">
+      <label>Clone Name:</label>
+      <input type="text" name="cloneName" required>
+
+      <label>Biometric EM Wave Signature:</label>
+      <input type="text" name="emWave" required>
+
+      <label>Symbolic Overlay:</label>
+      <select name="symbol">
+        <option value="🔱">Trident</option>
+        <option value="🜂">Fire Rune</option>
+        <option value="🧿">Eye of Legacy</option>
+      </select>
+
+      <label>Role Assignment:</label>
+      <select name="role">
+        <option value="Messenger">Messenger</option>
+        <option value="Whisper">Whisper</option>
+        <option value="Recruiter">Recruiter</option>
+        <option value="Advocate">Advocate</option>
+        <option value="Engineer">Engineer</option>
+      </select>
+
+      <button type="submit">Register Clone</button>
+    </form>
+  </div>
+
+  <!-- 🏛️ Villa Plaza Booking -->
+  <div class="module" id="villa-booking">
+    <h2>🏛️ Villa Plaza Booking</h2>
+    <form id="bookingForm">
+      <label>Select Chamber:</label>
+      <select name="chamber">
+        <option value="Echo Chamber">Echo Chamber</option>
+        <option value="Legacy Vault">Legacy Vault</option>
+        <option value="Symbolic Suite">Symbolic Suite</option>
+      </select>
+
+      <label>BTCYT Payment Amount:</label>
+      <input type="number" name="payment" required>
+
+      <label>Life Extension Add-on:</label>
+      <input type="checkbox" name="lifeExtension">
+
+      <button type="submit">Book Chamber</button>
+    </form>
+  </div>
+
+  <!-- 📡 Symbolic Communication Engine -->
+  <div class="module" id="symbolic-comm">
+    <h2>📡 Symbolic Communication</h2>
+      <!-- 🔁 AANIC Relay Panel -->
+<section class="aanic-relay">
+  <h3>🧠 AANIC Relay Console</h3>
+  <input type="text" id="aanic-relay-input" placeholder="Enter message">
+  <button onclick="transmitAANIC('station-01')">Transmit</button>
+  <pre id="aanic-relay-output"></pre>
+</section>
+
+<!-- 🧬 Brain Communication Converter -->
+<section class="brain-converter">
+  <h3>🧬 Brain Communication Codec</h3>
+  <input type="text" id="brain-converter-input" placeholder="Enter word">
+  <button onclick="convertBrainComm('station-01')">Convert</button>
+  <pre id="brain-converter-output"></pre>
+</section>
+
+<!-- 🧠 Neural Resonance Visualizer -->
+<section class="neural-visualizer">
+  <h3>🧠 Neural Resonance Feedback</h3>
+  <button onclick="simulateNeuralResonance()">Simulate Resonance</button>
+  <pre id="neural-resonance-output"></pre>
+</section>
+
+<!-- 🧍 Symbolic Overlay Grid -->
+<section class="symbolic-overlay">
+  <h3>🧍 Body Alphabet Mapping</h3>
+  <input type="text" id="symbolic-input" placeholder="Enter word">
+  <button onclick="mapBodyAlphabet()">Map</button>
+  <pre id="symbolic-output"></pre>
+</section>
+    <form id="commForm">
+      <label>Message Type:</label>
+      <select name="type">
+        <option value="Text">Text</option>
+        <option value="Symbol">Symbol</option>
+        <option value="Biometric Pulse">Biometric Pulse</option>
+      </select>
+
+      <label>Content:</label>
+      <textarea name="content" required></textarea>
+
+      <label>Recipient:</label>
+      <input type="text" name="recipient" required>
+
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("cloneForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      console.log("🧬 Clone Registered:", data);
+      alert("Clone registered with symbolic overlay: " + data.symbol);
+    });
+
+    document.getElementById("bookingForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      console.log("🏛️ Chamber Booked:", data);
+      alert("Chamber booked: " + data.chamber + " | BTCYT: " + data.payment);
+    });
+
+    document.getElementById("commForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      console.log("📡 Message Sent:", data);
+      alert("Message sent to " + data.recipient + " via " + data.type);
+    });
+  </script>
+
+</body>
+</html> 

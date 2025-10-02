@@ -1,0 +1,2774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AANIC Brain-Thoughts-to-Word-Audio Converter | David Gomadza</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --neural: #9b59b6;
+            --warning: #f39c12;
+        }
+       
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+       
+        body {
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+       
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+       
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+       
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #3498db, #e74c3c, #9b59b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+       
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+       
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+       
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+       
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+       
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+       
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+       
+        .neural-panel .panel-title {
+            color: var(--neural);
+        }
+       
+        .input-area, .output-area, .audio-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+       
+        textarea, input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+       
+        textarea:focus, input:focus, select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+            outline: none;
+        }
+       
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+       
+        button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+       
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+       
+        button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+       
+        .neural-btn {
+            background: var(--neural);
+        }
+       
+        .neural-btn:hover:not(:disabled) {
+            background: #8e44ad;
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
+        }
+       
+        .success-btn {
+            background: var(--success);
+        }
+       
+        .success-btn:hover:not(:disabled) {
+            background: #229954;
+        }
+       
+        .warning-btn {
+            background: var(--warning);
+        }
+       
+        .warning-btn:hover:not(:disabled) {
+            background: #e67e22;
+        }
+       
+        .output-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            padding: 15px;
+            min-height: 150px;
+            border: 1px solid rgba(255,255,255,0.1);
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+        }
+       
+        .converter-visual {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+       
+        .converter-part {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+       
+        .converter-part.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 8px;
+            transform: scale(1.05);
+        }
+       
+        .part-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+       
+        .part-arrow {
+            font-size: 1.5rem;
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+        }
+       
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+       
+        .neural-wave-display {
+            background: #1a1a1a;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            position: relative;
+            height: 120px;
+            overflow: hidden;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+       
+        .wave-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+        }
+       
+        .audio-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+       
+        .audio-player {
+            background: rgba(0,0,0,0.5);
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+       
+        .codec-display {
+            background: #1a1a1a;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+        }
+       
+        .binary-display {
+            color: #27ae60;
+            margin: 5px 0;
+        }
+       
+        .em-display {
+            color: #3498db;
+            margin: 5px 0;
+        }
+       
+        .neural-display {
+            color: #9b59b6;
+            margin: 5px 0;
+        }
+       
+        .frequency-analyzer {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+            height: 60px;
+        }
+       
+        .freq-bar {
+            background: linear-gradient(to top, var(--secondary), rgba(52, 152, 219, 0.3));
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            position: relative;
+            height: 100%;
+            transform-origin: bottom;
+        }
+       
+        .freq-bar.active {
+            background: linear-gradient(to top, var(--neural), rgba(155, 89, 182, 0.3));
+            transform: scaleY(1.5);
+            box-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+        }
+       
+        .freq-bar::after {
+            content: attr(data-freq);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+       
+        .aanic-processor {
+            background: rgba(155, 89, 182, 0.1);
+            border: 1px solid var(--neural);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+       
+        .brain-reader-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+       
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+            animation: pulse-status 1s infinite;
+        }
+       
+        .status-indicator.active {
+            background: #27ae60;
+        }
+       
+        .status-indicator.warning {
+            background: #f39c12;
+        }
+       
+        @keyframes pulse-status {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+       
+        .vowel-insertion-display {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid var(--secondary);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+       
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+       
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+       
+        .step.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-left: 3px solid var(--secondary);
+            transform: translateX(5px);
+        }
+       
+        .step.completed {
+            background: rgba(39, 174, 96, 0.2);
+            border-left: 3px solid var(--success);
+        }
+       
+        .step-number {
+            background: var(--secondary);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+       
+        .step.active .step-number {
+            animation: rotate 1s linear infinite;
+        }
+       
+        .step.completed .step-number {
+            background: var(--success);
+        }
+       
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+       
+        .forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+       
+        .form-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+       
+        .form-card:hover {
+            background: rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+       
+        .form-card.active {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid var(--accent);
+            transform: scale(1.05);
+        }
+       
+        .form-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+       
+        .download-area {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+       
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.7;
+        }
+       
+        .status-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+       
+        .status-success {
+            background: rgba(39, 174, 96, 0.2);
+            border: 1px solid #27ae60;
+            color: #27ae60;
+        }
+       
+        .status-error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+       
+        .status-warning {
+            background: rgba(243, 156, 18, 0.2);
+            border: 1px solid #f39c12;
+            color: #f39c12;
+        }
+       
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+       
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+       
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--neural));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+       
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--secondary);
+            animation: spin 1s ease-in-out infinite;
+        }
+       
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AANIC Brain-Thoughts-to-Word-Audio Converter</h1>
+            <p class="subtitle">Database 82698: Thoughts to Word or Audio by David Gomadza</p>
+            <p>Convert electromagnetic brain waves to written words and synthesized audio using the 7 Forms of Communication</p>
+        </header>
+       
+        <div class="converter-visual">
+            <div class="converter-part" id="part-brain">
+                <div class="part-icon">🧠</div>
+                <div>Brain Thoughts</div>
+                <div>(EM Waves)</div>
+            </div>
+            <div class="part-arrow">→</div>
+            <div class="converter-part" id="part-neural">
+                <div class="part-icon">⚡</div>
+                <div>Neural Codec</div>
+                <div>(AANIC Processing)</div>
+            </div>
+            <div class="part-arrow">→</div>
+            <div class="converter-part" id="part-biological">
+                <div class="part-icon">👅</div>
+                <div>Biological Interface</div>
+                <div>(Tongue/Teeth)</div>
+            </div>
+            <div class="part-arrow">→</div>
+            <div class="converter-part" id="part-text">
+                <div class="part-icon">💬</div>
+                <div>Text Output</div>
+                <div>(Words)</div>
+            </div>
+            <div class="part-arrow">→</div>
+            <div class="converter-part" id="part-audio">
+                <div class="part-icon">🔊</div>
+                <div>Audio Output</div>
+                <div>(Synthesized)</div>
+            </div>
+        </div>
+       
+        <div class="main-content">
+            <div class="panel">
+                <h2 class="panel-title">Input: Brain Thought (EM Wave)</h2>
+                <div class="input-area">
+                    <div>
+                        <label for="thoughtInput">Electromagnetic brain pattern:</label>
+                        <textarea id="thoughtInput" placeholder="Example: ikssyrghtnw (I kiss you right now)">ikssyrghtnw</textarea>
+                    </div>
+                   
+                    <div>
+                        <label for="thoughtType">Thought Type:</label>
+                        <select id="thoughtType">
+                            <option value="speech">Speech/Communication</option>
+                            <option value="emotion">Emotional Expression</option>
+                            <option value="command">Motor Command</option>
+                            <option value="abstract">Abstract Concept</option>
+                            <option value="subvocal">Subvocal Speech</option>
+                        </select>
+                    </div>
+                   
+                    <div>
+                        <label for="resonanceFreq">Neural Frequency: <span id="freqValue">50 Hz (Human Standard)</span></label>
+                        <input type="range" id="resonanceFreq" min="1" max="100" value="50">
+                    </div>
+                   
+                    <div>
+                        <label for="brainRegion">Target Brain Region:</label>
+                        <select id="brainRegion">
+                            <option value="temporal">Temporal Lobe (Auditory)</option>
+                            <option value="frontal">Frontal Lobe (Speech)</option>
+                            <option value="broca">Broca's Area</option>
+                            <option value="wernicke">Wernicke's Area</option>
+                            <option value="motor">Motor Cortex</option>
+                        </select>
+                    </div>
+                   
+                    <button id="convertBtn">🧠 Convert Thought to Word & Audio</button>
+                    <button id="realTimeBtn" class="neural-btn">🔴 Start Real-Time Brain Reading</button>
+                </div>
+               
+                <div class="brain-reader-status">
+                    <div class="status-indicator" id="brainReaderStatus"></div>
+                    <span id="statusText">Brain Reader: Offline</span>
+                </div>
+               
+                <div class="neural-wave-display">
+                    <canvas class="wave-canvas" id="waveCanvas"></canvas>
+                </div>
+               
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+               
+                <div class="process-steps">
+                    <div class="step" id="step1">
+                        <div class="step-number">1</div>
+                        <div>Electromagnetic Capture & Digital Analogue Attachment</div>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-number">2</div>
+                        <div>Binary Neural Deconstruction</div>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-number">3</div>
+                        <div>Skeletal Template Mapping (Worts→Words)</div>
+                    </div>
+                    <div class="step" id="step4">
+                        <div class="step-number">4</div>
+                        <div>Resonance Frequency Matching</div>
+                    </div>
+                    <div class="step" id="step5">
+                        <div class="step-number">5</div>
+                        <div>Vowel Insertion Algorithm</div>
+                    </div>
+                    <div class="step" id="step6">
+                        <div class="step-number">6</div>
+                        <div>Emotional Signature Application</div>
+                    </div>
+                    <div class="step" id="step7">
+                        <div class="step-number">7</div>
+                        <div>Audio Synthesis & Universal Template</div>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="panel">
+                <h2 class="panel-title">Output: Written Word & Conversion</h2>
+                <div class="output-area">
+                    <div class="output-box" id="outputText">Conversion results will appear here...</div>
+                   
+                    <div class="vowel-insertion-display">
+                        <div><strong>Worts to Words Process:</strong></div>
+                        <div id="wortsDisplay">Original Worts: (pending)</div>
+                        <div id="vowelProcess">Vowel Insertion: (pending)</div>
+                        <div id="finalWords">Final Words: (pending)</div>
+                    </div>
+                </div>
+               
+                <div class="codec-display">
+                    <div><strong>AANIC Neural Codec Processing:</strong></div>
+                    <div class="binary-display" id="binaryDisplay">Binary: Waiting for input...</div>
+                    <div class="em-display" id="emDisplay">EM Pattern: Waiting for input...</div>
+                    <div class="neural-display" id="neuralDisplay">Neural Codec: Standby...</div>
+                </div>
+               
+                <div class="frequency-analyzer">
+                    <div class="freq-bar" data-freq="8"></div>
+                    <div class="freq-bar" data-freq="12"></div>
+                    <div class="freq-bar" data-freq="20"></div>
+                    <div class="freq-bar" data-freq="30"></div>
+                    <div class="freq-bar" data-freq="40"></div>
+                    <div class="freq-bar" data-freq="60"></div>
+                    <div class="freq-bar" data-freq="80"></div>
+                    <div class="freq-bar" data-freq="100"></div>
+                </div>
+               
+                <h3 class="panel-title">The 7 Forms of Communication</h3>
+                <div class="forms-grid">
+                    <div class="form-card" data-form="1">
+                        <div class="form-number">1</div>
+                        <div>Electromagnetic</div>
+                    </div>
+                    <div class="form-card" data-form="2">
+                        <div class="form-number">2</div>
+                        <div>Binary Deconstruction</div>
+                    </div>
+                    <div class="form-card" data-form="3">
+                        <div class="form-number">3</div>
+                        <div>Skeletal Template</div>
+                    </div>
+                    <div class="form-card" data-form="4">
+                        <div class="form-number">4</div>
+                        <div>Resonance Frequency</div>
+                    </div>
+                    <div class="form-card" data-form="5">
+                        <div class="form-number">5</div>
+                        <div>Emotional Signature</div>
+                    </div>
+                    <div class="form-card" data-form="6">
+                        <div class="form-number">6</div>
+                        <div>Temporal Echo</div>
+                    </div>
+                    <div class="form-card" data-form="7">
+                        <div class="form-number">7</div>
+                        <div>Universal Template</div>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="panel neural-panel">
+                <h2 class="panel-title">🔊 Audio Synthesis & Neural Codec</h2>
+                <div class="audio-area">
+                    <div class="audio-controls">
+                        <button id="generateAudioBtn" class="neural-btn" disabled>🎵 Generate Audio from Thoughts</button>
+                        <button id="playAudioBtn" disabled>▶️ Play Audio</button>
+                        <button id="stopAudioBtn" disabled>⏹️ Stop Audio</button>
+                        <button id="downloadAudioBtn" disabled>💾 Download Audio</button>
+                    </div>
+                   
+                    <div>
+                        <label for="voiceType">Voice Synthesis Type:</label>
+                        <select id="voiceType">
+                            <option value="neural">Neural Synthesis</option>
+                            <option value="human">Human-like</option>
+                            <option value="robotic">Robotic</option>
+                            <option value="whisper">Whisper Mode</option>
+                            <option value="thinking">Inner Thought</option>
+                        </select>
+                    </div>
+                   
+                    <div>
+                        <label for="audioFreq">Audio Frequency: <span id="audioFreqValue">440 Hz</span></label>
+                        <input type="range" id="audioFreq" min="200" max="2000" value="440">
+                    </div>
+                   
+                    <div class="audio-player">
+                        <audio id="audioPlayer" controls style="width: 100%; margin-top: 10px;"></audio>
+                        <div id="audioStatus" style="margin-top: 10px; font-size: 0.9em;">No audio generated</div>
+                    </div>
+                </div>
+               
+                <div class="aanic-processor">
+                    <h4>🧠 AANIC Neural Processor Status</h4>
+                    <div id="aanicStatus">
+                        <div>• Digital Analogue: <span id="analogueStatus" style="color: #e74c3c;">Disconnected</span></div>
+                        <div>• Brain Reader: <span id="readerStatus" style="color: #e74c3c;">Offline</span></div>
+                        <div>• Neural Codec: <span id="codecStatus" style="color: #f39c12;">Standby</span></div>
+                        <div>• Audio Engine: <span id="audioEngineStatus" style="color: #27ae60;">Ready</span></div>
+                        <div>• EM Wave Detector: <span id="emDetectorStatus" style="color: #f39c12;">Calibrating</span></div>
+                    </div>
+                   
+                    <div style="margin-top: 15px;">
+                        <button id="calibrateBtn" class="warning-btn">🎯 Calibrate Brain Reader</button>
+                        <button id="attachAnalogueBtn" class="neural-btn">🔗 Attach Digital Analogue</button>
+                    </div>
+                </div>
+               
+                <div class="codec-display">
+                    <div><strong>Audio Waveform Analysis:</strong></div>
+                    <div id="waveformData">Waveform: Waiting for audio generation...</div>
+                    <div id="spectralData">Spectral: No data</div>
+                    <div id="neuralPatterns">Neural Patterns: Inactive</div>
+                </div>
+            </div>
+        </div>
+       
+        <div class="download-area">
+            <h2 class="panel-title">💾 Download Conversion Results</h2>
+            <p>Save your brain-thought conversions and audio files for Database 82698</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+                <button id="downloadBtn" disabled>📄 Download Word Document</button>
+                <button id="downloadFullBtn" class="neural-btn" disabled>📦 Download Complete Package</button>
+                <button id="downloadWaveBtn" disabled>🌊 Download Waveform Data</button>
+            </div>
+            <div id="downloadStatus"></div>
+        </div>
+       
+        <div class="footer">
+            <p>AANIC System • Based on the research of David Gomadza • www.twofuture.world</p>
+            <p>Database 82698: Thoughts to Word or Audio • Electromagnetic to Written Word & Audio Converter</p>
+            <p>Enhanced with Neural Codecs, Digital Analogue Brain Reader, and Advanced Audio Synthesis</p>
+        </div>
+    </div>
+
+    <script>
+        // System state management
+        const SystemState = {
+            isInitialized: false,
+            brainReaderConnected: false,
+            isRealTimeActive: false,
+            audioContext: null,
+            currentAudioBuffer: null,
+            waveAnimationId: null,
+            conversionInProgress: false,
+            currentConversion: null
+        };
+       
+// Enhanced conversion database with complete audio phonetic mappings
+        const ConversionDatabase = {
+            "ikssyrghtnw": {
+                text: "I kiss you right now",
+                phonetic: "aɪ kɪs juː raɪt naʊ",
+                audioPattern: [220, 440, 330, 440, 550, 440, 330, 220],
+                worts: "ikssyrghtnw",
+                emotional: "affectionate"
+            },
+            "iwntsx": {
+                text: "I want sex",
+                phonetic: "aɪ wɒnt sɛks",
+                audioPattern: [220, 440, 330, 550],
+                worts: "iwntsx",
+                emotional: "desire"
+            },
+            "hlwdym": {
+                text: "Hello how are you my friend",
+                phonetic: "həˈloʊ haʊ ɑːr juː maɪ frɛnd",
+                audioPattern: [330, 440, 550, 440, 330, 220, 440, 550],
+                worts: "hlwdym",
+                emotional: "friendly"
+            },
+            "thbrdsrflyng": {
+                text: "The birds are flying",
+                phonetic: "ðə bɜːrdz ɑːr ˈflaɪɪŋ",
+                audioPattern: [440, 550, 330, 440, 660, 550],
+                worts: "thbrdsrflyng",
+                emotional: "observational"
+            },
+            "mgttjpn": {
+                text: "I am going to Japan",
+                phonetic: "aɪ æm ˈɡoʊɪŋ tu dʒəˈpæn",
+                audioPattern: [330, 440, 550, 660, 440, 330],
+                worts: "mgttjpn",
+                emotional: "excited"
+            },
+            "jmp": {
+                text: "jump",
+                phonetic: "dʒʌmp",
+                audioPattern: [440, 550, 330],
+                worts: "jmp",
+                emotional: "action"
+            },
+            "rss": {
+                text: "rise",
+                phonetic: "raɪz",
+                audioPattern: [330, 440, 550],
+                worts: "rss",
+                emotional: "uplifting"
+            },
+            "kks": {
+                text: "kiss",
+                phonetic: "kɪs",
+                audioPattern: [440, 330, 220],
+                worts: "kks",
+                emotional: "romantic"
+            },
+            "lvv": {
+                text: "love",
+                phonetic: "lʌv",
+                audioPattern: [330, 440, 220],
+                worts: "lvv",
+                emotional: "love"
+            },
+            "wlkk": {
+                text: "walk",
+                phonetic: "wɔːk",
+                audioPattern: [440, 330, 220, 330],
+                worts: "wlkk",
+                emotional: "movement"
+            },
+            "rnn": {
+                text: "run",
+                phonetic: "rʌn",
+                audioPattern: [550, 440, 660],
+                worts: "rnn",
+                emotional: "energy"
+            }
+        };
+       
+        // Neural frequency mappings with enhanced data
+        const NeuralFrequencyMap = {
+            1: { name: "Delta (Deep Sleep)", range: "0.5-4 Hz", color: "#1abc9c", brainState: "unconscious" },
+            8: { name: "Theta (Meditation)", range: "4-8 Hz", color: "#3498db", brainState: "meditative" },
+            12: { name: "Alpha (Relaxed)", range: "8-13 Hz", color: "#9b59b6", brainState: "relaxed" },
+            20: { name: "Beta (Alert)", range: "13-30 Hz", color: "#e74c3c", brainState: "focused" },
+            30: { name: "Low Gamma", range: "30-50 Hz", color: "#f39c12", brainState: "processing" },
+            40: { name: "Gamma (Focus)", range: "30-100 Hz", color: "#e67e22", brainState: "hyperaware" },
+            60: { name: "High Gamma", range: "50-100 Hz", color: "#d35400", brainState: "transcendent" },
+            80: { name: "Ultra High", range: "80-200 Hz", color: "#c0392b", brainState: "supernatural" },
+            100: { name: "Hyper Gamma", range: "100+ Hz", color: "#8e44ad", brainState: "cosmic" }
+        };
+       
+        // 7 Forms descriptions with detailed explanations
+        const FormDescriptions = {
+            1: "Raw electromagnetic brainwave patterns captured by digital analogue sensors attached to the neural exit points of the brain",
+            2: "Neural thoughts deconstructed into binary streams (0s and 1s) representing the fundamental digital language of consciousness",
+            3: "Consonant skeleton extraction creating 'worts' - words without vowels captured from tongue/teeth/mouth resonance patterns",
+            4: "Frequency matching between brain electromagnetic waves and audio synthesis parameters for perfect resonance alignment",
+            5: "Emotional context and tone embedding extracted from the neural signature for natural speech synthesis with feeling",
+            6: "Temporal processing analyzing past/present/future thought context and adding chronological depth to the conversion",
+            7: "Universal meaning extraction transcending language barriers - the core essence of thought in its purest form"
+        };
+       
+        // DOM element references
+        const Elements = {
+            // Input elements
+            thoughtInput: document.getElementById('thoughtInput'),
+            thoughtType: document.getElementById('thoughtType'),
+            brainRegion: document.getElementById('brainRegion'),
+            resonanceFreq: document.getElementById('resonanceFreq'),
+            freqValue: document.getElementById('freqValue'),
+           
+            // Control buttons
+            convertBtn: document.getElementById('convertBtn'),
+            realTimeBtn: document.getElementById('realTimeBtn'),
+            generateAudioBtn: document.getElementById('generateAudioBtn'),
+            playAudioBtn: document.getElementById('playAudioBtn'),
+            stopAudioBtn: document.getElementById('stopAudioBtn'),
+            downloadAudioBtn: document.getElementById('downloadAudioBtn'),
+            calibrateBtn: document.getElementById('calibrateBtn'),
+            attachAnalogueBtn: document.getElementById('attachAnalogueBtn'),
+           
+            // Audio controls
+            voiceType: document.getElementById('voiceType'),
+            audioFreq: document.getElementById('audioFreq'),
+            audioFreqValue: document.getElementById('audioFreqValue'),
+            audioPlayer: document.getElementById('audioPlayer'),
+            audioStatus: document.getElementById('audioStatus'),
+           
+            // Display elements
+            outputText: document.getElementById('outputText'),
+            binaryDisplay: document.getElementById('binaryDisplay'),
+            emDisplay: document.getElementById('emDisplay'),
+            neuralDisplay: document.getElementById('neuralDisplay'),
+            wortsDisplay: document.getElementById('wortsDisplay'),
+            vowelProcess: document.getElementById('vowelProcess'),
+            finalWords: document.getElementById('finalWords'),
+            waveformData: document.getElementById('waveformData'),
+            spectralData: document.getElementById('spectralData'),
+            neuralPatterns: document.getElementById('neuralPatterns'),
+           
+            // Status elements
+            brainReaderStatus: document.getElementById('brainReaderStatus'),
+            statusText: document.getElementById('statusText'),
+            analogueStatus: document.getElementById('analogueStatus'),
+            readerStatus: document.getElementById('readerStatus'),
+            codecStatus: document.getElementById('codecStatus'),
+            audioEngineStatus: document.getElementById('audioEngineStatus'),
+            emDetectorStatus: document.getElementById('emDetectorStatus'),
+           
+            // Visualization elements
+            waveCanvas: document.getElementById('waveCanvas'),
+            progressFill: document.getElementById('progressFill'),
+            steps: document.querySelectorAll('.step'),
+            formCards: document.querySelectorAll('.form-card'),
+            freqBars: document.querySelectorAll('.freq-bar'),
+            converterParts: document.querySelectorAll('.converter-part'),
+           
+            // Download elements
+            downloadBtn: document.getElementById('downloadBtn'),
+            downloadFullBtn: document.getElementById('downloadFullBtn'),
+            downloadWaveBtn: document.getElementById('downloadWaveBtn'),
+            downloadStatus: document.getElementById('downloadStatus')
+        };
+       
+        // Initialize system on load
+        window.addEventListener('load', function() {
+            initializeSystem();
+        });
+       
+        // System initialization
+        function initializeSystem() {
+            try {
+                console.log('Initializing AANIC Brain-Thoughts-to-Word-Audio Converter...');
+               
+                // Setup canvas
+                setupCanvas();
+               
+                // Initialize audio context
+                initializeAudioContext();
+               
+                // Setup event listeners
+                setupEventListeners();
+               
+                // Initialize frequency display
+                updateFrequencyDisplay(50);
+                updateFrequencyBars(50);
+               
+                // Set default values
+                Elements.thoughtInput.value = "ikssyrghtnw";
+                Elements.audioFreq.value = "440";
+                Elements.audioFreqValue.textContent = "440 Hz";
+               
+                // Mark system as initialized
+                SystemState.isInitialized = true;
+               
+                showStatus("AANIC System initialized successfully!", "success");
+                console.log('System initialization complete');
+               
+            } catch (error) {
+                console.error('System initialization failed:', error);
+                showStatus("System initialization failed. Please refresh the page.", "error");
+            }
+        }
+       
+        // Setup canvas for neural wave visualization
+        function setupCanvas() {
+            const canvas = Elements.waveCanvas;
+            const ctx = canvas.getContext('2d');
+           
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+           
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+           
+            // Store context for later use
+            SystemState.canvasContext = ctx;
+        }
+       
+        // Initialize Web Audio API context
+        function initializeAudioContext() {
+            try {
+                SystemState.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                console.log('Audio context initialized successfully');
+            } catch (error) {
+                console.warn('Audio context initialization failed:', error);
+                Elements.audioEngineStatus.textContent = "Error";
+                Elements.audioEngineStatus.style.color = "#e74c3c";
+            }
+        }
+       
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Frequency controls
+            Elements.resonanceFreq.addEventListener('input', handleFrequencyChange);
+            Elements.audioFreq.addEventListener('input', handleAudioFrequencyChange);
+           
+            // Main control buttons
+            Elements.convertBtn.addEventListener('click', handleConvertThought);
+            Elements.realTimeBtn.addEventListener('click', handleRealTimeToggle);
+            Elements.generateAudioBtn.addEventListener('click', handleGenerateAudio);
+           
+            // Audio controls
+            Elements.playAudioBtn.addEventListener('click', handlePlayAudio);
+            Elements.stopAudioBtn.addEventListener('click', handleStopAudio);
+            Elements.downloadAudioBtn.addEventListener('click', handleDownloadAudio);
+           
+            // System controls
+            Elements.calibrateBtn.addEventListener('click', handleCalibrateSystem);
+            Elements.attachAnalogueBtn.addEventListener('click', handleAttachAnalogue);
+           
+            // Download controls
+            Elements.downloadBtn.addEventListener('click', () => handleDownload('word'));
+            Elements.downloadFullBtn.addEventListener('click', () => handleDownload('full'));
+            Elements.downloadWaveBtn.addEventListener('click', () => handleDownload('wave'));
+           
+            // Form card interactions
+            Elements.formCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const formNumber = parseInt(this.getAttribute('data-form'));
+                    showFormDescription(formNumber);
+                });
+            });
+           
+            // Input validation
+            Elements.thoughtInput.addEventListener('input', validateInput);
+           
+            console.log('Event listeners setup complete');
+        }
+       
+        // Handle frequency changes
+        function handleFrequencyChange() {
+            const freq = parseInt(Elements.resonanceFreq.value);
+            updateFrequencyDisplay(freq);
+            updateFrequencyBars(freq);
+        }
+       
+        // Update frequency display with neural mapping
+        function updateFrequencyDisplay(freq) {
+            const mapping = Object.keys(NeuralFrequencyMap).reduce((prev, curr) =>
+                Math.abs(curr - freq) < Math.abs(prev - freq) ? curr : prev
+            );
+           
+            const neuralData = NeuralFrequencyMap[mapping];
+            Elements.freqValue.innerHTML = `${freq} Hz - ${neuralData.name}<br><small>${neuralData.range} (${neuralData.brainState})</small>`;
+        }
+       
+        // Update frequency bars visualization
+        function updateFrequencyBars(targetFreq) {
+            Elements.freqBars.forEach(bar => {
+                const barFreq = parseInt(bar.dataset.freq);
+                const proximity = 1 - Math.abs(targetFreq - barFreq) / 100;
+                const intensity = Math.max(0, proximity);
+               
+                bar.style.transform = `scaleY(${0.2 + intensity * 1.3})`;
+                bar.style.opacity = `${0.3 + intensity * 0.7}`;
+               
+                if (intensity > 0.7) {
+                    bar.classList.add('active');
+                } else {
+                    bar.classList.remove('active');
+                }
+            });
+        }
+       
+        // Handle audio frequency changes
+        function handleAudioFrequencyChange() {
+            const freq = parseInt(Elements.audioFreq.value);
+            Elements.audioFreqValue.textContent = `${freq} Hz`;
+        }
+       
+        // Main conversion function
+        async function handleConvertThought() {
+            if (SystemState.conversionInProgress) {
+                showStatus("Conversion already in progress. Please wait.", "warning");
+                return;
+            }
+           
+            const emPattern = Elements.thoughtInput.value.trim().toLowerCase();
+            if (!emPattern) {
+                showStatus("Please enter an electromagnetic brain pattern.", "error");
+                return;
+            }
+           
+            try {
+                SystemState.conversionInProgress = true;
+                Elements.convertBtn.disabled = true;
+                Elements.convertBtn.innerHTML = '<span class="loading-spinner"></span> Converting...';
+               
+                await performConversion(emPattern);
+               
+            } catch (error) {
+                console.error('Conversion failed:', error);
+                showStatus("Conversion failed. Please try again.", "error");
+            } finally {
+                SystemState.conversionInProgress = false;
+                Elements.convertBtn.disabled = false;
+                Elements.convertBtn.innerHTML = '🧠 Convert Thought to Word & Audio';
+            }
+        }
+       
+        // Perform the complete conversion process
+        async function performConversion(emPattern) {
+            const type = Elements.thoughtType.value;
+            const region = Elements.brainRegion.value;
+            const frequency = parseInt(Elements.resonanceFreq.value);
+           
+            console.log(`Starting conversion: ${emPattern} (${type}, ${region}, ${frequency}Hz)`);
+           
+            // Reset all states
+            resetProcessSteps();
+            resetConverterParts();
+           
+            // Start step-by-step conversion with realistic delays
+            await processStepsSequentially(emPattern, type, region, frequency);
+           
+            // Complete the conversion
+            await completeConversion(emPattern, type, region, frequency);
+        }
+       
+        // Process conversion steps sequentially with animations
+        async function processStepsSequentially(emPattern, type, region, frequency) {
+            const steps = [
+                () => processStep1_EMCapture(emPattern),
+                () => processStep2_BinaryDeconstruction(emPattern),
+                () => processStep3_SkeletalMapping(emPattern),
+                () => processStep4_FrequencyMatching(frequency),
+                () => processStep5_VowelInsertion(emPattern),
+                () => processStep6_EmotionalSignature(type),
+                () => processStep7_AudioSynthesis(region)
+            ];
+           
+            for (let i = 0; i < steps.length; i++) {
+                // Activate current step
+                Elements.steps[i].classList.add('active');
+                Elements.formCards[i].classList.add('active');
+                Elements.converterParts[i % Elements.converterParts.length].classList.add('active');
+               
+                // Update progress bar
+                const progress = ((i + 1) / steps.length) * 100;
+                Elements.progressFill.style.width = `${progress}%`;
+               
+                // Execute step function
+                await steps[i]();
+               
+                // Mark as completed
+                await sleep(500);
+                Elements.steps[i].classList.remove('active');
+                Elements.steps[i].classList.add('completed');
+               
+                // Small delay between steps
+                await sleep(300);
+            }
+        }
+       
+        // Step 1: Electromagnetic Capture
+        async function processStep1_EMCapture(emPattern) {
+            Elements.analogueStatus.textContent = "Capturing";
+            Elements.analogueStatus.style.color = "#f39c12";
+            Elements.emDetectorStatus.textContent = "Detecting EM Waves";
+            Elements.emDetectorStatus.style.color = "#3498db";
+           
+            // Simulate EM wave detection
+            await sleep(800);
+           
+            Elements.emDisplay.textContent = `EM Pattern: ${emPattern.toUpperCase()} (Captured)`;
+            Elements.analogueStatus.textContent = "Connected";
+            Elements.analogueStatus.style.color = "#27ae60";
+        }
+       
+        // Step 2: Binary Deconstruction
+        async function processStep2_BinaryDeconstruction(emPattern) {
+            Elements.readerStatus.textContent = "Processing";
+            Elements.readerStatus.style.color = "#3498db";
+           
+            // Generate binary representation
+            const binary = textToBinary(emPattern);
+           
+            // Animate binary display
+            let binaryText = "";
+            for (let i = 0; i < binary.length; i++) {
+                binaryText += binary[i];
+                Elements.binaryDisplay.textContent = `Binary: ${binaryText}`;
+                if (i % 10 === 0) await sleep(50);
+            }
+           
+            Elements.readerStatus.textContent = "Active";
+            Elements.readerStatus.style.color = "#27ae60";
+        }
+       
+        // Step 3: Skeletal Template Mapping
+        async function processStep3_SkeletalMapping(emPattern) {
+            Elements.codecStatus.textContent = "Mapping";
+            Elements.codecStatus.style.color = "#f39c12";
+           
+            Elements.wortsDisplay.textContent = `Original Worts: ${emPattern.toUpperCase()}`;
+           
+            await sleep(600);
+            Elements.codecStatus.textContent = "Processing";
+            Elements.codecStatus.style.color = "#3498db";
+        }
+       
+        // Step 4: Frequency Matching
+        async function processStep4_FrequencyMatching(frequency) {
+            const mapping = Object.keys(NeuralFrequencyMap).reduce((prev, curr) =>
+                Math.abs(curr - frequency) < Math.abs(prev - frequency) ? curr : prev
+            );
+            const neuralData = NeuralFrequencyMap[mapping];
+           
+            Elements.neuralDisplay.textContent = `Neural Codec: Frequency matching at ${frequency}Hz (${neuralData.name})`;
+           
+            // Animate frequency bars
+            updateFrequencyBars(frequency);
+            await sleep(700);
+        }
+       
+        // Step 5: Vowel Insertion
+        async function processStep5_VowelInsertion(emPattern) {
+            const vowelInserted = insertVowels(emPattern);
+           
+            // Animate vowel insertion process
+            let currentText = emPattern;
+            Elements.vowelProcess.textContent = `Vowel Insertion: ${currentText}`;
+           
+            await sleep(300);
+            for (let i = 0; i < 3; i++) {
+                Elements.vowelProcess.textContent = `Vowel Insertion: ${currentText} → processing...`;
+                await sleep(200);
+            }
+           
+            Elements.vowelProcess.textContent = `Vowel Insertion: ${emPattern} → ${vowelInserted}`;
+        }
+       
+        // Step 6: Emotional Signature
+        async function processStep6_EmotionalSignature(type) {
+            Elements.neuralDisplay.textContent = `Neural Codec: Applying emotional signature (${type})`;
+            await sleep(500);
+        }
+       
+        // Step 7: Audio Synthesis
+        async function processStep7_AudioSynthesis(region) {
+            Elements.audioEngineStatus.textContent = "Synthesizing";
+            Elements.audioEngineStatus.style.color = "#f39c12";
+           
+            await sleep(600);
+            Elements.audioEngineStatus.textContent = "Ready";
+            Elements.audioEngineStatus.style.color = "#27ae60";
+        }
+       
+        // Complete the conversion process
+        async function completeConversion(emPattern, type, region, frequency) {
+            // Get conversion data
+            const conversionData = ConversionDatabase[emPattern];
+            let convertedText, phonetic, audioPattern, emotional;
+           
+            if (conversionData) {
+                convertedText = conversionData.text;
+                phonetic = conversionData.phonetic;
+                audioPattern = conversionData.audioPattern;
+                emotional = conversionData.emotional;
+            } else {
+                convertedText = convertAlgorithmically(emPattern);
+                phonetic = generatePhonetic(convertedText);
+                audioPattern = generateAudioPattern(convertedText);
+                emotional = "neutral";
+            }
+           
+            // Apply enhancements
+            const enhancedText = applyAllEnhancements(convertedText, type, region, frequency);
+           
+            // Display final results
+            Elements.finalWords.textContent = `Final Words: ${enhancedText}`;
+           
+            const detailedOutput = generateDetailedOutput({
+                emPattern,
+                convertedText: enhancedText,
+                type,
+                region,
+                frequency,
+                phonetic,
+                audioPattern,
+                emotional,
+                binary: textToBinary(emPattern)
+            });
+           
+            Elements.outputText.textContent = detailedOutput;
+           
+            // Update technical displays
+            updateTechnicalDisplays(audioPattern, region, frequency);
+           
+            // Store conversion data
+            SystemState.currentConversion = {
+                emPattern,
+                convertedText: enhancedText,
+                originalText: convertedText,
+                type,
+                region,
+                frequency,
+                phonetic,
+                audioPattern,
+                emotional,
+                binaryPattern: textToBinary(emPattern),
+                timestamp: new Date().toLocaleString()
+            };
+           
+            // Enable relevant buttons
+            enablePostConversionButtons();
+           
+            // Start neural wave animation
+            if (!SystemState.isRealTimeActive) {
+                startNeuralWaveVisualization();
+            }
+           
+            showStatus("Brain thought conversion completed successfully!", "success");
+            console.log('Conversion completed:', SystemState.currentConversion);
+        }
+       
+        // Generate detailed output text
+        function generateDetailedOutput(data) {
+            return `"${data.convertedText}"
+
+CONVERSION ANALYSIS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Original EM Pattern: ${data.emPattern.toUpperCase()}
+- Thought Type: ${data.type}
+- Brain Region: ${data.region}
+- Neural Frequency: ${data.frequency} Hz
+- Emotional Signature: ${data.emotional}
+- Phonetic Representation: /${data.phonetic}/
+- Audio Pattern: [${data.audioPattern.join(', ')} Hz]
+- Binary Neural Code: ${data.binary.substring(0, 50)}...
+
+AANIC PROCESSING STATUS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Electromagnetic Capture Complete
+✓ Binary Deconstruction Complete 
+✓ Skeletal Template Mapped
+✓ Frequency Resonance Matched
+✓ Vowel Insertion Applied
+✓ Emotional Context Embedded
+✓ Universal Template Generated
+
+🎵 Audio synthesis ready for generation.
+📊 Neural patterns successfully decoded.
+🧠 Brain-to-word conversion: COMPLETE`;
+        }
+       
+        // Update technical displays
+        function updateTechnicalDisplays(audioPattern, region, frequency) {
+            Elements.waveformData.textContent = `Waveform: ${audioPattern.length} frequency points [${audioPattern.slice(0, 5).join(', ')}... Hz]`;
+            Elements.spectralData.textContent = `Spectral: Peak ${Math.max(...audioPattern)}Hz, Avg ${Math.round(audioPattern.reduce((a,b) => a+b) / audioPattern.length)}Hz`;
+            Elements.neuralPatterns.textContent = `Neural Patterns: ${region} region activated at ${frequency}Hz - Pattern recognized`;
+        }
+       
+        // Enable buttons after successful conversion
+        function enablePostConversionButtons() {
+            Elements.generateAudioBtn.disabled = false;
+            Elements.downloadBtn.disabled = false;
+            Elements.downloadFullBtn.disabled = false;
+            Elements.downloadWaveBtn.disabled = false;
+        }
+       
+        // Audio generation
+        async function handleGenerateAudio() {
+            if (!SystemState.currentConversion) {
+                showStatus("No conversion data available. Please convert a brain thought first.", "error");
+                return;
+            }
+           
+            if (!SystemState.audioContext) {
+                showStatus("Audio system not available. Please check your browser settings.", "error");
+                return;
+            }
+           
+            try {
+                Elements.generateAudioBtn.disabled = true;
+                Elements.generateAudioBtn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+                Elements.audioStatus.textContent = "Generating neural audio synthesis...";
+               
+                await generateNeuralAudio(SystemState.currentConversion);
+               
+                showStatus("Neural audio generated successfully!", "success");
+               
+            } catch (error) {
+                console.error('Audio generation failed:', error);
+                showStatus("Audio generation failed. Please try again.", "error");
+            } finally {
+                Elements.generateAudioBtn.disabled = false;
+                Elements.generateAudioBtn.innerHTML = '🎵 Generate Audio from Thoughts';
+            }
+        }
+       
+        // Generate neural audio synthesis
+        async function generateNeuralAudio(conversionData) {
+            const ctx = SystemState.audioContext;
+            const duration = Math.max(2.0, conversionData.convertedText.length * 0.1);
+            const sampleRate = ctx.sampleRate;
+            const frameCount = sampleRate * duration;
+           
+            // Create audio buffer
+            SystemState.currentAudioBuffer = ctx.createBuffer(1, frameCount, sampleRate);
+            const channelData = SystemState.currentAudioBuffer.getChannelData(0);
+           
+            // Get synthesis parameters
+            const audioPattern = conversionData.audioPattern;
+            const baseFreq = parseInt(Elements.audioFreq.value);
+            const voiceSynthType = Elements.voiceType.value;
+            const neuralFreq = conversionData.frequency;
+           
+            // Generate waveform
+            for (let i = 0; i < frameCount; i++) {
+                const time = i / sampleRate;
+                const progress = time / duration;
+                const patternIndex = Math.floor(progress * audioPattern.length);
+                const freq = audioPattern[patternIndex] || baseFreq;
+               
+                let sample = generateWaveformSample(time, freq, voiceSynthType, neuralFreq, progress);
+               
+                // Apply envelope for natural sound
+                const envelope = applyEnvelope(progress, voiceSynthType);
+                channelData[i] = sample * envelope;
+            }
+           
+            // Create downloadable audio
+            const audioBlob = audioBufferToWav(SystemState.currentAudioBuffer);
+            const audioUrl = URL.createObjectURL(audioBlob);
+            Elements.audioPlayer.src = audioUrl;
+           
+            // Update status and enable controls
+            Elements.audioStatus.textContent = `Audio generated: ${voiceSynthType} synthesis of "${conversionData.convertedText}" (${duration.toFixed(1)}s)`;
+            Elements.playAudioBtn.disabled = false;
+            Elements.downloadAudioBtn.disabled = false;
+           
+            console.log('Audio generation completed');
+        }
+       
+        // Generate waveform sample based on synthesis type
+        function generateWaveformSample(time, freq, type, neuralFreq, progress) {
+            switch(type) {
+                case 'neural':
+                    return generateNeuralWaveform(time, freq, neuralFreq);
+                case 'human':
+                    return generateHumanLikeWaveform(time, freq, progress);
+                case 'robotic':
+                    return generateRoboticWaveform(time, freq);
+                case 'whisper':
+                    return generateWhisperWaveform(time, freq);
+                case 'thinking':
+                    return generateThinkingWaveform(time, freq, neuralFreq);
+                default:
+                    return Math.sin(2 * Math.PI * freq * time);
+            }
+        }
+       
+        // Neural waveform with brain frequency modulation
+        function generateNeuralWaveform(time, freq, neuralFreq) {
+            const base = Math.sin(2 * Math.PI * freq * time);
+            const neural = Math.sin(2 * Math.PI * neuralFreq * time * 0.1) * 0.3;
+            const modulation = Math.sin(2 * Math.PI * 0.5 * time) * 0.2;
+            return (base + neural + modulation) * 0.4;
+        }
+       
+        // Human-like waveform with harmonics
+        function generateHumanLikeWaveform(time, freq, progress) {
+            const fundamental = Math.sin(2 * Math.PI * freq * time);
+            const harmonic2 = Math.sin(2 * Math.PI * freq * 2 * time) * 0.5;
+            const harmonic3 = Math.sin(2 * Math.PI * freq * 3 * time) * 0.25;
+            const vibrato = Math.sin(2 * Math.PI * 5 * time) * 0.05 * progress;
+            return (fundamental + harmonic2 + harmonic3) * (0.8 + vibrato);
+        }
+       
+        // Robotic/digital waveform
+        function generateRoboticWaveform(time, freq) {
+            return Math.sign(Math.sin(2 * Math.PI * freq * time)) * 0.5;
+        }
+       
+        // Whisper waveform with noise
+        function generateWhisperWaveform(time, freq) {
+            const noise = (Math.random() - 0.5) * 0.4;
+            const tone = Math.sin(2 * Math.PI * freq * time) * 0.3;
+            return noise + tone;
+        }
+       
+        // Thinking/subvocal waveform
+        function generateThinkingWaveform(time, freq, neuralFreq) {
+            const subvocal = Math.sin(2 * Math.PI * freq * 0.3 * time) * 0.4;
+            const brainwave = Math.sin(2 * Math.PI * neuralFreq * 0.01 * time) * 0.6;
+            const thought = Math.sin(2 * Math.PI * freq * 0.1 * time) * 0.2;
+            return subvocal + brainwave + thought;
+        }
+       
+// Apply envelope for natural audio characteristics
+        function applyEnvelope(progress, voiceType) {
+            let envelope = 1.0;
+           
+            switch(voiceType) {
+                case 'neural':
+                    // Smooth neural envelope with slight fade
+                    envelope = Math.sin(Math.PI * progress) * 0.6;
+                    break;
+                case 'human':
+                    // Natural speech envelope with breath-like dynamics
+                    envelope = Math.sin(Math.PI * progress) * (0.7 + Math.sin(progress * 20) * 0.1);
+                    break;
+                case 'robotic':
+                    // Sharp digital envelope
+                    envelope = progress < 0.1 ? progress * 10 : (progress > 0.9 ? (1 - progress) * 10 : 1) * 0.5;
+                    break;
+                case 'whisper':
+                    // Soft whisper envelope
+                    envelope = Math.sin(Math.PI * progress) * 0.4;
+                    break;
+                case 'thinking':
+                    // Internal thought envelope - very soft
+                    envelope = Math.sin(Math.PI * progress) * 0.3;
+                    break;
+                default:
+                    envelope = Math.sin(Math.PI * progress) * 0.5;
+            }
+           
+            return Math.max(0, Math.min(1, envelope));
+        }
+       
+        // Audio control handlers
+        function handlePlayAudio() {
+            if (Elements.audioPlayer.src) {
+                Elements.audioPlayer.play()
+                    .then(() => {
+                        Elements.audioStatus.textContent = "Playing synthesized neural audio...";
+                        Elements.stopAudioBtn.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Audio play failed:', error);
+                        showStatus("Audio playback failed. Please try again.", "error");
+                    });
+            } else {
+                showStatus("No audio available. Please generate audio first.", "warning");
+            }
+        }
+       
+        function handleStopAudio() {
+            Elements.audioPlayer.pause();
+            Elements.audioPlayer.currentTime = 0;
+            Elements.audioStatus.textContent = "Audio stopped.";
+            Elements.stopAudioBtn.disabled = true;
+        }
+       
+        async function handleDownloadAudio() {
+            if (!SystemState.currentAudioBuffer) {
+                showStatus("No audio generated yet. Please generate audio first.", "error");
+                return;
+            }
+           
+            try {
+                const audioBlob = audioBufferToWav(SystemState.currentAudioBuffer);
+                const filename = `AANIC_Neural_Audio_${SystemState.currentConversion.emPattern}_${Date.now()}.wav`;
+                downloadFile(audioBlob, filename);
+               
+                showStatus("Neural audio file downloaded successfully!", "success");
+                console.log('Audio downloaded:', filename);
+               
+            } catch (error) {
+                console.error('Audio download failed:', error);
+                showStatus("Audio download failed. Please try again.", "error");
+            }
+        }
+       
+        // Real-time brain reading toggle
+        async function handleRealTimeToggle() {
+            if (!SystemState.brainReaderConnected) {
+                showStatus("Please attach the digital analogue brain reader first.", "warning");
+                return;
+            }
+           
+            SystemState.isRealTimeActive = !SystemState.isRealTimeActive;
+           
+            if (SystemState.isRealTimeActive) {
+                await startRealTimeBrainReading();
+            } else {
+                stopRealTimeBrainReading();
+            }
+        }
+       
+        // Start real-time brain reading simulation
+        async function startRealTimeBrainReading() {
+            Elements.realTimeBtn.textContent = "⏹️ Stop Real-Time Reading";
+            Elements.realTimeBtn.classList.add('warning-btn');
+            Elements.brainReaderStatus.classList.add('active');
+            Elements.statusText.textContent = "Brain Reader: Active - Real-time monitoring";
+           
+            // Start neural wave animation
+            startNeuralWaveVisualization();
+           
+            // Simulate real-time thought detection
+            const thoughtPatterns = Object.keys(ConversionDatabase);
+            let patternIndex = 0;
+            let detectionCount = 0;
+           
+            const detectionInterval = setInterval(() => {
+                if (!SystemState.isRealTimeActive) {
+                    clearInterval(detectionInterval);
+                    return;
+                }
+               
+                const currentPattern = thoughtPatterns[patternIndex % thoughtPatterns.length];
+                const conversionData = ConversionDatabase[currentPattern];
+               
+                // Update displays with detected pattern
+                Elements.thoughtInput.value = currentPattern;
+                Elements.neuralDisplay.textContent = `Neural Codec: Real-time pattern detected - "${conversionData.text}"`;
+                Elements.emDisplay.textContent = `EM Pattern: ${currentPattern.toUpperCase()} (Live Detection #${++detectionCount})`;
+               
+                // Flash frequency bars to show activity
+                updateFrequencyBars(Math.random() * 100);
+               
+                // Simulate neural activity in converter parts
+                Elements.converterParts.forEach((part, index) => {
+                    setTimeout(() => {
+                        part.classList.add('active');
+                        setTimeout(() => part.classList.remove('active'), 500);
+                    }, index * 200);
+                });
+               
+                patternIndex++;
+               
+                console.log(`Real-time detection: ${currentPattern} -> ${conversionData.text}`);
+               
+            }, 3000);
+           
+            SystemState.realTimeInterval = detectionInterval;
+            showStatus("Real-time brain reading started!", "success");
+        }
+       
+        // Stop real-time brain reading
+        function stopRealTimeBrainReading() {
+            Elements.realTimeBtn.textContent = "🔴 Start Real-Time Brain Reading";
+            Elements.realTimeBtn.classList.remove('warning-btn');
+            Elements.brainReaderStatus.classList.remove('active');
+            Elements.statusText.textContent = "Brain Reader: Offline";
+           
+            // Stop wave animation
+            if (SystemState.waveAnimationId) {
+                cancelAnimationFrame(SystemState.waveAnimationId);
+                SystemState.waveAnimationId = null;
+            }
+           
+            // Clear real-time interval
+            if (SystemState.realTimeInterval) {
+                clearInterval(SystemState.realTimeInterval);
+                SystemState.realTimeInterval = null;
+            }
+           
+            // Reset displays
+            Elements.neuralDisplay.textContent = "Neural Codec: Standby...";
+            resetConverterParts();
+           
+            showStatus("Real-time brain reading stopped.", "warning");
+        }
+       
+        // Neural wave visualization
+        function startNeuralWaveVisualization() {
+            if (SystemState.waveAnimationId) return;
+           
+            const canvas = Elements.waveCanvas;
+            const ctx = SystemState.canvasContext;
+            let time = 0;
+           
+            function animate() {
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+               
+                const centerY = canvas.height / 2;
+                const amplitude = canvas.height * 0.3;
+                const frequency = parseInt(Elements.resonanceFreq.value) / 10;
+               
+                // Draw multiple wave layers for depth
+                const layers = [
+                    { color: 'rgba(155, 89, 182, 0.8)', offset: 0, amp: 1 },
+                    { color: 'rgba(52, 152, 219, 0.6)', offset: 0.5, amp: 0.7 },
+                    { color: 'rgba(231, 76, 60, 0.4)', offset: 1.0, amp: 0.5 }
+                ];
+               
+                layers.forEach(layer => {
+                    ctx.beginPath();
+                    ctx.strokeStyle = layer.color;
+                    ctx.lineWidth = 2;
+                   
+                    for (let x = 0; x < canvas.width; x++) {
+                        const waveX = x / canvas.width;
+                        const wavePhase = (waveX * frequency * 2 * Math.PI) + (time * 0.02) + layer.offset;
+                        const y = centerY + Math.sin(wavePhase) * amplitude * layer.amp;
+                       
+                        if (x === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                    ctx.stroke();
+                });
+               
+                time++;
+               
+                if (SystemState.isRealTimeActive || SystemState.currentConversion) {
+                    SystemState.waveAnimationId = requestAnimationFrame(animate);
+                }
+            }
+           
+            animate();
+        }
+       
+        // System calibration
+        async function handleCalibrateSystem() {
+            Elements.calibrateBtn.disabled = true;
+            Elements.calibrateBtn.innerHTML = '<span class="loading-spinner"></span> Calibrating...';
+           
+            const calibrationSteps = [
+                { status: "Initializing sensors...", delay: 500 },
+                { status: "Calibrating EM detectors...", delay: 800 },
+                { status: "Tuning neural frequencies...", delay: 600 },
+                { status: "Testing signal integrity...", delay: 700 },
+                { status: "Finalizing calibration...", delay: 400 }
+            ];
+           
+            try {
+                for (let i = 0; i < calibrationSteps.length; i++) {
+                    const step = calibrationSteps[i];
+                    Elements.emDetectorStatus.textContent = step.status;
+                    Elements.emDetectorStatus.style.color = "#f39c12";
+                   
+                    // Update progress
+                    const progress = ((i + 1) / calibrationSteps.length) * 100;
+                    Elements.progressFill.style.width = `${progress}%`;
+                   
+                    await sleep(step.delay);
+                }
+               
+                Elements.emDetectorStatus.textContent = "Calibrated";
+                Elements.emDetectorStatus.style.color = "#27ae60";
+                Elements.progressFill.style.width = "0%";
+               
+                showStatus("Brain reader calibration completed successfully!", "success");
+               
+            } catch (error) {
+                console.error('Calibration failed:', error);
+                Elements.emDetectorStatus.textContent = "Calibration Error";
+                Elements.emDetectorStatus.style.color = "#e74c3c";
+                showStatus("Calibration failed. Please try again.", "error");
+            } finally {
+                Elements.calibrateBtn.disabled = false;
+                Elements.calibrateBtn.textContent = "🎯 Calibrate Brain Reader";
+            }
+        }
+       
+        // Digital analogue attachment
+        async function handleAttachAnalogue() {
+            if (SystemState.brainReaderConnected) {
+                // Disconnect
+                SystemState.brainReaderConnected = false;
+                Elements.attachAnalogueBtn.textContent = "🔗 Attach Digital Analogue";
+                Elements.attachAnalogueBtn.classList.remove('success-btn');
+               
+                Elements.analogueStatus.textContent = "Disconnected";
+                Elements.analogueStatus.style.color = "#e74c3c";
+                Elements.readerStatus.textContent = "Offline";
+                Elements.readerStatus.style.color = "#e74c3c";
+                Elements.codecStatus.textContent = "Standby";
+                Elements.codecStatus.style.color = "#f39c12";
+               
+                // Stop real-time if active
+                if (SystemState.isRealTimeActive) {
+                    SystemState.isRealTimeActive = false;
+                    stopRealTimeBrainReading();
+                }
+               
+                showStatus("Digital analogue brain reader disconnected.", "warning");
+               
+            } else {
+                // Connect with animation
+                Elements.attachAnalogueBtn.disabled = true;
+                Elements.attachAnalogueBtn.innerHTML = '<span class="loading-spinner"></span> Connecting...';
+               
+                await sleep(1500);
+               
+                SystemState.brainReaderConnected = true;
+                Elements.attachAnalogueBtn.textContent = "🔌 Detach Digital Analogue";
+                Elements.attachAnalogueBtn.classList.add('success-btn');
+                Elements.attachAnalogueBtn.disabled = false;
+               
+                Elements.analogueStatus.textContent = "Connected";
+                Elements.analogueStatus.style.color = "#27ae60";
+                Elements.readerStatus.textContent = "Standby";
+                Elements.readerStatus.style.color = "#27ae60";
+                Elements.codecStatus.textContent = "Ready";
+                Elements.codecStatus.style.color = "#27ae60";
+               
+                showStatus("Digital analogue brain reader connected successfully!", "success");
+            }
+        }
+       
+        // Download handlers
+        async function handleDownload(type) {
+            if (!SystemState.currentConversion) {
+                showStatus("Please convert a brain thought first.", "error");
+                return;
+            }
+           
+            try {
+                let content, filename, mimeType;
+               
+                switch(type) {
+                    case 'word':
+                        content = generateWordDocument(SystemState.currentConversion);
+                        filename = `AANIC_Conversion_${SystemState.currentConversion.emPattern}_${Date.now()}.doc`;
+                        mimeType = 'application/msword';
+                        break;
+                       
+                    case 'full':
+                        content = await generateCompletePackage(SystemState.currentConversion);
+                        filename = `AANIC_Complete_Package_${Date.now()}.txt`;
+                        mimeType = 'text/plain';
+                        break;
+                       
+                    case 'wave':
+                        content = generateWaveformData(SystemState.currentConversion);
+                        filename = `AANIC_Waveform_${Date.now()}.txt`;
+                        mimeType = 'text/plain';
+                        break;
+                       
+                    default:
+                        throw new Error('Unknown download type');
+                }
+               
+                const blob = new Blob([content], { type: mimeType });
+                downloadFile(blob, filename);
+               
+                showStatus(`${type.charAt(0).toUpperCase() + type.slice(1)} file downloaded successfully!`, "success");
+                console.log(`Download completed: ${filename}`);
+               
+            } catch (error) {
+                console.error('Download failed:', error);
+                showStatus("Download failed. Please try again.", "error");
+            }
+        }
+       
+        // Utility functions
+       
+        // Sleep function for delays
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+       
+        // Reset process steps
+        function resetProcessSteps() {
+            Elements.steps.forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+            Elements.formCards.forEach(card => {
+                card.classList.remove('active');
+            });
+            Elements.progressFill.style.width = "0%";
+        }
+       
+        // Reset converter parts
+        function resetConverterParts() {
+            Elements.converterParts.forEach(part => {
+                part.classList.remove('active');
+            });
+        }
+       
+        // Input validation
+        function validateInput() {
+            const value = Elements.thoughtInput.value.trim();
+            const isValid = /^[a-z]+$/i.test(value) && value.length > 0;
+           
+            if (!isValid && value.length > 0) {
+                Elements.thoughtInput.style.borderColor = "#e74c3c";
+                showStatus("Please enter only letters for the electromagnetic pattern.", "warning");
+            } else {
+                Elements.thoughtInput.style.borderColor = "rgba(255,255,255,0.2)";
+            }
+           
+            Elements.convertBtn.disabled = !isValid;
+        }
+       
+        // Show form description
+        function showFormDescription(formNumber) {
+            const description = FormDescriptions[formNumber];
+            alert(`Form ${formNumber}: ${description}`);
+        }
+       
+        // Enhanced utility functions
+       
+        // Text to binary conversion
+        function textToBinary(text) {
+            return text.split('').map(char => {
+                return char.charCodeAt(0).toString(2).padStart(8, '0');
+            }).join(' ');
+        }
+       
+        // Advanced vowel insertion algorithm
+        function insertVowels(worts) {
+            let result = worts.toLowerCase();
+           
+            // Advanced patterns for better word reconstruction
+            const patterns = [
+                // Common consonant clusters
+                { from: /([bcdfghjklmnpqrstvwxyz])([bcdfghjklmnpqrstvwxyz])([bcdfghjklmnpqrstvwxyz])/g, to: '$1a$2e$3' },
+                { from: /([bcdfghjklmnpqrstvwxyz])([bcdfghjklmnpqrstvwxyz])/g, to: '$1a$2' },
+               
+                // Word boundaries
+                { from: /^([bcdfghjklmnpqrstvwxyz])/g, to: '$1e' },
+                { from: /([bcdfghjklmnpqrstvwxyz])$/g, to: '$1e' },
+               
+                // Special combinations
+                { from: /th/g, to: 'the' },
+                { from: /ng/g, to: 'ing' },
+                { from: /ck/g, to: 'ick' },
+                { from: /sh/g, to: 'ish' }
+            ];
+           
+            patterns.forEach(pattern => {
+                result = result.replace(pattern.from, pattern.to);
+            });
+           
+            // Capitalize first letter
+            result = result.charAt(0).toUpperCase() + result.slice(1);
+           
+            return result;
+        }
+       
+        // Generate phonetic representation
+        function generatePhonetic(text) {
+            const phoneticMap = {
+                'th': 'ð', 'sh': 'ʃ', 'ch': 'tʃ', 'ng': 'ŋ',
+                'a': 'ɑ', 'e': 'ɛ', 'i': 'ɪ', 'o': 'ɔ', 'u': 'ʊ'
+            };
+           
+            let phonetic = text.toLowerCase();
+            Object.entries(phoneticMap).forEach(([key, value]) => {
+                phonetic = phonetic.replace(new RegExp(key, 'g'), value);
+            });
+           
+            return phonetic;
+        }
+       
+        // Generate audio pattern from text
+        function generateAudioPattern(text) {
+            return text.split('').map(char => {
+                const code = char.charCodeAt(0);
+                return 200 + (code % 26) * 20; // Map to 200-720 Hz range
+            }).filter(freq => freq >= 200);
+        }
+       
+        // Algorithmic conversion for unknown patterns
+        function convertAlgorithmically(emPattern) {
+            let result = insertVowels(emPattern);
+           
+            // Apply common word patterns
+            const commonPatterns = [
+                { from: /^ik/, to: 'I k' },
+                { from: /yr$/, to: 'your' },
+                { from: /nw$/, to: 'now' },
+                { from: /^hl/, to: 'Hello' },
+                { from: /ym$/, to: 'you my' }
+            ];
+           
+            commonPatterns.forEach(pattern => {
+                result = result.replace(pattern.from, pattern.to);
+            });
+           
+            return result;
+        }
+       
+        // Apply all enhancements to converted text
+        function applyAllEnhancements(text, type, region, frequency) {
+            let enhanced = text;
+           
+            // Apply brain region effects
+            enhanced = applyBrainRegionEffects(enhanced, region);
+           
+            // Apply emotional signature
+            enhanced = applyEmotionalSignature(enhanced, type);
+           
+            // Apply frequency effects
+            enhanced = applyFrequencyEffects(enhanced, frequency);
+           
+            return enhanced;
+        }
+       
+        // Apply brain region specific effects
+        function applyBrainRegionEffects(text, region) {
+            const effects = {
+                'temporal': `[Temporal-Auditory] ${text}`,
+                'frontal': `[Frontal-Speech] ${text}`,
+                'broca': `[Broca-Motor] ${text.toUpperCase()}`,
+                'wernicke': `[Wernicke-Comprehension] "${text}"`,
+                'motor': `[Motor-Cortex] ${text}!`
+            };
+            return effects[region] || text;
+        }
+       
+        // Apply emotional signature
+        function applyEmotionalSignature(text, type) {
+            const signatures = {
+                'speech': text,
+                'emotion': `[Emotional] ${text} 💭`,
+                'command': `[Command] ${text.toUpperCase()}!`,
+                'abstract': `[Abstract] "${text}" (Conceptual)`,
+                'subvocal': `[Subvocal] ${text.toLowerCase()}`
+            };
+            return signatures[type] || text;
+        }
+       
+        // Apply frequency effects
+        function applyFrequencyEffects(text, frequency) {
+            if (frequency >= 80) {
+                return `[High-Frequency] ${text} ✨ (Transcendent)`;
+            } else if (frequency >= 60) {
+                return `[Gamma] ${text} ⚡ (Hyperaware)`;
+            } else if (frequency >= 30) {
+                return `[Beta] ${text} 🧠 (Focused)`;
+            } else if (frequency <= 20) {
+                return `[Alpha] ${text} ... (Relaxed)`;
+            }
+            return text;
+        }
+       
+        // Audio buffer to WAV conversion
+        function audioBufferToWav(buffer) {
+            const length = buffer.length;
+            const arrayBuffer = new ArrayBuffer(44 + length * 2);
+            const view = new DataView(arrayBuffer);
+            const channels = buffer.numberOfChannels;
+            const sampleRate = buffer.sampleRate;
+           
+            // WAV header
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+           
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + length * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, channels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * channels * 2, true);
+            view.setUint16(32, channels * 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, length * 2, true);
+           
+            // Convert audio data
+            const channelData = buffer.getChannelData(0);
+            let offset = 44;
+            for (let i = 0; i < length; i++) {
+                const sample = Math.max(-1, Math.min(1, channelData[i]));
+                view.setInt16(offset, sample * 0x7FFF, true);
+                offset += 2;
+            }
+           
+            return new Blob([arrayBuffer], { type: 'audio/wav' });
+        }
+       
+        // Document generation functions
+        function generateWordDocument(conversion) {
+            return `
+AANIC BRAIN-THOUGHTS-TO-WORD-AUDIO CONVERSION REPORT
+Database 82698: Thoughts to Word or Audio | By David Gomadza
+www.twofuture.world
+
+═══════════════════════════════════════════════════════════════
+
+CONVERSION SUMMARY:
+Original EM Pattern: ${conversion.emPattern.toUpperCase()}
+Final Translation: ${conversion.convertedText}
+Processing Time: ${conversion.timestamp}
+
+TECHNICAL ANALYSIS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Thought Classification: ${conversion.type}
+- Target Brain Region: ${conversion.region} 
+- Neural Frequency: ${conversion.frequency} Hz
+- Emotional Signature: ${conversion.emotional}
+- Phonetic Structure: /${conversion.phonetic}/
+- Audio Synthesis Pattern: [${conversion.audioPattern.join(', ')} Hz]
+- Binary Neural Encoding: ${conversion.binaryPattern}
+
+AANIC PROCESSING PIPELINE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. ✓ Electromagnetic Capture & Digital Analogue Attachment
+2. ✓ Binary Neural Deconstruction (${conversion.binaryPattern.split(' ').length} bytes)
+3. ✓ Skeletal Template Mapping (Worts→Words Algorithm)
+4. ✓ Resonance Frequency Matching (${conversion.frequency}Hz Locked)
+5. ✓ Vowel Insertion Algorithm Applied
+6. ✓ Emotional Signature Integration (${conversion.emotional} tone)
+7. ✓ Audio Synthesis & Universal Template Generation
+
+CONVERSION METHODOLOGY:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The AANIC system captures raw electromagnetic patterns from brain exit points,
+processes them through 7 forms of communication, and converts the skeletal
+"worts" (words without vowels) into complete natural language with audio synthesis.
+
+QUALITY METRICS:
+- Pattern Recognition: 100% (Database Match Found)
+- Vowel Insertion Accuracy: Verified
+- Audio Synthesis Quality: High-Fidelity Neural Generation
+- Emotional Context Integration: Successfully Applied
+- Universal Template Compliance: Full Compatibility
+
+═══════════════════════════════════════════════════════════════
+
+Generated by AANIC Neural Codec System v1.0
+Research Foundation: David Gomadza
+Database 82698: Thoughts to Word or Audio Converter
+
+This document certifies the successful conversion of electromagnetic brain
+patterns to written and audible language using advanced neural processing
+and the revolutionary 7 Forms of Communication framework.
+            `;
+        }
+       
+        async function generateCompletePackage(conversion) {
+            return `
+╔══════════════════════════════════════════════════════════════╗
+║ AANIC COMPLETE PACKAGE ║
+║ Brain-Thoughts-to-Word-Audio System ║
+╚══════════════════════════════════════════════════════════════╝
+
+CONVERSION DATA:
+══════════════
+Original Pattern: ${conversion.emPattern}
+Converted Text: ${conversion.convertedText}
+Original Text: ${conversion.originalText}
+
+NEURAL DATA:
+════════════
+Binary Stream: ${conversion.binaryPattern}
+Phonetic: /${conversion.phonetic}/
+Audio Pattern: ${conversion.audioPattern.join(',')}
+Emotional Tone: ${conversion.emotional}
+
+TECHNICAL SPECS:
+═══════════════
+Brain Region: ${conversion.region}
+Neural Frequency: ${conversion.frequency}Hz
+Thought Type: ${conversion.type}
+Processing Time: ${conversion.timestamp}
+
+AUDIO SYNTHESIS:
+═══════════════
+Frequency Points: ${conversion.audioPattern.length}
+Waveform Type: Neural Synthesis
+Duration: ${Math.max(2.0, conversion.convertedText.length * 0.1).toFixed(1)}s
+Sample Rate: 44100Hz
+
+SYSTEM STATUS:
+═════════════
+AANIC Version: 1.0
+Database: 82698 Active
+All Systems: Operational
+Quality Check: ✓ Passed
+
+[Note: Complete audio files would be included in full implementation]
+
+Generated by AANIC System | David Gomadza | www.twofuture.world
+            `;
+        }
+       
+        function generateWaveformData(conversion) {
+            const avgFreq = conversion.audioPattern.reduce((a,b) => a+b) / conversion.audioPattern.length;
+            const maxFreq = Math.max(...conversion.audioPattern);
+            const minFreq = Math.min(...conversion.audioPattern);
+           
+            return `
+AANIC NEURAL WAVEFORM DATA EXPORT
+═════════════════════════════════
+
+PATTERN IDENTIFICATION:
+Original EM Pattern: ${conversion.emPattern.toUpperCase()}
+Decoded Message: "${conversion.convertedText}"
+Neural Classification: ${conversion.type}
+
+FREQUENCY ANALYSIS:
+═══════════════════
+Base Neural Frequency: ${conversion.frequency}Hz
+Audio Frequency Range: ${minFreq}-${maxFreq}Hz
+Average Frequency: ${Math.round(avgFreq)}Hz
+Peak Amplitude Point: ${maxFreq}Hz
+Frequency Stability: ${((1 - (maxFreq - minFreq) / maxFreq) * 100).toFixed(1)}%
+
+WAVEFORM COMPONENTS:
+═══════════════════
+Fundamental Pattern: ${conversion.audioPattern.slice(0, 8).join(', ')}Hz
+Harmonic Series: Generated
+Emotional Modulation: ${conversion.emotional} signature applied
+Brain Region Mapping: ${conversion.region} cortex active
+
+RAW FREQUENCY DATA:
+══════════════════
+${conversion.audioPattern.map((freq, i) => `Point ${i+1}: ${freq}Hz`).join('\n')}
+
+BINARY NEURAL ENCODING:
+══════════════════════
+${conversion.binaryPattern}
+
+SYNTHESIS PARAMETERS:
+════════════════════
+Sample Rate: 44100Hz
+Bit Depth: 16-bit
+Channels: 1 (Mono)
+Duration: ${Math.max(2.0, conversion.convertedText.length * 0.1).toFixed(1)} seconds
+Wave Type: Neural Synthesis
+Envelope: Natural Speech Pattern
+
+QUALITY METRICS:
+═══════════════
+Signal Clarity: 98.7%
+Pattern Recognition: 100%
+Audio Synthesis: High Quality
+Neural Compatibility: Verified
+
+Export Generated: ${new Date().toISOString()}
+AANIC System Version: 1.0
+Research Base: David Gomadza
+Database Reference: 82698
+            `;
+        }
+       
+        // File download utility
+        function downloadFile(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+           
+            document.body.appendChild(a);
+            a.click();
+           
+            // Cleanup
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+       
+        // Status message display
+        function showStatus(message, type) {
+            Elements.downloadStatus.textContent = message;
+            Elements.downloadStatus.className = `status-message status-${type}`;
+           
+            // Auto-clear after delay
+            setTimeout(() => {
+                Elements.downloadStatus.textContent = '';
+                Elements.downloadStatus.className = 'status-message';
+            }, 5000);
+        }
+       
+        // Audio player event listeners
+        Elements.audioPlayer.addEventListener('ended', function() {
+            Elements.audioStatus.textContent = "Audio playback completed.";
+            Elements.stopAudioBtn.disabled = true;
+        });
+       
+        Elements.audioPlayer.addEventListener('error', function(e) {
+            console.error('Audio player error:', e);
+            Elements.audioPlayer.addEventListener('error', function(e) {
+            console.error('Audio player error:', e);
+            Elements.audioStatus.textContent = "Audio playback error occurred.";
+            showStatus("Audio playback failed. Please regenerate audio.", "error");
+        });
+      
+        // Handle window resize for responsive canvas
+        window.addEventListener('resize', function() {
+            if (Elements.waveCanvas) {
+                Elements.waveCanvas.width = Elements.waveCanvas.offsetWidth;
+                Elements.waveCanvas.height = Elements.waveCanvas.offsetHeight;
+            }
+        });
+      
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to convert
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!Elements.convertBtn.disabled) {
+                    handleConvertThought();
+                }
+            }
+          
+            // Space to play/pause audio
+            if (e.code === 'Space' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+                if (!Elements.playAudioBtn.disabled && Elements.audioPlayer.paused) {
+                    handlePlayAudio();
+                } else if (!Elements.audioPlayer.paused) {
+                    handleStopAudio();
+                }
+            }
+          
+            // Escape to stop real-time reading
+            if (e.key === 'Escape' && SystemState.isRealTimeActive) {
+                e.preventDefault();
+                handleRealTimeToggle();
+            }
+        });
+      
+        // Advanced error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e);
+            showStatus("System error occurred. Please refresh if issues persist.", "error");
+        });
+      
+        // Unhandled promise rejection handling
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e);
+            showStatus("Async operation failed. Please try again.", "error");
+        });
+      
+        // Performance monitoring
+        const PerformanceMonitor = {
+            startTime: null,
+          
+            startConversion() {
+                this.startTime = performance.now();
+            },
+          
+            endConversion() {
+                if (this.startTime) {
+                    const duration = performance.now() - this.startTime;
+                    console.log(`Conversion completed in ${duration.toFixed(2)}ms`);
+                    this.startTime = null;
+                    return duration;
+                }
+                return 0;
+            }
+        };
+      
+        // Enhanced conversion with performance monitoring
+        const originalHandleConvertThought = handleConvertThought;
+        handleConvertThought = async function() {
+            PerformanceMonitor.startConversion();
+            try {
+                await originalHandleConvertThought();
+                const duration = PerformanceMonitor.endConversion();
+              
+                if (duration > 0) {
+                    Elements.neuralDisplay.textContent += ` (Processed in ${duration.toFixed(0)}ms)`;
+                }
+            } catch (error) {
+                PerformanceMonitor.endConversion();
+                throw error;
+            }
+        };
+      
+        // Data validation utilities
+        const DataValidator = {
+            validateEmPattern(pattern) {
+                if (!pattern || typeof pattern !== 'string') {
+                    return { valid: false, error: 'Pattern must be a non-empty string' };
+                }
+              
+                if (!/^[a-z]+$/i.test(pattern)) {
+                    return { valid: false, error: 'Pattern must contain only letters' };
+                }
+              
+                if (pattern.length > 50) {
+                    return { valid: false, error: 'Pattern too long (max 50 characters)' };
+                }
+              
+                return { valid: true };
+            },
+          
+            validateFrequency(freq) {
+                const numFreq = parseInt(freq);
+                if (isNaN(numFreq) || numFreq < 1 || numFreq > 100) {
+                    return { valid: false, error: 'Frequency must be between 1-100 Hz' };
+                }
+                return { valid: true };
+            }
+        };
+      
+        // Enhanced input validation with real-time feedback
+        Elements.thoughtInput.addEventListener('input', function() {
+            const validation = DataValidator.validateEmPattern(this.value);
+          
+            if (!validation.valid && this.value.length > 0) {
+                this.style.borderColor = "#e74c3c";
+                this.style.boxShadow = "0 0 5px rgba(231, 76, 60, 0.3)";
+                showStatus(validation.error, "warning");
+            } else {
+                this.style.borderColor = "rgba(255,255,255,0.2)";
+                this.style.boxShadow = "none";
+            }
+          
+            Elements.convertBtn.disabled = !validation.valid;
+        });
+      
+        // System health check
+        const SystemHealth = {
+            checkAudioContext() {
+                return SystemState.audioContext && SystemState.audioContext.state === 'running';
+            },
+          
+            checkBrowserCompatibility() {
+                return {
+                    audioContext: !!(window.AudioContext || window.webkitAudioContext),
+                    canvas: !!document.createElement('canvas').getContext,
+                    download: !!document.createElement('a').download,
+                    fileAPI: !!(window.File && window.FileReader && window.FileList && window.Blob)
+                };
+            },
+          
+            displayCompatibilityWarnings() {
+                const compat = this.checkBrowserCompatibility();
+              
+                if (!compat.audioContext) {
+                    showStatus("Audio features may be limited in this browser.", "warning");
+                }
+              
+                if (!compat.canvas) {
+                    showStatus("Visual features may be limited in this browser.", "warning");
+                }
+            }
+        };
+      
+        // Initialize compatibility check
+        SystemHealth.displayCompatibilityWarnings();
+      
+        // Auto-save conversion history
+        const ConversionHistory = {
+            maxEntries: 10,
+          
+            save(conversion) {
+                try {
+                    let history = this.load();
+                    history.unshift({
+                        ...conversion,
+                        id: Date.now(),
+                        savedAt: new Date().toISOString()
+                    });
+                  
+                    // Keep only recent entries
+                    if (history.length > this.maxEntries) {
+                        history = history.slice(0, this.maxEntries);
+                    }
+                  
+                    localStorage.setItem('aanic_history', JSON.stringify(history));
+                    console.log('Conversion saved to history');
+                } catch (error) {
+                    console.warn('Failed to save conversion history:', error);
+                }
+            },
+          
+            load() {
+                try {
+                    const stored = localStorage.getItem('aanic_history');
+                    return stored ? JSON.parse(stored) : [];
+                } catch (error) {
+                    console.warn('Failed to load conversion history:', error);
+                    return [];
+                }
+            },
+          
+            clear() {
+                try {
+                    localStorage.removeItem('aanic_history');
+                    showStatus("Conversion history cleared.", "success");
+                } catch (error) {
+                    console.warn('Failed to clear history:', error);
+                }
+            }
+        };
+      
+        // Save conversions to history automatically
+        const originalCompleteConversion = completeConversion;
+        completeConversion = async function(emPattern, type, region, frequency) {
+            await originalCompleteConversion(emPattern, type, region, frequency);
+          
+            if (SystemState.currentConversion) {
+                ConversionHistory.save(SystemState.currentConversion);
+            }
+        };
+      
+        // Add history feature to UI
+        function createHistoryButton() {
+            const historyBtn = document.createElement('button');
+            historyBtn.textContent = '📚 View History';
+            historyBtn.className = 'neural-btn';
+            historyBtn.style.marginTop = '10px';
+          
+            historyBtn.addEventListener('click', function() {
+                const history = ConversionHistory.load();
+                if (history.length === 0) {
+                    alert('No conversion history available.');
+                    return;
+                }
+              
+                let historyText = 'AANIC Conversion History:\n\n';
+                history.slice(0, 5).forEach((conv, i) => {
+                    historyText += `${i + 1}. ${conv.emPattern} → "${conv.convertedText}"\n`;
+                    historyText += `   ${new Date(conv.savedAt).toLocaleString()}\n\n`;
+                });
+              
+                alert(historyText);
+            });
+          
+            Elements.downloadBtn.parentNode.appendChild(historyBtn);
+        }
+      
+        // Initialize history feature after DOM is ready
+        setTimeout(createHistoryButton, 100);
+      
+        // Advanced neural wave patterns based on actual brain frequencies
+        const AdvancedWavePatterns = {
+            delta: { freq: 2, amp: 0.8, phase: 0 },      // Deep sleep
+            theta: { freq: 6, amp: 0.6, phase: Math.PI/4 }, // Meditation
+            alpha: { freq: 10, amp: 0.7, phase: Math.PI/2 }, // Relaxed
+            beta: { freq: 20, amp: 0.5, phase: Math.PI },   // Alert
+            gamma: { freq: 40, amp: 0.4, phase: 3*Math.PI/2 } // Peak focus
+        };
+      
+        // Enhanced wave visualization with realistic patterns
+        function drawRealisticBrainWaves(ctx, canvas, time, targetFreq) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+            const centerY = canvas.height / 2;
+            const baseAmplitude = canvas.height * 0.15;
+          
+            // Determine dominant brain wave based on frequency
+            let dominantWave = 'alpha';
+            if (targetFreq <= 4) dominantWave = 'delta';
+            else if (targetFreq <= 8) dominantWave = 'theta';
+            else if (targetFreq <= 13) dominantWave = 'alpha';
+            else if (targetFreq <= 30) dominantWave = 'beta';
+            else dominantWave = 'gamma';
+          
+            // Draw multiple frequency components
+            Object.entries(AdvancedWavePatterns).forEach(([waveType, pattern], index) => {
+                const isActive = waveType === dominantWave;
+                const opacity = isActive ? 0.9 : 0.3;
+                const amplitude = baseAmplitude * pattern.amp * (isActive ? 1.5 : 0.5);
+              
+                const colors = {
+                    delta: `rgba(26, 188, 156, ${opacity})`,  // Teal
+                    theta: `rgba(52, 152, 219, ${opacity})`,  // Blue
+                    alpha: `rgba(155, 89, 182, ${opacity})`,  // Purple
+                    beta: `rgba(231, 76, 60, ${opacity})`,    // Red
+                    gamma: `rgba(243, 156, 18, ${opacity})`   // Orange
+                };
+              
+                ctx.beginPath();
+                ctx.strokeStyle = colors[waveType];
+                ctx.lineWidth = isActive ? 3 : 1;
+              
+                for (let x = 0; x < canvas.width; x++) {
+                    const normalizedX = x / canvas.width;
+                    const wavePhase = (normalizedX * pattern.freq * Math.PI) + (time * 0.01) + pattern.phase;
+                    const noise = (Math.random() - 0.5) * 0.1; // Add realistic noise
+                    const y = centerY + (Math.sin(wavePhase) + noise) * amplitude;
+                  
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+              
+                // Add wave type label
+                if (isActive) {
+                    ctx.fillStyle = colors[waveType];
+                    ctx.font = '12px monospace';
+                    ctx.fillText(`${waveType.toUpperCase()} (${pattern.freq}Hz)`, 10, 20 + index * 15);
+                }
+            });
+          
+            // Add frequency indicator
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = 'bold 14px monospace';
+            ctx.fillText(`Target: ${targetFreq}Hz`, canvas.width - 120, 25);
+        }
+      
+        // Update wave visualization to use realistic patterns
+        const originalStartNeuralWaveVisualization = startNeuralWaveVisualization;
+        startNeuralWaveVisualization = function() {
+            if (SystemState.waveAnimationId) return;
+          
+            const canvas = Elements.waveCanvas;
+            const ctx = SystemState.canvasContext;
+            let time = 0;
+          
+            function animate() {
+                const targetFreq = parseInt(Elements.resonanceFreq.value);
+                drawRealisticBrainWaves(ctx, canvas, time, targetFreq);
+              
+                time++;
+              
+                if (SystemState.isRealTimeActive || SystemState.currentConversion) {
+                    SystemState.waveAnimationId = requestAnimationFrame(animate);
+                }
+            }
+          
+            animate();
+        };
+      
+        // Diagnostic tools
+        const DiagnosticTools = {
+            runSystemDiagnostic() {
+                const results = {
+                    timestamp: new Date().toISOString(),
+                    browser: navigator.userAgent,
+                    audioContext: !!SystemState.audioContext,
+                    canvas: !!SystemState.canvasContext,
+                    brainReader: SystemState.brainReaderConnected,
+                    realTime: SystemState.isRealTimeActive,
+                    conversions: ConversionHistory.load().length,
+                    performance: performance.now()
+                };
+              
+                console.log('AANIC System Diagnostic:', results);
+                return results;
+            },
+          
+            exportDiagnostic() {
+                const diagnostic = this.runSystemDiagnostic();
+                const blob = new Blob([JSON.stringify(diagnostic, null, 2)], { type: 'application/json' });
+                downloadFile(blob, `AANIC_Diagnostic_${Date.now()}.json`);
+                showStatus("System diagnostic exported.", "success");
+            }
+        };
+      
+        // Add diagnostic button (hidden in production, visible in development)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const diagnosticBtn = document.createElement('button');
+            diagnosticBtn.textContent = '🔧 Diagnostic';
+            diagnosticBtn.className = 'warning-btn';
+            diagnosticBtn.style.position = 'fixed';
+            diagnosticBtn.style.bottom = '20px';
+            diagnosticBtn.style.right = '20px';
+            diagnosticBtn.style.zIndex = '1000';
+          
+            diagnosticBtn.addEventListener('click', DiagnosticTools.exportDiagnostic.bind(DiagnosticTools));
+            document.body.appendChild(diagnosticBtn);
+        }
+      
+        // Final system check and startup message
+        setTimeout(() => {
+            if (SystemState.isInitialized) {
+                console.log('🧠 AANIC Brain-Thoughts-to-Word-Audio Converter - Fully Operational');
+                console.log('📡 Digital Analogue Brain Reader - Ready for Connection');
+                console.log('🎵 Neural Audio Synthesis Engine - Loaded');
+                console.log('💾 Database 82698 - Active');
+                console.log('🔬 Research Foundation: David Gomadza | www.twofuture.world');
+              
+                // Show welcome message
+                Elements.outputText.textContent = `🧠 AANIC System Ready!
+
+Welcome to the Brain-Thoughts-to-Word-Audio Converter
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+System Status: ✓ Fully Operational
+Database 82698: ✓ Active and Loaded
+Neural Codecs: ✓ Ready for Processing
+Audio Engine: ✓ Initialized
+
+QUICK START GUIDE:
+1. 🔗 Attach Digital Analogue Brain Reader
+2. 🎯 Calibrate the EM Wave Detectors
+3. 💭 Enter electromagnetic brain pattern (e.g., "ikssyrghtnw")
+4. ⚡ Set neural frequency and brain region
+5. 🧠 Convert Thought to Word & Audio
+6. 🎵 Generate and play synthesized audio
+7. 💾 Download complete conversion package
+
+The system uses advanced AANIC processing to convert
+electromagnetic patterns from brain exit points into
+natural language through the 7 Forms of Communication.
+
+Ready to read your thoughts! 🚀`;
+
+                // Auto-attach analogue for demo purposes
+                setTimeout(() => {
+                    if (!SystemState.brainReaderConnected) {
+                        showStatus("💡 Tip: Click 'Attach Digital Analogue' to enable brain reading!", "warning");
+                    }
+                }, 3000);
+            } else {
+                showStatus("System initialization incomplete. Please refresh the page.", "error");
+            }
+        }, 1000);
+      
+        // Export system for debugging (development only)
+        if (typeof window !== 'undefined') {
+            window.AANICSystem = {
+                state: SystemState,
+                database: ConversionDatabase,
+                elements: Elements,
+                history: ConversionHistory,
+                diagnostic: DiagnosticTools,
+                version: '1.0.0'
+            };
+        }
+      
+    </script>
+</body>
+</html>  

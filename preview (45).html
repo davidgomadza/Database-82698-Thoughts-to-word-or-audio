@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Code Input Box</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .code-container {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .code-input {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            resize: vertical;
+            transition: border 0.3s;
+            line-height: 1.5;
+            tab-size: 4;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+        }
+        
+        .code-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .actions {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn {
+            background: #3498db;
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .format-btn {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .format-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .char-count {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-left: auto;
+        }
+        
+        .preview {
+            padding: 25px;
+            border-top: 1px solid #eee;
+        }
+        
+        .preview h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .preview-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+            background: #f9f9f9;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            padding: 25px;
+            border-top: 1px solid #eee;
+        }
+        
+        .instructions h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .char-count {
+                margin: 10px 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HTML Code Input Box</h1>
+            <p>Share your HTML code snippets with unlimited characters</p>
+        </div>
+        
+        <div class="code-container">
+            <textarea class="code-input" id="htmlCode" placeholder="Paste or type your HTML code here..." autofocus></textarea>
+        </div>
+        
+        <div class="actions">
+            <div class="btn-group">
+                <button class="btn submit-btn" id="submitBtn">Submit Code</button>
+                <button class="btn format-btn" id="formatBtn">Format Code</button>
+                <button class="btn clear-btn" id="clearBtn">Clear</button>
+            </div>
+            <div class="char-count">Character count: <span id="charCount">0</span></div>
+        </div>
+        
+        <div class="preview">
+            <h2>Live Preview</h2>
+            <div class="preview-container" id="preview">
+                <p style="color: #7f8c8d; text-align: center; margin-top: 60px;">Your HTML preview will appear here</p>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2>How to Use</h2>
+            <ul>
+                <li>Type or paste your HTML code in the text area above</li>
+                <li>Click "Format Code" to automatically indent your code</li>
+                <li>Click "Submit Code" to render your HTML in the preview area</li>
+                <li>There's no character limit - paste as much code as you need</li>
+                <li>Use the clear button to start over</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const htmlCode = document.getElementById('htmlCode');
+            const submitBtn = document.getElementById('submitBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const formatBtn = document.getElementById('formatBtn');
+            const preview = document.getElementById('preview');
+            const charCount = document.getElementById('charCount');
+            
+            // Update character count
+            htmlCode.addEventListener('input', function() {
+                charCount.textContent = htmlCode.value.length;
+            });
+            
+            // Submit code to preview
+            submitBtn.addEventListener('click', function() {
+                preview.innerHTML = htmlCode.value;
+            });
+            
+            // Clear code
+            clearBtn.addEventListener('click', function() {
+                htmlCode.value = '';
+                preview.innerHTML = '<p style="color: #7f8c8d; text-align: center; margin-top: 60px;">Your HTML preview will appear here</p>';
+                charCount.textContent = '0';
+            });
+            
+            // Format code
+            formatBtn.addEventListener('click', function() {
+                const formatted = formatHtml(htmlCode.value);
+                htmlCode.value = formatted;
+                charCount.textContent = formatted.length;
+            });
+            
+            // Simple HTML formatter function
+            function formatHtml(html) {
+                // This is a simple formatter - in a real application you might want a more robust solution
+                let formatted = '';
+                let indent = '';
+                const indentSize = 4;
+                
+                html.split(/>\s*</).forEach(function(element) {
+                    if (element.match(/^\/\w/)) {
+                        indent = indent.substring(indentSize);
+                    }
+                    
+                    formatted += indent + '<' + element + '>\r\n';
+                    
+                    if (element.match(/^<?\w[^>]*[^\/]$/) && !element.startsWith('input')) {
+                        indent += ' '.repeat(indentSize);
+                    }
+                });
+                
+                return formatted.substring(1, formatted.length - 3);
+            }
+            
+            // Add some example code
+            const exampleCode = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Example Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to My Blog</h1>
+        <p>This is an example of HTML code that you can paste into the input box.</p>
+        <ul>
+            <li>Feature one</li>
+            <li>Feature two</li>
+            <li>Feature three</li>
+        </ul>
+    </div>
+</body>
+</html>`;
+            
+            // Load example code after a short delay
+            setTimeout(() => {
+                htmlCode.value = exampleCode;
+                charCount.textContent = exampleCode.length;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

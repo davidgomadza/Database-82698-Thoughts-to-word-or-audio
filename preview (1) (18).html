@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Decision-Making Interactive Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .brain-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .brain-svg {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .brain-region {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .brain-region:hover {
+            filter: brightness(1.2);
+            stroke-width: 3;
+        }
+        
+        .decision-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .step-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-demo {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        
+        .demo-button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-button:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        
+        .timeline {
+            position: relative;
+            margin: 30px 0;
+        }
+        
+        .timeline-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.5s ease;
+        }
+        
+        .timeline-item.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .info-panel {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .info-panel.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question-simulator {
+            background: #34495e;
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .question-input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        
+        .thinking-process {
+            background: #2c3e50;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            min-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .brain-waves {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+        
+        .wave {
+            width: 4px;
+            background: #667eea;
+            animation: wave 1s infinite ease-in-out;
+        }
+        
+        .wave:nth-child(2) { animation-delay: 0.1s; }
+        .wave:nth-child(3) { animation-delay: 0.2s; }
+        .wave:nth-child(4) { animation-delay: 0.3s; }
+        .wave:nth-child(5) { animation-delay: 0.4s; }
+        
+        @keyframes wave {
+            0%, 100% { height: 20px; }
+            50% { height: 40px; }
+        }
+        
+        .neural-pathway {
+            stroke: #667eea;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5,5;
+            animation: dash 2s linear infinite;
+        }
+        
+        @keyframes dash {
+            to { stroke-dashoffset: -10; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>How the Brain Makes Decisions</h1>
+            <p>An Interactive Guide to Neural Decision-Making</p>
+        </header>
+        
+        <div class="brain-container">
+            <svg class="brain-svg" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- Brain outline -->
+                <path d="M100 200 Q100 100 200 100 Q300 80 400 100 Q500 100 500 200 Q500 300 400 300 Q300 320 200 300 Q100 300 100 200 Z" 
+                      fill="#f8f9fa" stroke="#667eea" stroke-width="2"/>
+                
+                <!-- Prefrontal Cortex -->
+                <ellipse cx="180" cy="150" rx="60" ry="40" fill="#e74c3c" class="brain-region" 
+                         onclick="showRegionInfo('prefrontal')" data-region="prefrontal"/>
+                <text x="180" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PFC</text>
+                
+                <!-- Amygdala -->
+                <ellipse cx="280" cy="220" rx="30" ry="25" fill="#f39c12" class="brain-region"
+                         onclick="showRegionInfo('amygdala')" data-region="amygdala"/>
+                <text x="280" y="225" text-anchor="middle" fill="white" font-size="10" font-weight="bold">AMG</text>
+                
+                <!-- Posterior Cingulate -->
+                <ellipse cx="350" cy="180" rx="40" ry="30" fill="#27ae60" class="brain-region"
+                         onclick="showRegionInfo('cingulate')" data-region="cingulate"/>
+                <text x="350" y="185" text-anchor="middle" fill="white" font-size="10" font-weight="bold">PCC</text>
+                
+                <!-- Hippocampus -->
+                <ellipse cx="320" cy="250" rx="35" ry="20" fill="#9b59b6" class="brain-region"
+                         onclick="showRegionInfo('hippocampus')" data-region="hippocampus"/>
+                <text x="320" y="255" text-anchor="middle" fill="white" font-size="10" font-weight="bold">HIPP</text>
+                
+                <!-- Neural pathways -->
+                <path class="neural-pathway" d="M210 170 Q250 190 280 210"/>
+                <path class="neural-pathway" d="M310 220 Q330 200 350 180"/>
+                <path class="neural-pathway" d="M300 240 Q320 230 340 210"/>
+            </svg>
+            
+            <div class="brain-waves">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+        </div>
+        
+        <!-- Region Information Panels -->
+        <div id="prefrontal" class="info-panel">
+            <h3>Prefrontal Cortex (PFC)</h3>
+            <p><strong>Function:</strong> Executive control, working memory, planning</p>
+            <p><strong>Role in Decision-Making:</strong> Evaluates options, considers consequences, implements decisions</p>
+            <p><strong>Key Processes:</strong> Inhibitory control, cognitive flexibility, goal management</p>
+        </div>
+        
+        <div id="amygdala" class="info-panel">
+            <h3>Amygdala</h3>
+            <p><strong>Function:</strong> Emotion processing, threat detection, social predictions</p>
+            <p><strong>Role in Decision-Making:</strong> Processes emotional significance, predicts others' choices</p>
+            <p><strong>Key Processes:</strong> Fear conditioning, reward prediction, social cognition</p>
+        </div>
+        
+        <div id="cingulate" class="info-panel">
+            <h3>Posterior Cingulate Cortex (PCC)</h3>
+            <p><strong>Function:</strong> Self-referential thinking, memory integration</p>
+            <p><strong>Role in Decision-Making:</strong> Integrates past experiences with current decisions</p>
+            <p><strong>Key Processes:</strong> Autobiographical memory, value assessment, attention</p>
+        </div>
+        
+        <div id="hippocampus" class="info-panel">
+            <h3>Hippocampus</h3>
+            <p><strong>Function:</strong> Memory formation, spatial navigation</p>
+            <p><strong>Role in Decision-Making:</strong> Provides context from past experiences</p>
+            <p><strong>Key Processes:</strong> Memory consolidation, pattern completion, future simulation</p>
+        </div>
+        
+        <div class="decision-steps">
+            <div class="step-card" onclick="simulateStep(1)">
+                <div class="step-number">1</div>
+                <h3>Information Gathering</h3>
+                <p>Brain collects sensory input and retrieves relevant memories</p>
+            </div>
+            
+            <div class="step-card" onclick="simulateStep(2)">
+                <div class="step-number">2</div>
+                <h3>Option Generation</h3>
+                <p>Multiple possible actions are considered simultaneously</p>
+            </div>
+            
+            <div class="step-card" onclick="simulateStep(3)">
+                <div class="step-number">3</div>
+                <h3>Value Assessment</h3>
+                <p>Each option is evaluated for potential outcomes and rewards</p>
+            </div>
+            
+            <div class="step-card" onclick="simulateStep(4)">
+                <div class="step-number">4</div>
+                <h3>Selection Process</h3>
+                <p>Best option is selected based on integrated assessment</p>
+            </div>
+            
+            <div class="step-card" onclick="simulateStep(5)">
+                <div class="step-number">5</div>
+                <h3>Action Execution</h3>
+                <p>Motor cortex implements the chosen decision</p>
+            </div>
+            
+            <div class="step-card" onclick="simulateStep(6)">
+                <div class="step-number">6</div>
+                <h3>Outcome Learning</h3>
+                <p>Results are evaluated and stored for future decisions</p>
+            </div>
+        </div>
+        
+        <div class="interactive-demo">
+            <h3>Decision-Making Simulator</h3>
+            <p>Click the scenario buttons to see how the brain processes different types of decisions:</p>
+            
+            <button class="demo-button" onclick="simulateDecision('simple')">Simple Choice</button>
+            <button class="demo-button" onclick="simulateDecision('complex')">Complex Problem</button>
+            <button class="demo-button" onclick="simulateDecision('social')">Social Decision</button>
+            <button class="demo-button" onclick="simulateDecision('moral')">Moral Dilemma</button>
+            
+            <div id="simulation-output" class="thinking-process">
+                Click a scenario to see neural processing...
+            </div>
+        </div>
+        
+        <div class="question-simulator">
+            <h3>Brain Question Processing</h3>
+            <p>Enter a question to see how the brain might process it through different evaluation stages:</p>
+            <input type="text" class="question-input" id="questionInput" placeholder="Enter your question here...">
+            <button class="demo-button" onclick="processQuestion()">Process Question</button>
+            
+            <div class="timeline" id="questionTimeline">
+                <!-- Timeline items will be generated here -->
+            </div>
+        </div>
+        
+        <div class="brain-container">
+            <h3>Real Neuroscience vs. Speculative Claims</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <div style="background: #d5f4e6; padding: 20px; border-radius: 10px;">
+                    <h4 style="color: #27ae60;">Established Science</h4>
+                    <ul style="margin-top: 10px; line-height: 1.6;">
+                        <li>fMRI can detect brain activity patterns</li>
+                        <li>EEG measures electrical brain signals</li>
+                        <li>Basic brain-computer interfaces exist</li>
+                        <li>Decision-making involves multiple brain regions</li>
+                        <li>Neural networks process information in parallel</li>
+                    </ul>
+                </div>
+                <div style="background: #ffeaa7; padding: 20px; border-radius: 10px;">
+                    <h4 style="color: #f39c12;">Current Limitations</h4>
+                    <ul style="margin-top: 10px; line-height: 1.6;">
+                        <li>Cannot read specific thoughts</li>
+                        <li>No "mind control" technology exists</li>
+                        <li>Animal communication is limited</li>
+                        <li>No direct brain-to-brain transfer</li>
+                        <li>DNA cannot be "calculated" from appearance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real neuroscience-based decision processing questions
+        const decisionQuestions = [
+            "What information is available?",
+            "What are my options?", 
+            "What are the potential outcomes?",
+            "What are the risks and benefits?",
+            "What do I value most?",
+            "What does past experience suggest?",
+            "What would others expect?",
+            "What are the time constraints?",
+            "What are the resource requirements?",
+            "What is my emotional response?",
+            "What is the likely success rate?",
+            "What are the unintended consequences?"
+        ];
+        
+        const brainRegions = {
+            prefrontal: {
+                name: "Prefrontal Cortex",
+                function: "Executive control and planning",
+                processes: ["Working memory", "Inhibitory control", "Cognitive flexibility"]
+            },
+            amygdala: {
+                name: "Amygdala", 
+                function: "Emotion and threat processing",
+                processes: ["Fear detection", "Emotional memories", "Social predictions"]
+            },
+            cingulate: {
+                name: "Posterior Cingulate Cortex",
+                function: "Self-referential processing",
+                processes: ["Autobiographical memory", "Value assessment", "Attention control"]
+            },
+            hippocampus: {
+                name: "Hippocampus",
+                function: "Memory formation and retrieval", 
+                processes: ["Episodic memory", "Spatial navigation", "Future simulation"]
+            }
+        };
+        
+        function showRegionInfo(region) {
+            // Hide all panels
+            document.querySelectorAll('.info-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Show selected panel
+            document.getElementById(region).classList.add('active');
+            
+            // Highlight brain region
+            document.querySelectorAll('.brain-region').forEach(r => {
+                r.style.stroke = '#667eea';
+                r.style.strokeWidth = '2';
+            });
+            
+            document.querySelector(`[data-region="${region}"]`).style.stroke = '#e74c3c';
+            document.querySelector(`[data-region="${region}"]`).style.strokeWidth = '4';
+        }
+        
+        function simulateDecision(type) {
+            const scenarios = {
+                simple: {
+                    scenario: "Choosing between coffee or tea",
+                    process: [
+                        "Sensory input: See coffee and tea options",
+                        "Memory retrieval: Past preferences accessed", 
+                        "Value assessment: Taste, energy, mood considered",
+                        "Quick decision: Coffee selected based on caffeine need",
+                        "Motor execution: Reach for coffee",
+                        "Outcome monitoring: Satisfaction with choice"
+                    ]
+                },
+                complex: {
+                    scenario: "Deciding on a career change",
+                    process: [
+                        "Information gathering: Current job satisfaction, market research",
+                        "Option generation: Multiple career paths considered",
+                        "Risk analysis: Financial security vs. personal fulfillment",
+                        "Future simulation: Imagining different life outcomes", 
+                        "Social consideration: Family impact, peer opinions",
+                        "Values integration: Aligning choice with core beliefs",
+                        "Decision commitment: Weighing all factors",
+                        "Action planning: Steps to implement change"
+                    ]
+                },
+                social: {
+                    scenario: "Responding to a friend's request for help",
+                    process: [
+                        "Social signal processing: Friend's emotional state detected",
+                        "Relationship assessment: Importance of friendship evaluated",
+                        "Capability analysis: Own ability to help considered",
+                        "Competing priorities: Other commitments weighed",
+                        "Empathy activation: Friend's perspective considered",
+                        "Reciprocity calculation: Past help given/received",
+                        "Decision: Agreement to help based on social bonds"
+                    ]
+                },
+                moral: {
+                    scenario: "Finding a wallet with money",
+                    process: [
+                        "Moral recognition: Ethical dimension identified",
+                        "Rule retrieval: Social norms about honesty accessed",
+                        "Consequence prediction: Outcomes of keeping vs. returning",
+                        "Empathy activation: Owner's potential distress considered",
+                        "Value conflict: Personal gain vs. moral principles",
+                        "Social reputation: What others would think",
+                        "Moral decision: Return wallet based on ethical values"
+                    ]
+                }
+            };
+            
+            const scenario = scenarios[type];
+            const output = document.getElementById('simulation-output');
+            output.innerHTML = `<strong>Scenario:</strong> ${scenario.scenario}<br><br>`;
+            
+            scenario.process.forEach((step, index) => {
+                setTimeout(() => {
+                    output.innerHTML += `<span style="color: #f39c12;">[${(index + 1) * 200}ms]</span> ${step}<br>`;
+                    output.scrollTop = output.scrollHeight;
+                }, index * 800);
+            });
+        }
+        
+        function processQuestion() {
+            const question = document.getElementById('questionInput').value;
+            if (!question.trim()) return;
+            
+            const timeline = document.getElementById('questionTimeline');
+            timeline.innerHTML = '';
+            
+            // Generate processing stages based on the question
+            const stages = [
+                `Question received: "${question}"`,
+                "Semantic analysis: Breaking down meaning",
+                "Memory search: Accessing relevant information", 
+                "Pattern matching: Finding similar past experiences",
+                "Option generation: Creating possible answers",
+                "Probability assessment: Evaluating likelihood of outcomes",
+                "Value alignment: Checking against personal beliefs",
+                "Confidence calculation: Assessing certainty level",
+                "Response formulation: Constructing answer",
+                "Output preparation: Ready to respond"
+            ];
+            
+            stages.forEach((stage, index) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                timelineItem.innerHTML = `
+                    <strong>Stage ${index + 1}:</strong> ${stage}<br>
+                    <small>Processing time: ${(index + 1) * 150}ms</small>
+                `;
+                timeline.appendChild(timelineItem);
+                
+                setTimeout(() => {
+                    timelineItem.classList.add('active');
+                }, index * 600);
+            });
+        }
+        
+        function simulateStep(stepNumber) {
+            const steps = {
+                1: "Information Gathering: Sensory inputs processed, memories activated",
+                2: "Option Generation: Multiple pathways explored simultaneously", 
+                3: "Value Assessment: Prefrontal cortex weighs pros and cons",
+                4: "Selection Process: Winner-take-all competition between options",
+                5: "Action Execution: Motor commands sent to implement decision",
+                6: "Outcome Learning: Results fed back to update future decisions"
+            };
+            
+            alert(`Step ${stepNumber}: ${steps[stepNumber]}`);
+        }
+        
+        // Add some dynamic brain activity
+        setInterval(() => {
+            const regions = document.querySelectorAll('.brain-region');
+            const randomRegion = regions[Math.floor(Math.random() * regions.length)];
+            
+            randomRegion.style.filter = 'brightness(1.3)';
+            setTimeout(() => {
+                randomRegion.style.filter = 'brightness(1)';
+            }, 300);
+        }, 2000);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show default info
+            setTimeout(() => {
+                showRegionInfo('prefrontal');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

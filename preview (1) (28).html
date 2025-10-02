@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Miniature Floating Wheelclamper Artifact</title>
+  <style>
+    body {
+      background: #18182b;
+      color: #f2f2f2;
+      min-height:100vh;
+      margin:0;
+      font-family:sans-serif;
+      overflow:hidden;
+    }
+    .floating-clamp {
+      width:70px;height:70px;
+      position:absolute;
+      border-radius:50%;
+      background:linear-gradient(145deg,#3a4256,#273043);
+      box-shadow: 0 0 16px #00ffee88;
+      display:flex;
+      align-items:center;justify-content:center;
+      transition:transform 0.5s;
+      cursor:pointer;
+      animation: floatY 2.5s ease-in-out infinite alternate;
+      z-index:10;
+    }
+    @keyframes floatY {
+      0%   {transform:translateY(-10px);}
+      100% {transform:translateY(30px);}
+    }
+    .rotary {
+      width:50px;height:50px;
+      border:6px solid #0ff;
+      border-radius:50%;
+      position:absolute;
+      animation: rotate 1.7s linear infinite;
+    }
+    @keyframes rotate {
+      0%{transform:rotate(0deg);}
+      100%{transform:rotate(360deg);}
+    }
+    .lever {
+      width:6px;height:36px;background:#0ff;
+      border-radius:5px;
+      position:absolute;
+      left:50%;top:50%;
+      transform:translate(-50%,-90%)rotate(-24deg);
+      box-shadow:0 0 7px #00d9ff88;
+    }
+    .enemy {
+      width:40px;height:40px;
+      background:#e74a3b;
+      border-radius:50%;
+      position:absolute;
+      top:85%;
+      left:10%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:18px;font-weight:bold;
+      z-index:5;
+      transition:top 2.5s,left 2.5s;
+    }
+    .clamped {
+      box-shadow: 0 0 30px #0ff, 0 0 45px #0ff;
+      background:#083d47 !important;
+      color:#edc948;
+      font-weight:bold;
+    }
+    .disposal-bin {
+      position: fixed;
+      bottom: 25px;
+      right: 20px;
+      background: #222831;
+      color: #8afff8;
+      border: 2px solid #30f4b2;
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 22px;
+      padding: 12px 20px;
+      letter-spacing:2.5px;
+      z-index:20;
+      box-shadow:0 0 12px #1de9b6aa;
+    }
+    .bin-label {
+      display:block;margin-bottom:6px;
+      font-weight:bold;
+      color:#f6e7e7;
+      text-shadow: 0 1px #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-clamp" id="clamp1" style="top:80px;left:130px;">
+    <div class="rotary"></div>
+    <div class="lever"></div>
+  </div>
+  <div class="floating-clamp" id="clamp2" style="top:220px;left:480px;animation-delay:1s;">
+    <div class="rotary"></div>
+    <div class="lever" style="transform:translate(-50%,-90%) rotate(22deg);"></div>
+  </div>
+  <div class="floating-clamp" id="clamp3" style="top:120px;left:750px;animation-delay:1.6s;">
+    <div class="rotary"></div>
+    <div class="lever" style="transform:translate(-50%,-90%) rotate(-48deg);"></div>
+  </div>
+  <div class="enemy" id="enemy1" style="left:50px;">👾</div>
+  <div class="enemy" id="enemy2" style="left:350px;">👽</div>
+  <div class="enemy" id="enemy3" style="left:670px;">🤖</div>
+
+  <div class="disposal-bin">
+    <span class="bin-label">Disposal Bin:</span>
+    101<span style="color:#f8f323;">000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</span>86
+  </div>
+
+  <script>
+    // Simulate enemy approach and auto-clamp detection/locking
+    function clampEnemy(enemyId, clampId) {
+      let enemy = document.getElementById(enemyId);
+      let clamp = document.getElementById(clampId);
+      let clampRect = clamp.getBoundingClientRect();
+      let docTop = document.body.getBoundingClientRect().top;
+      // Move enemy to top of clamp, add clamped effect
+      enemy.style.top = (clampRect.top-docTop+18) + "px";
+      enemy.style.left = (clampRect.left+18) + "px";
+      setTimeout(() => {
+        enemy.classList.add("clamped");
+        clamp.style.boxShadow = "0 0 36px #f4ff88, 0 0 50px #0ff";
+      }, 1800);
+    }
+    setTimeout(() => {clampEnemy('enemy1','clamp1');},700);
+    setTimeout(() => {clampEnemy('enemy2','clamp2');},1300);
+    setTimeout(() => {clampEnemy('enemy3','clamp3');},1900);
+  </script>
+</body>
+</html>

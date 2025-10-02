@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ezekiel's Vision - Interactive Rotating Sphere</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #e0e0e0;
+            min-height: 70vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .visualization {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .description {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .description h2 {
+            color: #ffa500;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 165, 0, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .description p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+        
+        input[type="range"] {
+            width: 200px;
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .info-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .info-panel h2 {
+            color: #ffa500;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 165, 0, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .rotation-points {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .point {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            min-width: 150px;
+        }
+        
+        .point h3 {
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .visualization, .description {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Ezekiel's Vision Interactive Visualization</h1>
+            <div class="subtitle">A rotating sphere with 84 points representing the divine vision</div>
+        </header>
+        
+        <div class="content">
+            <div class="visualization">
+                <div class="canvas-container">
+                    <canvas id="sphereCanvas"></canvas>
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="rotationSpeed">Rotation Speed</label>
+                        <input type="range" id="rotationSpeed" min="0" max="5" step="0.1" value="1">
+                    </div>
+                    <div class="control-group">
+                        <label for="pointSize">Point Size</label>
+                        <input type="range" id="pointSize" min="1" max="10" step="0.5" value="3">
+                    </div>
+                    <button id="toggleRotation">Pause Rotation</button>
+                    <button id="resetView">Reset View</button>
+                </div>
+            </div>
+            
+            <div class="description">
+                <h2>Ezekiel's Vision (Ezekiel 1:4-28)</h2>
+                <p>4 I looked, and I saw a windstorm coming out of the north—an immense cloud with flashing lightning and surrounded by brilliant light. The center of the fire looked like glowing metal, 5 and in the fire was what looked like four living creatures. In appearance their form was human, 6 but each of them had four faces and four wings.</p>
+                <p>7 Their legs were straight; their feet were like those of a calf and gleamed like burnished bronze. 8 Under their wings on their four sides they had human hands. All four of them had faces and wings, 9 and the wings of one touched the wings of another. Each one went straight ahead; they did not turn as they moved.</p>
+                <p>10 Their faces looked like this: Each of the four had the face of a human being, and on the right side each had the face of a lion, and on the left the face of an ox; each also had the face of an eagle. 11 Such were their faces. They each had two wings spreading out upward, each wing touching that of the creature on either side; and each had two other wings covering its body.</p>
+                <p>12 Each one went straight ahead. Wherever the spirit would go, they would go, without turning as they went. 13 The appearance of the living creatures was like burning coals of fire or like torches. Fire moved back and forth among the creatures; it was bright, and lightning flashed out of it. 14 The creatures sped back and forth like flashes of lightning.</p>
+                <p>15 As I looked at the living creatures, I saw a wheel on the ground beside each creature with its four faces. 16 This was the appearance and structure of the wheels: They sparkled like topaz, and all four looked alike. Each appeared to be made like a wheel intersecting a wheel. 17 As they moved, they would go in any one of the four directions the creatures faced; the wheels did not change direction as the creatures went. 18 Their rims were high and awesome, and all four rims were full of eyes all around.</p>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h2>Rotation Points</h2>
+            <p>The sphere rotates around three major points as described in Ezekiel's vision:</p>
+            <div class="rotation-points">
+                <div class="point">
+                    <h3>South West</h3>
+                    <p>-28°</p>
+                </div>
+                <div class="point">
+                    <h3>North East</h3>
+                    <p>28°</p>
+                </div>
+                <div class="point">
+                    <h3>True North</h3>
+                    <p>0°</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Interactive Visualization of Ezekiel's Vision | Created with Three.js</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Initialize Three.js scene
+        let scene, camera, renderer, sphere, points;
+        let rotationEnabled = true;
+        let rotationSpeed = 1;
+        let pointSize = 3;
+        
+        // Initialize the scene
+        function init() {
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000011);
+            
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, 
+                document.getElementById('sphereCanvas').clientWidth / 
+                document.getElementById('sphereCanvas').clientHeight, 
+                0.1, 1000);
+            camera.position.z = 5;
+            
+            // Create renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, canvas: document.getElementById('sphereCanvas') });
+            renderer.setSize(document.getElementById('sphereCanvas').clientWidth, 
+                            document.getElementById('sphereCanvas').clientHeight);
+            
+            // Add lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Create the sphere with 84 points
+            createSphereWithPoints();
+            
+            // Add event listeners for controls
+            document.getElementById('rotationSpeed').addEventListener('input', function(e) {
+                rotationSpeed = parseFloat(e.target.value);
+            });
+            
+            document.getElementById('pointSize').addEventListener('input', function(e) {
+                pointSize = parseFloat(e.target.value);
+                if (points) {
+                    points.material.size = pointSize;
+                }
+            });
+            
+            document.getElementById('toggleRotation').addEventListener('click', function() {
+                rotationEnabled = !rotationEnabled;
+                this.textContent = rotationEnabled ? 'Pause Rotation' : 'Resume Rotation';
+            });
+            
+            document.getElementById('resetView').addEventListener('click', function() {
+                camera.position.set(0, 0, 5);
+                camera.lookAt(0, 0, 0);
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start animation
+            animate();
+        }
+        
+        // Create sphere with 84 points
+        function createSphereWithPoints() {
+            // Remove existing sphere and points if they exist
+            if (sphere) scene.remove(sphere);
+            if (points) scene.remove(points);
+            
+            // Create sphere geometry (transparent)
+            const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
+            const sphereMaterial = new THREE.MeshPhongMaterial({
+                color: 0x0066ff,
+                transparent: true,
+                opacity: 0.1,
+                wireframe: true
+            });
+            sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            scene.add(sphere);
+            
+            // Create 84 points on the sphere surface
+            const pointsGeometry = new THREE.BufferGeometry();
+            const pointsMaterial = new THREE.PointsMaterial({
+                color: 0xffaa00,
+                size: pointSize,
+                sizeAttenuation: true
+            });
+            
+            const vertices = [];
+            const numPoints = 84;
+            
+            // Use Fibonacci sphere algorithm to evenly distribute points
+            for (let i = 0; i < numPoints; i++) {
+                const y = 1 - (i / (numPoints - 1)) * 2;
+                const radius = Math.sqrt(1 - y * y);
+                
+                const theta = i * Math.PI * (3 - Math.sqrt(5)); // Golden angle
+                
+                const x = Math.cos(theta) * radius;
+                const z = Math.sin(theta) * radius;
+                
+                vertices.push(x * 2, y * 2, z * 2);
+            }
+            
+            pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            points = new THREE.Points(pointsGeometry, pointsMaterial);
+            scene.add(points);
+        }
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (rotationEnabled) {
+                // Rotate around three points: -28° SW, 28° NE, and true North
+                const time = Date.now() * 0.001 * rotationSpeed;
+                
+                // Complex rotation pattern
+                sphere.rotation.x = Math.sin(time * 0.7) * 0.5;
+                sphere.rotation.y = Math.sin(time * 0.3) * 0.8;
+                sphere.rotation.z = Math.sin(time * 0.5) * 0.3;
+                
+                points.rotation.x = Math.sin(time * 0.6) * 0.4;
+                points.rotation.y = Math.sin(time * 0.4) * 0.7;
+                points.rotation.z = Math.sin(time * 0.8) * 0.2;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Handle window resize
+        function onWindowResize() {
+            camera.aspect = document.getElementById('sphereCanvas').clientWidth / 
+                           document.getElementById('sphereCanvas').clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(document.getElementById('sphereCanvas').clientWidth, 
+                            document.getElementById('sphereCanvas').clientHeight);
+        }
+        
+        // Initialize the visualization when the page loads
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
+ 

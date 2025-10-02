@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TWO/NGI Advanced Security System - Database 7628429</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            background: radial-gradient(ellipse at center, #0f0f23 0%, #000000 100%);
+            color: #00ff41;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridPulse 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes gridPulse {
+            from { opacity: 0.3; }
+            to { opacity: 0.1; }
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 25px;
+            text-align: center;
+            border-bottom: 3px solid #00ff41;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ff41, transparent);
+            animation: scanLine 2s linear infinite;
+        }
+        
+        @keyframes scanLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff41;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        
+        .header .system-id {
+            color: #00ccff;
+            font-size: 1.1em;
+            margin: 5px 0;
+        }
+        
+        .header .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+        
+        .led-green { background: #00ff41; }
+        .led-yellow { background: #ffaa00; }
+        .led-red { background: #ff4444; }
+        
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px #00ff41; }
+            to { text-shadow: 0 0 30px #00ff41, 0 0 40px #00ff41; }
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(0, 255, 65, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 50px rgba(0, 255, 65, 0.1);
+        }
+        
+        .panel-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+        }
+        
+        .defense-module {
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), rgba(0, 0, 0, 0.3));
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .defense-module::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .defense-module:hover::before {
+            left: 100%;
+        }
+        
+        .defense-module:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+        
+        .module-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .module-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        
+        .power-switch {
+            width: 50px;
+            height: 25px;
+            background: #333;
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .power-switch.on {
+            background: #00ff41;
+        }
+        
+        .power-switch::after {
+            content: '';
+            width: 23px;
+            height: 23px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            transition: left 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .power-switch.on::after {
+            left: 26px;
+        }
+        
+        .threat-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .stat-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff4444;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #00ccff;
+            text-transform: uppercase;
+        }
+        
+        .command-button {
+            background: linear-gradient(45deg, #00ff41, #00aa33);
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 3px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .command-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .command-button:hover::before {
+            left: 100%;
+        }
+        
+        .command-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 65, 0.4);
+        }
+        
+        .command-button.danger {
+            background: linear-gradient(45deg, #ff4444, #aa0000);
+            color: #fff;
+        }
+        
+        .command-button.warning {
+            background: linear-gradient(45deg, #ffaa00, #cc6600);
+            color: #000;
+        }
+        
+        .terminal {
+            background: #000;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-size: 11px;
+            line-height: 1.4;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .terminal::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal::-webkit-scrollbar-track {
+            background: #333;
+        }
+        
+        .terminal::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            border-radius: 4px;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .setting-group {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .device-protection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .device-item {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .device-item:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .device-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .attack-surface {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .critical-alert {
+            background: linear-gradient(45deg, rgba(255, 68, 68, 0.2), rgba(255, 170, 0, 0.2));
+            border: 2px solid #ff4444;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            animation: alertPulse 1s infinite alternate;
+        }
+        
+        @keyframes alertPulse {
+            from { box-shadow: 0 0 5px rgba(255, 68, 68, 0.3); }
+            to { box-shadow: 0 0 20px rgba(255, 68, 68, 0.6); }
+        }
+        
+        .progress-bar {
+            background: #333;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #00ff41, #00aa33);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    
+    <header class="header">
+        <h1>🛡️ TWO/NGI DEFENSE MATRIX</h1>
+        <div class="system-id">Database ID: 7628429 | Professional Cyber Defense System</div>
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-led led-green"></div>
+                <span>SYSTEMS ONLINE</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led led-yellow"></div>
+                <span>THREAT LEVEL: ELEVATED</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led led-green"></div>
+                <span>AI DEFENSE: ACTIVE</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-grid">
+        <!-- Left Panel - Defense Systems -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>🔥 ACTIVE DEFENSES</h2>
+            </div>
+            
+            <div class="defense-module">
+                <div class="module-header">
+                    <div class="module-name">
+                        <span>🔥</span>
+                        <span>Advanced Firewall</span>
+                    </div>
+                    <div class="power-switch on" onclick="toggleDefense(this, 'firewall')"></div>
+                </div>
+                <div style="font-size: 12px; color: #00ccff;">
+                    Deep Packet Inspection | Geo-IP Blocking | DDoS Protection
+                </div>
+            </div>
+            
+            <div class="defense-module">
+                <div class="module-header">
+                    <div class="module-name">
+                        <span>🤖</span>
+                        <span>AI Threat Hunter</span>
+                    </div>
+                    <div class="power-switch on" onclick="toggleDefense(this, 'ai-hunter')"></div>
+                </div>
+                <div style="font-size: 12px; color: #00ccff;">
+                    Machine Learning | Behavioral Analysis | Predictive Defense
+                </div>
+            </div>
+            
+            <div class="defense-module">
+                <div class="module-header">
+                    <div class="module-name">
+                        <span>🦠</span>
+                        <span>Anti-Malware Engine</span>
+                    </div>
+                    <div class="power-switch on" onclick="toggleDefense(this, 'antimalware')"></div>
+                </div>
+                <div style="font-size: 12px; color: #00ccff;">
+                    Real-time Scanning | Heuristic Analysis | Zero-Day Detection
+                </div>
+            </div>
+            
+            <div class="defense-module">
+                <div class="module-header">
+                    <div class="module-name">
+                        <span>👁️</span>
+                        <span>Intrusion Detection</span>
+                    </div>
+                    <div class="power-switch on" onclick="toggleDefense(this, 'ids')"></div>
+                </div>
+                <div style="font-size: 12px; color: #00ccff;">
+                    Network Monitoring | Anomaly Detection | Auto-Response
+                </div>
+            </div>
+            
+            <div class="defense-module">
+                <div class="module-header">
+                    <div class="module-name">
+                        <span>🔐</span>
+                        <span>Quantum Encryption</span>
+                    </div>
+                    <div class="power-switch on" onclick="toggleDefense(this, 'encryption')"></div>
+                </div>
+                <div style="font-size: 12px; color: #00ccff;">
+                    AES-256 | RSA-4096 | Quantum-Resistant Algorithms
+                </div>
+            </div>
+            
+            <div class="defense-module">
+                <div class="module-header">
+                    <div class="module-name">
+                        <span>⚔️</span>
+                        <span>Proactive Strike</span>
+                    </div>
+                    <div class="power-switch on" onclick="toggleDefense(this, 'proactive')"></div>
+                </div>
+                <div style="font-size: 12px; color: #00ccff;">
+                    Pre-emptive Neutralization | Counter-Attack | Threat Elimination
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h4 style="margin-bottom: 15px; color: #ff4444;">🚨 EMERGENCY PROTOCOLS</h4>
+                <button class="command-button danger" onclick="initiateDefcon1()">DEFCON 1</button>
+                <button class="command-button warning" onclick="activateSiegeMode()">SIEGE MODE</button>
+                <button class="command-button" onclick="fullSystemRestore()">RESTORE ALL</button>
+            </div>
+        </div>
+
+        <!-- Center Panel - Threat Intelligence -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>🎯 THREAT INTELLIGENCE CENTER</h2>
+            </div>
+            
+            <div class="critical-alert">
+                <h4 style="color: #ff4444; margin-bottom: 10px;">⚠️ ACTIVE THREAT ASSESSMENT</h4>
+                <div>Multiple attack vectors detected | Implementing countermeasures</div>
+            </div>
+            
+            <div class="threat-stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="attacks-blocked">15,847</div>
+                    <div class="stat-label">Attacks Blocked Today</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="threats-quarantined">2,394</div>
+                    <div class="stat-label">Threats Quarantined</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="intrusions-stopped">567</div>
+                    <div class="stat-label">Intrusions Stopped</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="malware-eliminated">1,829</div>
+                    <div class="stat-label">Malware Eliminated</div>
+                </div>
+            </div>
+            
+            <div class="attack-surface">
+                <h4 style="margin-bottom: 15px;">🌐 PROTECTED ATTACK SURFACE</h4>
+                <div class="device-protection">
+                    <div class="device-item" onclick="scanDeviceType('computer')">
+                        <span class="device-icon">💻</span>
+                        <div>Computers</div>
+                        <div style="font-size: 11px; color: #00ff41;">SECURED</div>
+                    </div>
+                    <div class="device-item" onclick="scanDeviceType('mobile')">
+                        <span class="device-icon">📱</span>
+                        <div>Mobile Devices</div>
+                        <div style="font-size: 11px; color: #00ff41;">PROTECTED</div>
+                    </div>
+                    <div class="device-item" onclick="scanDeviceType('server')">
+                        <span class="device-icon">🖥️</span>
+                        <div>Servers</div>
+                        <div style="font-size: 11px; color: #00ff41;">HARDENED</div>
+                    </div>
+                    <div class="device-item" onclick="scanDeviceType('iot')">
+                        <span class="device-icon">🏠</span>
+                        <div>IoT Ecosystem</div>
+                        <div style="font-size: 11px; color: #ffaa00;">MONITORING</div>
+                    </div>
+                    <div class="device-item" onclick="scanDeviceType('network')">
+                        <span class="device-icon">🌐</span>
+                        <div>Network Infrastructure</div>
+                        <div style="font-size: 11px; color: #00ff41;">DEFENDED</div>
+                    </div>
+                    <div class="device-item" onclick="scanDeviceType('cloud')">
+                        <span class="device-icon">☁️</span>
+                        <div>Cloud Services</div>
+                        <div style="font-size: 11px; color: #00ff41;">ENCRYPTED</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0;">
+                <button class="command-button" onclick="initiateFullScan()">FULL SPECTRUM SCAN</button>
+                <button class="command-button" onclick="deepThreatHunt()">DEEP THREAT HUNT</button>
+                <button class="command-button warning" onclick="proactiveStrike()">PREEMPTIVE STRIKE</button>
+                <button class="command-button danger" onclick="quarantineProtocol()">MASS QUARANTINE</button>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="defense-strength" style="width: 94%;"></div>
+            </div>
+            <div style="text-align: center; font-size: 12px; color: #00ccff;">
+                Defense Integrity: <span style="color: #00ff41; font-weight: bold;">94%</span>
+            </div>
+            
+            <div class="terminal" id="threat-terminal">
+[INIT] TWO/NGI Defense Matrix Database 7628429 Online
+[AI] Advanced threat hunting algorithms activated
+[FIREWALL] Deep packet inspection enabled - monitoring 1,247 connections
+[SCAN] Real-time malware detection active across all endpoints
+[IDS] Behavioral anomaly detection running - baseline established
+[ENCRYPT] Quantum-resistant encryption protocols engaged
+[NETWORK] Zero-trust architecture implemented
+[PROACTIVE] Counter-attack systems on standby
+[STATUS] All defense systems operational - God-tier protection active
+[ALERT] 15,847 attacks neutralized in last 24 hours
+            </div>
+        </div>
+
+        <!-- Right Panel - Configuration & Controls -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>⚙️ SYSTEM CONFIGURATION</h2>
+            </div>
+            
+            <div class="setting-group">
+                <h4 style="margin-bottom: 15px; color: #00ccff;">🛡️ DEFENSE PROTOCOLS</h4>
+                
+                <div class="setting-item">
+                    <label>Defense Level:</label>
+                    <select id="defense-level" onchange="updateDefenseLevel()" style="background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 5px;">
+                        <option value="standard">Standard</option>
+                        <option value="enhanced">Enhanced</option>
+                        <option value="maximum">Maximum</option>
+                        <option value="godtier" selected>God-Tier</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Auto-Quarantine:</label>
+                    <div class="power-switch on" onclick="toggleSetting(this, 'auto-quarantine')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Proactive Defense:</label>
+                    <div class="power-switch on" onclick="toggleSetting(this, 'proactive-defense')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>AI Threat Prediction:</label>
+                    <div class="power-switch on" onclick="toggleSetting(this, 'ai-prediction')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Zero-Day Protection:</label>
+                    <div class="power-switch on" onclick="toggleSetting(this, 'zero-day')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Counter-Attack Mode:</label>
+                    <div class="power-switch on" onclick="toggleSetting(this, 'counter-attack')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Deep Web Monitoring:</label>
+                    <div class="power-switch on" onclick="toggleSetting(this, 'deep-web')"></div>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h4 style="margin-bottom: 15px; color: #00ccff;">📱 DEVICE PROTECTION</h4>
+                
+                <div class="setting-item">
+                    <label>Smartphones:</label>
+                    <div class="power-switch on" onclick="toggleDevice(this, 'smartphones')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Computers:</label>
+                    <div class="power-switch on" onclick="toggleDevice(this, 'computers')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Servers:</label>
+                    <div class="power-switch on" onclick="toggleDevice(this, 'servers')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>IoT Devices:</label>
+                    <div class="power-switch on" onclick="toggleDevice(this, 'iot')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Cloud Infrastructure:</label>
+                    <div class="power-switch on" onclick="toggleDevice(this, 'cloud')"></div>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h4 style="margin-bottom: 15px; color: #00ccff;">🔧 ADVANCED OPTIONS</h4>
+                
+                <div class="setting-item">
+                    <label>Scan Frequency:</label>
+                    <select style="background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 3px;">
+                        <option value="realtime" selected>Real-time</option>
+                        <option value="continuous">Continuous</option>
+                        <option value="aggressive">Aggressive</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Threat Response:</label>
+                    <select style="background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 3px;">
+                        <option value="automatic" selected>Automatic</option>
+                        <option value="manual">Manual Approval</option>
+                        <option value="aggressive">Aggressive Auto</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Logging Level:</label>
+                    <select style="background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 3px;">
+                        <option value="minimal">Minimal</option>
+                        <option value="standard">Standard</option>
+                        <option value="verbose" selected>Verbose</option>
+                        <option value="debug">Debug</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <h4 style="margin-bottom: 15px; color: #ff4444;">⚡ CRITICAL CONTROLS</h4>
+                <button class="command-button" onclick="exportConfiguration()">EXPORT CONFIG</button>
+                <button class="command-button warning" onclick="updateAllSystems()">UPDATE ALL</button>
+                <button class="command-button danger" onclick="systemWipe()">SECURE WIPE</button>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="margin-bottom: 10px;">📊 System Performance</h4>
+                <div>CPU Usage: <span style="color: #00ff41;">23%</span></div>
+                <div>Memory: <span style="color: #00ff41;">4.2GB / 16GB</span></div>
+                <div>Network: <span style="color: #00ff41;">847 Mbps</span></div>
+                <div>Threat Database: <span style="color: #00ff41;">2.4M signatures</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global defense state
+        let defenseState = {
+            systems: {
+                firewall: true,
+                aiHunter: true,
+                antimalware: true,
+                ids: true,
+                encryption: true,
+                proactive: true
+            },
+            counters: {
+                attacksBlocked: 15847,
+                threatsQuarantined: 2394,
+                intrusionsStopped: 567,
+                malwareEliminated: 1829
+            },
+            logs: [],
+            defenseLevel: 'godtier'
+        };
+
+        function addThreatLog(message, category = 'SYSTEM', severity = 'INFO') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] [${category}] ${message}`;
+            defenseState.logs.unshift(logEntry);
+            
+            // Keep only last 100 entries
+            if (defenseState.logs.length > 100) {
+                defenseState.logs = defenseState.logs.slice(0, 100);
+            }
+            
+            updateThreatDisplay();
+        }
+
+        function updateThreatDisplay() {
+            const terminal = document.getElementById('threat-terminal');
+            terminal.textContent = defenseState.logs.slice(0, 15).join('\n');
+            terminal.scrollTop = 0;
+        }
+
+        function toggleDefense(element, systemName) {
+            element.classList.toggle('on');
+            const isActive = element.classList.contains('on');
+            defenseState.systems[systemName] = isActive;
+            
+            const status = isActive ? 'ACTIVATED' : 'DEACTIVATED';
+            addThreatLog(`${systemName.toUpperCase().replace('-', ' ')} system ${status}`, 'CONFIG', 'WARNING');
+            
+            if (!isActive) {
+                addThreatLog(`⚠️ CRITICAL: ${systemName.toUpperCase()} defense layer disabled`, 'ALERT', 'CRITICAL');
+            }
+        }
+
+        function toggleSetting(element, settingName) {
+            element.classList.toggle('on');
+            const status = element.classList.contains('on') ? 'ENABLED' : 'DISABLED';
+            addThreatLog(`Security feature ${settingName.replace('-', ' ').toUpperCase()} ${status}`, 'CONFIG');
+        }
+
+        function toggleDevice(element, deviceType) {
+            element.classList.toggle('on');
+            const status = element.classList.contains('on') ? 'PROTECTED' : 'VULNERABLE';
+            addThreatLog(`Device category ${deviceType.toUpperCase()} now ${status}`, 'DEVICE');
+        }
+
+        function initiateDefcon1() {
+            addThreatLog('🚨 DEFCON 1 INITIATED - MAXIMUM THREAT RESPONSE 🚨', 'CRITICAL', 'CRITICAL');
+            addThreatLog('All defensive systems at maximum capacity', 'DEFENSE', 'CRITICAL');
+            addThreatLog('Implementing scorched earth protocols', 'PROTOCOL', 'CRITICAL');
+            addThreatLog('Counter-attack systems fully authorized', 'WEAPON', 'CRITICAL');
+            
+            // Visual alert effect
+            document.body.style.filter = 'hue-rotate(30deg) brightness(1.2)';
+            setTimeout(() => {
+                document.body.style.filter = 'none';
+            }, 5000);
+        }
+
+        function activateSiegeMode() {
+            addThreatLog('⚔️ SIEGE MODE ACTIVATED - FORTRESS DEFENSE ENGAGED ⚔️', 'DEFENSE', 'HIGH');
+            addThreatLog('All external connections under heavy scrutiny', 'NETWORK', 'HIGH');
+            addThreatLog('Proactive threat elimination authorized', 'ATTACK', 'HIGH');
+            addThreatLog('System entering maximum defensive posture', 'POSTURE', 'HIGH');
+            
+            setTimeout(() => {
+                const neutralized = Math.floor(Math.random() * 50) + 20;
+                defenseState.counters.attacksBlocked += neutralized;
+                document.getElementById('attacks-blocked').textContent = defenseState.counters.attacksBlocked.toLocaleString();
+                addThreatLog(`Siege defense complete: ${neutralized} threats eliminated`, 'SUCCESS');
+            }, 3000);
+        }
+
+        function fullSystemRestore() {
+            addThreatLog('Initiating complete system restoration...', 'SYSTEM');
+            addThreatLog('Resetting all defense systems to optimal configuration', 'RESTORE');
+            
+            // Reset all switches to on
+            document.querySelectorAll('.power-switch').forEach(sw => sw.classList.add('on'));
+            
+            setTimeout(() => {
+                addThreatLog('System restoration complete - all defenses at 100%', 'SUCCESS');
+                document.getElementById('defense-strength').style.width = '100%';
+            }, 2000);
+        }
+
+        function initiateFullScan() {
+            addThreatLog('🔍 INITIATING FULL SPECTRUM THREAT SCAN', 'SCAN');
+            addThreatLog('Scanning all protected endpoints and infrastructure', 'SCAN');
+            addThreatLog('AI behavioral analysis active across all systems', 'AI');
+            
+            let scanProgress = 0;
+            const scanInterval = setInterval(() => {
+                scanProgress += Math.random() * 20 + 10;
+                addThreatLog(`Scan progress: ${Math.floor(scanProgress)}% - analyzing threat vectors`, 'SCAN');
+                
+                if (scanProgress >= 100) {
+                    clearInterval(scanInterval);
+                    const threatsFound = Math.floor(Math.random() * 30) + 10;
+                    defenseState.counters.threatsQuarantined += threatsFound;
+                    defenseState.counters.malwareEliminated += threatsFound;
+                    
+                    document.getElementById('threats-quarantined').textContent = defenseState.counters.threatsQuarantined.toLocaleString();
+                    document.getElementById('malware-eliminated').textContent = defenseState.counters.malwareEliminated.toLocaleString();
+                    
+                    addThreatLog(`🎯 FULL SCAN COMPLETE: ${threatsFound} threats neutralized and quarantined`, 'SUCCESS');
+                    addThreatLog('All identified malware eliminated from systems', 'CLEANUP');
+                }
+            }, 1200);
+        }
+
+        function deepThreatHunt() {
+            addThreatLog('🕵️ INITIATING DEEP THREAT HUNTING OPERATION', 'HUNT');
+            addThreatLog('AI algorithms analyzing behavioral patterns and anomalies', 'AI');
+            addThreatLog('Cross-referencing with global threat intelligence databases', 'INTEL');
+            addThreatLog('Hunting for advanced persistent threats and zero-days', 'APT');
+            
+            setTimeout(() => {
+                const aptsFound = Math.floor(Math.random() * 8) + 2;
+                const zerodays = Math.floor(Math.random() * 3) + 1;
+                
+                addThreatLog(`Deep hunt complete: ${aptsFound} APTs and ${zerodays} zero-day exploits detected`, 'DISCOVERY');
+                addThreatLog('Implementing custom signatures and behavioral blocks', 'SIGNATURE');
+                addThreatLog('Threat intelligence database updated with new IOCs', 'IOC');
+                
+                defenseState.counters.intrusionsStopped += aptsFound;
+                document.getElementById('intrusions-stopped').textContent = defenseState.counters.intrusionsStopped.toLocaleString();
+            }, 4500);
+        }
+
+        function proactiveStrike() {
+            addThreatLog('⚔️ PROACTIVE STRIKE AUTHORIZATION CONFIRMED', 'STRIKE', 'HIGH');
+            addThreatLog('Identifying threat sources for pre-emptive neutralization', 'TARGET', 'HIGH');
+            addThreatLog('Launching counter-attack algorithms', 'ATTACK', 'HIGH');
+            addThreatLog('Deploying offensive security measures', 'OFFENSE', 'HIGH');
+            
+            setTimeout(() => {
+                const sourcesNeutralized = Math.floor(Math.random() * 15) + 5;
+                defenseState.counters.attacksBlocked += sourcesNeutralized * 3;
+                document.getElementById('attacks-blocked').textContent = defenseState.counters.attacksBlocked.toLocaleString();
+                
+                addThreatLog(`⚡ STRIKE COMPLETE: ${sourcesNeutralized} threat sources neutralized`, 'SUCCESS');
+                addThreatLog('Pre-emptive defense successful - attack vectors eliminated', 'ELIMINATION');
+                addThreatLog('Threat landscape significantly reduced', 'TACTICAL');
+            }, 3500);
+        }
+
+        function quarantineProtocol() {
+            addThreatLog('🔒 MASS QUARANTINE PROTOCOL INITIATED', 'QUARANTINE', 'HIGH');
+            addThreatLog('Isolating all suspicious files, processes, and network connections', 'ISOLATION');
+            addThreatLog('Emergency containment procedures active', 'CONTAINMENT');
+            
+            setTimeout(() => {
+                const quarantined = Math.floor(Math.random() * 100) + 50;
+                defenseState.counters.threatsQuarantined += quarantined;
+                document.getElementById('threats-quarantined').textContent = defenseState.counters.threatsQuarantined.toLocaleString();
+                
+                addThreatLog(`🛡️ MASS QUARANTINE COMPLETE: ${quarantined} items secured`, 'SUCCESS');
+                addThreatLog('All identified threats isolated and neutralized', 'SECURE');
+            }, 2500);
+        }
+
+        function scanDeviceType(deviceType) {
+            addThreatLog(`🔎 Initiating comprehensive ${deviceType.toUpperCase()} security scan`, 'DEVICE');
+            addThreatLog(`Analyzing ${deviceType} infrastructure for vulnerabilities`, 'VULN');
+            
+            setTimeout(() => {
+                const threatsFound = Math.floor(Math.random() * 8);
+                if (threatsFound > 0) {
+                    addThreatLog(`${deviceType.toUpperCase()} scan: ${threatsFound} threats detected and neutralized`, 'DEVICE');
+                    defenseState.counters.attacksBlocked += threatsFound;
+                    document.getElementById('attacks-blocked').textContent = defenseState.counters.attacksBlocked.toLocaleString();
+                } else {
+                    addThreatLog(`${deviceType.toUpperCase()} scan: All systems clean - no threats detected`, 'CLEAN');
+                }
+                addThreatLog(`${deviceType.toUpperCase()} infrastructure security verified`, 'VERIFY');
+            }, 2000);
+        }
+
+        function updateDefenseLevel() {
+            const level = document.getElementById('defense-level').value;
+            defenseState.defenseLevel = level;
+            addThreatLog(`Defense level updated to: ${level.toUpperCase()}`, 'CONFIG');
+            
+            switch(level) {
+                case 'godtier':
+                    addThreatLog('🔥 GOD-TIER DEFENSE ACTIVATED - MAXIMUM PROTECTION', 'UPGRADE', 'HIGH');
+                    addThreatLog('All advanced AI systems online - predictive threat neutralization active', 'AI', 'HIGH');
+                    addThreatLog('Quantum-resistant encryption and proactive strike capabilities enabled', 'QUANTUM', 'HIGH');
+                    document.getElementById('defense-strength').style.width = '100%';
+                    break;
+                case 'maximum':
+                    addThreatLog('Maximum security protocols engaged', 'UPGRADE');
+                    document.getElementById('defense-strength').style.width = '85%';
+                    break;
+                case 'enhanced':
+                    addThreatLog('Enhanced protection mode activated', 'UPGRADE');
+                    document.getElementById('defense-strength').style.width = '70%';
+                    break;
+                case 'standard':
+                    addThreatLog('Standard defense protocols active', 'STANDARD');
+                    document.getElementById('defense-strength').style.width = '50%';
+                    break;
+            }
+        }
+
+        function exportConfiguration() {
+            addThreatLog('📁 Exporting current security configuration...', 'EXPORT');
+            setTimeout(() => {
+                addThreatLog('Security configuration exported to secure encrypted backup', 'SUCCESS');
+                addThreatLog('Configuration includes all defense rules and threat signatures', 'BACKUP');
+            }, 1500);
+        }
+
+        function updateAllSystems() {
+            addThreatLog('🔄 INITIATING COMPREHENSIVE SYSTEM UPDATE', 'UPDATE');
+            addThreatLog('Downloading latest threat signatures and security patches', 'DOWNLOAD');
+            addThreatLog('Updating AI models with newest attack patterns', 'AI-UPDATE');
+            
+            setTimeout(() => {
+                addThreatLog('System update complete: 25,847 new threat signatures installed', 'SUCCESS');
+                addThreatLog('AI behavioral models updated with latest threat intelligence', 'AI-SUCCESS');
+                addThreatLog('All defense systems operating at peak efficiency', 'OPTIMAL');
+            }, 3000);
+        }
+
+        function systemWipe() {
+            if (confirm('⚠️ WARNING: This will perform a secure wipe of all threat data and reset to factory defaults. Continue?')) {
+                addThreatLog('🧹 SECURE SYSTEM WIPE INITIATED', 'WIPE', 'CRITICAL');
+                addThreatLog('Performing 7-pass DoD secure erase of threat databases', 'ERASE', 'CRITICAL');
+                addThreatLog('Resetting all configurations to factory defaults', 'RESET', 'CRITICAL');
+                
+                setTimeout(() => {
+                    addThreatLog('Secure wipe complete - system restored to clean state', 'SUCCESS');
+                    addThreatLog('All threat traces eliminated - fresh defense installation', 'CLEAN');
+                    // Reset counters
+                    Object.keys(defenseState.counters).forEach(key => defenseState.counters[key] = 0);
+                    document.querySelectorAll('.stat-value').forEach(el => el.textContent = '0');
+                }, 4000);
+            }
+        }
+
+        // Auto-update system with realistic threat simulation
+        setInterval(() => {
+            const eventChance = Math.random();
+            
+            if (eventChance < 0.15) {
+                const newThreats = Math.floor(Math.random() * 5) + 1;
+                defenseState.counters.attacksBlocked += newThreats;
+                document.getElementById('attacks-blocked').textContent = defenseState.counters.attacksBlocked.toLocaleString();
+                addThreatLog(`${newThreats} incoming attacks automatically blocked`, 'AUTO-DEFENSE');
+            }
+            
+            if (eventChance > 0.85 && eventChance < 0.9) {
+                addThreatLog('Routine security health check completed - all systems optimal', 'HEALTH');
+            }
+            
+            if (eventChance > 0.95) {
+                const threatType = ['botnet C&C', 'phishing attempt', 'malware payload', 'intrusion probe'][Math.floor(Math.random() * 4)];
+                addThreatLog(`Advanced ${threatType} detected and neutralized by AI systems`, 'AI-DEFENSE');
+            }
+        }, 8000);
+
+        // Initialize system with startup sequence
+        setTimeout(() => {
+            addThreatLog('🚀 TWO/NGI Defense Matrix fully initialized and operational', 'INIT');
+            addThreatLog('All protection modules active - God-tier security engaged', 'STATUS');
+            addThreatLog('Proactive threat hunting and counter-attack systems online', 'READY');
+        }, 1000);
+
+        // Simulate real-time threat activity
+        setTimeout(() => {
+            addThreatLog('Real-time threat feed active - monitoring global attack patterns', 'FEED');
+        }, 3000);

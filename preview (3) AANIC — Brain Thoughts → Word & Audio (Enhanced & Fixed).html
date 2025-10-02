@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AANIC — Brain Thoughts → Word & Audio (Enhanced & Fixed)</title>
+<style>
+:root{--bg:#071024;--card:#071827;--accent:#7c3aed;--muted:#94a3b8;--good:#16a34a}
+*{box-sizing:border-box;font-family:Inter,Segoe UI,system-ui,Arial,sans-serif}
+body{background:linear-gradient(180deg,#041226,#071024);color:#e6eef8;margin:0;padding:20px}
+.container{max-width:1100px;margin:0 auto}
+.header{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.title{font-size:1.1rem;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 420px;gap:18px;margin-top:18px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+.row{display:flex;gap:10px;align-items:center}
+textarea{width:100%;height:100px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+select,input[type=range]{width:100%}
+.btn{background:var(--accent);color:white;padding:9px 12px;border-radius:8px;border:none;cursor:pointer}
+.btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+.indicator{width:12px;height:12px;border-radius:999px;background:#e74c3c}
+.indicator.on{background:var(--good)}
+.output{white-space:pre-wrap;background:rgba(0,0,0,0.28);padding:12px;border-radius:6px;font-family:ui-monospace,Menlo,monospace}
+.canvas-wrap{height:120px;background:#041827;border-radius:6px;padding:6px}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.dragdrop{border:2px dashed rgba(255,255,255,0.04);padding:12px;border-radius:8px;text-align:center;color:var(--muted);cursor:pointer}
+.thumb{width:100%;height:80px;background:#03111a;border-radius:6px;margin-top:8px}
+.footer{margin-top:18px;color:var(--muted);font-size:0.85rem}
+.small{font-size:0.85rem;color:var(--muted)}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div>
+      <div class="title">AANIC — Brain Thoughts → Word & Audio (Enhanced & Fixed)</div>
+      <div class="small">Database 82698 • David Gomadza — DSP, drag & drop, waveform & spectrogram, segmentation</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div id="analogueIndicator" class="indicator"></div>
+      <div id="readerIndicator" class="indicator"></div>
+      <div id="statusLabel" class="small">Analogue: Disconnected · Reader: Offline</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <label><strong>EM pattern (worts / shorthand)</strong></label>
+      <textarea id="input" placeholder="e.g. ikssyrghtnw">ikssyrghtnw</textarea>
+
+      <div style="margin-top:10px" class="row">
+        <div style="flex:1">
+          <label>Thought type</label>
+          <select id="thoughtType"><option>speech</option><option>emotion</option><option>command</option></select>
+        </div>
+        <div style="width:150px">
+          <label>Resonance (Hz)</label>
+          <input id="resFreq" type="range" min="1" max="100" value="50">
+          <div id="resLabel" class="small">50 Hz</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button id="convert" class="btn">Convert →</button>
+        <button id="toggleReader" class="btn secondary">Start Real-Time</button>
+        <button id="attachAnalogue" class="btn secondary">Attach Digital Analogue</button>
+      </div>
+
+      <div style="margin-top:12px">
+        <div id="dragDrop" class="dragdrop">Drag & drop an audio file here, or click Attach Digital Analogue</div>
+        <input id="hiddenFile" type="file" accept="audio/*" style="display:none">
+        <div class="thumb"><canvas id="waveThumb" width="800" height="80"></canvas></div>
+        <div class="thumb"><canvas id="specThumb" width="800" height="80"></canvas></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div><strong>Conversion output</strong></div>
+        <div id="output" class="output">No conversion yet.</div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <div><strong>Audio & Neural Codec</strong></div>
+      <div style="margin-top:8px">
+        <label>Voice type</label>
+        <select id="voiceSelect"><option value="neural">Neural</option><option value="human">Human-like</option><option value="robotic">Robotic</option></select>
+      </div>
+
+      <div style="margin-top:8px">
+        <label>Base frequency</label>
+        <input id="audioFreq" type="range" min="120" max="2000" value="440">
+        <div id="audioFreqLabel" class="small">440 Hz</div>
+      </div>
+
+      <div style="margin-top:12px" class="controls">
+        <button id="genAudio" class="btn">Generate Audio</button>
+        <button id="play" class="btn secondary">Play</button>
+        <button id="stop" class="btn secondary">Stop</button>
+        <button id="download" class="btn secondary">Download WAV</button>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="small"><strong>Segmentation & Matches</strong></div>
+        <div id="segments" class="small">(segments will appear here)</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="small"><strong>DSP Match Scores</strong></div>
+        <div id="matches" class="small">(matching info)</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-size:0.9rem;color:var(--muted)"><strong>Status</strong></div>
+        <div id="audioStatus" class="small">No audio</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">This demo uses in-browser DSP: energy envelope, cross-correlation, segmentation and visual FFT for spectrogram. It's for experimentation only — real neural capture needs medical hardware.</div>
+</div>
+
+<script>
+// -------------------- Utilities & DB --------------------
+const db = {
+  ikssyrghtnw: {text: 'I kiss you right now', pattern:[220,330,440,330,220]},
+  hlwdym: {text: 'Hello how are you my friend', pattern:[330,440,550,440,330]},
+  lvv: {text: 'love', pattern:[330,440,220]},
+  kks: {text: 'kiss', pattern:[440,330,220]},
+  jmp: {text: 'jump', pattern:[440,550,330]}
+};
+
+// DOM refs
+const input = document.getElementById('input');
+const convertBtn = document.getElementById('convert');
+const output = document.getElementById('output');
+const toggleReader = document.getElementById('toggleReader');
+const attachAnalogue = document.getElementById('attachAnalogue');
+const analogueIndicator = document.getElementById('analogueIndicator');
+const readerIndicator = document.getElementById('readerIndicator');
+const statusLabel = document.getElementById('statusLabel');
+const resFreq = document.getElementById('resFreq');
+const resLabel = document.getElementById('resLabel');
+const genAudio = document.getElementById('genAudio');
+const playBtn = document.getElementById('play');
+const stopBtn = document.getElementById('stop');
+const downloadBtn = document.getElementById('download');
+const audioFreq = document.getElementById('audioFreq');
+const audioFreqLabel = document.getElementById('audioFreqLabel');
+const audioStatus = document.getElementById('audioStatus');
+const dragDrop = document.getElementById('dragDrop');
+const hiddenFile = document.getElementById('hiddenFile');
+const waveThumb = document.getElementById('waveThumb');
+const specThumb = document.getElementById('specThumb');
+const segmentsEl = document.getElementById('segments');
+const matchesEl = document.getElementById('matches');
+
+let analogueAttached = false;
+let readerRunning = false;
+let currentPattern = null;
+let audioBufferUrl = null;
+let audioCtx = null;
+let sourceNode = null;
+
+// UI helpers
+resFreq.addEventListener('input', ()=>{ resLabel.textContent = resFreq.value + ' Hz'; });
+audioFreq.addEventListener('input', ()=>{ audioFreqLabel.textContent = audioFreq.value + ' Hz'; });
+
+function setIndicators(){
+  analogueIndicator.className = 'indicator' + (analogueAttached? ' on' : '');
+  readerIndicator.className = 'indicator' + (readerRunning? ' on' : '');
+  statusLabel.textContent = `Analogue: ${analogueAttached? 'Connected' : 'Disconnected'} · Reader: ${readerRunning? 'Online' : 'Offline'}`;
+}
+setIndicators();
+
+// -------------------- Conversion logic --------------------
+function isConsonant(ch){ return /[bcdfghjklmnpqrstvwxyz]/i.test(ch); }
+function vowelInsert(wort){
+  const vowels = ['a','e','i','o','u'];
+  let out = '';
+  let vix = 0;
+  for(let i=0;i<wort.length;i++){
+    out += wort[i];
+    if(i < wort.length - 1 && isConsonant(wort[i]) && isConsonant(wort[i+1])){
+      out += vowels[vix % vowels.length];
+      vix++;
+    }
+  }
+  return out.replace(/x/g, ' ');
+}
+
+function convertInput(str){
+  const key = (str||'').trim().toLowerCase();
+  if(!key) return {text: '(empty input)', pattern: null};
+  if(db[key]) return {text: db[key].text, pattern: db[key].pattern.slice()};
+  const cleaned = key.replace(/[^a-z0-9]/g,'');
+  const words = cleaned.match(/.{1,6}/g) || [cleaned];
+  const generated = words.map(w => vowelInsert(w)).join(' ');
+  const patt = [];
+  for(let i=0;i<generated.length;i++) patt.push(120 + (generated.charCodeAt(i) % 800));
+  return {text: generated, pattern: patt};
+}
+
+convertBtn.addEventListener('click', ()=>{
+  const res = convertInput(input.value);
+  currentPattern = res.pattern;
+  output.textContent = res.text + (res.pattern ? `\n\n[pattern length: ${res.pattern.length}]` : '');
+});
+
+// -------------------- Drag & drop / file handling --------------------
+['dragenter','dragover'].forEach(ev => dragDrop.addEventListener(ev, e => { e.preventDefault(); dragDrop.style.borderColor = '#6ee7b7'; }));
+['dragleave','drop'].forEach(ev => dragDrop.addEventListener(ev, e => { e.preventDefault(); dragDrop.style.borderColor = ''; }));
+dragDrop.addEventListener('click', () => hiddenFile.click());
+hiddenFile.addEventListener('change', () => { if(hiddenFile.files && hiddenFile.files[0]) handleFile(hiddenFile.files[0]); });
+dragDrop.addEventListener('drop', (e) => { if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+async function handleFile(file){
+  audioStatus.textContent = 'Loading file...';
+  try{
+    const arrayBuffer = await file.arrayBuffer();
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const decoded = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
+    const channel = decoded.numberOfChannels ? decoded.getChannelData(0) : decoded.getChannelData(0);
+    drawWaveform(channel);
+    drawSpectrogramApprox(channel, decoded.sampleRate);
+    const energyPattern = envelopeToPattern(channel);
+    currentPattern = reducePattern(energyPattern, 32);
+    analogueAttached = true; setIndicators();
+    const segments = segmentPattern(currentPattern);
+    segmentsEl.textContent = segments.map((s,i)=>`[${i+1}] len:${s.length}`).join(' | ');
+    const matches = matchAgainstDB(segments);
+    matchesEl.textContent = matches.map(m=> `${m.key || '(pseudo)'} → ${m.text || m.pseudo} (score:${Math.round(m.score||0)})`).join('\n');
+    const transcription = matches.map(m => (m.text || m.pseudo || '') ).join(' ');
+    output.textContent = `File processed. Transcription:\n${transcription}`;
+    audioStatus.textContent = 'Digital analogue processed';
+    audioBufferUrl = null; // regenerate on demand
+  }catch(err){
+    console.error(err);
+    audioStatus.textContent = 'Failed to process file';
+  }
+}
+
+function envelopeToPattern(channelData){
+  const win = Math.max(256, Math.floor(channelData.length / 256));
+  const patt = [];
+  for(let i=0;i<channelData.length;i+=win){
+    let sum=0, n=0;
+    for(let j=i;j<i+win && j<channelData.length;j++){ sum += Math.abs(channelData[j]); n++; }
+    patt.push(n? (sum/n) : 0);
+  }
+  return patt;
+}
+
+function reducePattern(patt, targetLen=16){
+  const out = [];
+  const step = Math.max(1, Math.floor(patt.length / targetLen));
+  for(let i=0;i<patt.length;i+=step) out.push(Math.round(120 + Math.min(1,patt[i]*12)*1080));
+  return out;
+}
+
+function segmentPattern(patt){
+  if(!patt || !patt.length) return [];
+  const segments = [];
+  let cur = [];
+  const mean = patt.reduce((a,b)=>a+b,0) / patt.length;
+  const thresh = mean * 0.85;
+  for(let i=0;i<patt.length;i++){
+    if(patt[i] > thresh) { cur.push(patt[i]); }
+    else { if(cur.length){ segments.push(cur.slice()); cur = []; } }
+  }
+  if(cur.length) segments.push(cur);
+  if(segments.length === 0) segments.push(patt.slice(0, Math.min(8, patt.length)));
+  return segments;
+}
+
+function matchAgainstDB(segments){
+  const results = [];
+  const dbPatterns = Object.keys(db).map(k => ({ key: k, pattern: db[k].pattern.map(x => Math.round(120 + (x % 800))), text: db[k].text }));
+  for(const seg of segments){
+    let best = { key: null, score: Infinity, text: null };
+    for(const d of dbPatterns){
+      const sc = normalizedDistance(seg, d.pattern);
+      if(sc < best.score){ best = { key: d.key, score: sc, text: d.text, pattern: d.pattern }; }
+    }
+    if(!best.key || best.score > 300){ // fallback to pseudo
+      const pseudo = patternToPseudo(seg);
+      best.pseudo = vowelInsert(pseudo);
+      best.text = best.pseudo;
+      best.key = null;
+    }
+    results.push(best);
+  }
+  return results;
+}
+
+function normalizedDistance(a,b){
+  if(!a || !b || !a.length || !b.length) return Infinity;
+  const L = Math.min(a.length, b.length);
+  if(L === 0) return Infinity;
+  let s = 0;
+  for(let i=0;i<L;i++) s += Math.abs(a[i] - b[i]);
+  return s / L;
+}
+
+function patternToPseudo(p){ return (p || []).map(v => String.fromCharCode(97 + (v % 25))).join(''); }
+
+// -------------------- Visualization --------------------
+function drawWaveform(data){
+  const c = waveThumb; const ctx = c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#02121a'; ctx.fillRect(0,0,c.width,c.height);
+  ctx.lineWidth = 1; ctx.strokeStyle = '#4ade80'; ctx.beginPath();
+  const step = Math.ceil(data.length / c.width);
+  for(let i=0;i<c.width;i++){
+    const v = data[i*step] || 0;
+    const y = (1 - (v + 1) / 2) * c.height;
+    if(i===0) ctx.moveTo(i,y); else ctx.lineTo(i,y);
+  }
+  ctx.stroke();
+}
+
+function drawSpectrogramApprox(channel, sampleRate){
+  const c = specThumb; const ctx = c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+  const sliceLen = Math.floor(channel.length / c.width) || 1024;
+  for(let x=0;x<c.width;x++){
+    const start = x * sliceLen; let sum = 0; let n = 0;
+    for(let i=start;i<start+sliceLen && i<channel.length;i++){ sum += Math.abs(channel[i]); n++; }
+    const v = n ? Math.min(1, (sum/n) * 12) : 0;
+    const h = Math.round(v * c.height);
+    ctx.fillStyle = `rgb(${Math.round(20+v*200)},${Math.round(30+v*120)},${Math.round(40+v*80)})`;
+    ctx.fillRect(x, c.height - h, 1, h);
+  }
+}
+
+// -------------------- Audio generation --------------------
+function buildWavFromPattern(pattern, baseHz){
+  if(!pattern || !pattern.length) return null;
+  const sampleRate = 44100;
+  const seconds = Math.max(0.4, Math.min(8, pattern.length * 0.04));
+  const length = Math.floor(sampleRate * seconds);
+  const floatBuffer = new Float32Array(length);
+  for(let i=0;i<length;i++){
+    let s = 0;
+    for(let j=0;j<Math.min(6, pattern.length);j++){
+      const freq = baseHz * (pattern[j] / 220);
+      s += Math.sin(2*Math.PI*freq*(i/sampleRate)) * (0.3 / (j+1));
+    }
+    floatBuffer[i] = s / 1.5;
+  }
+  // create WAV
+  const wavBuffer = new ArrayBuffer(44 + floatBuffer.length * 2);
+  const view = new DataView(wavBuffer);
+  function writeString(view, offset, string){ for(let i=0;i<string.length;i++) view.setUint8(offset + i, string.charCodeAt(i)); }
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + floatBuffer.length * 2, true);
+  writeString(view, 8, 'WAVE');
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeString(view, 36, 'data');
+  view.setUint32(40, floatBuffer.length * 2, true);
+  let offset = 44;
+  for(let i=0;i<floatBuffer.length;i++){
+    const s = Math.max(-1, Math.min(1, floatBuffer[i]));
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    offset += 2;
+  }
+  return new Blob([view], { type: 'audio/wav' });
+}
+
+genAudio.addEventListener('click', ()=>{
+  if(!currentPattern || !currentPattern.length){ audioStatus.textContent = 'No pattern available — attach digital analogue or convert text first'; return; }
+  const baseHz = parseInt(audioFreq.value, 10) || 440;
+  const wav = buildWavFromPattern(currentPattern, baseHz);
+  if(!wav){ audioStatus.textContent = 'Audio generation failed'; return; }
+  if(audioBufferUrl) URL.revokeObjectURL(audioBufferUrl);
+  audioBufferUrl = URL.createObjectURL(wav);
+  audioStatus.textContent = 'Audio generated';
+});
+
+playBtn.addEventListener('click', async ()=>{
+  if(!audioBufferUrl){ audioStatus.textContent = 'No audio — generate first'; return; }
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(sourceNode) try{ sourceNode.stop(); }catch(e){}
+  const resp = await fetch(audioBufferUrl);
+  const ab = await resp.arrayBuffer();
+  const decoded = await audioCtx.decodeAudioData(ab.slice(0));
+  sourceNode = audioCtx.createBufferSource();
+  sourceNode.buffer = decoded; sourceNode.connect(audioCtx.destination); sourceNode.start();
+  audioStatus.textContent = 'Playing';
+  sourceNode.onended = ()=> audioStatus.textContent = 'Playback finished';
+});
+
+stopBtn.addEventListener('click', ()=>{ if(sourceNode) try{ sourceNode.stop(); audioStatus.textContent = 'Stopped'; }catch(e){} });
+
+downloadBtn.addEventListener('click', ()=>{ if(!audioBufferUrl){ audioStatus.textContent = 'No audio to download'; return; } const a = document.createElement('a'); a.href = audioBufferUrl; a.download = 'aanic_audio.wav'; document.body.appendChild(a); a.click(); a.remove(); });
+
+// -------------------- Keyboard shortcuts & attach behavior --------------------
+attachAnalogue.addEventListener('click', ()=>{ hiddenFile.click(); });
+window.addEventListener('keydown', e => { if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') hiddenFile.click(); });
+
+// -------------------- Small helper used in matching fallback --------------------
+function patternToPseudo(p){ return (p || []).map(v => String.fromCharCode(97 + (v % 25))).join(''); }
+
+</script>
+</body>
+</html>

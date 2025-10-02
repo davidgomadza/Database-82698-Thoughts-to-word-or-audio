@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ezekiel's Vision - The Mystical Sphere</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(ellipse tlef, 
+                #1a1a2e 0%, 
+                #16213e 35%,
+                #0f3460 60%,
+                #0e2954 85%,
+                #000014 100%);
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Georgia', serif;
+            color: #ffd700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sphere-container {
+            width: 600px;
+            height: 600px;
+            position: relative;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .sphere {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            animation: 
+                rotateY 20s linear infinite,
+                rotateX 30s ease-in-out infinite,
+                rotateZ 25s linear infinite;
+        }
+
+        .point {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffd700 0%, #ffaa00 50%, #ff8c00 100%);
+            box-shadow: 
+                0 0 10px #ffd700,
+                0 0 20px #ffd700,
+                0 0 30px #ffd700;
+            transform-style: preserve-3d;
+        }
+
+        .point:nth-child(4n) {
+            background: radial-gradient(circle, #00ffff 0%, #0088ff 50%, #0044ff 100%);
+            box-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 30px #00ffff;
+        }
+
+        .point:nth-child(4n+1) {
+            background: radial-gradient(circle, #ff4500 0%, #ff6500 50%, #ff8500 100%);
+            box-shadow: 
+                0 0 10px #ff4500,
+                0 0 20px #ff4500,
+                0 0 30px #ff4500;
+        }
+
+        .point:nth-child(7n) {
+            background: radial-gradient(circle, #ffffff 0%, #e6e6e6 50%, #cccccc 100%);
+            box-shadow: 
+                0 0 15px #ffffff,
+                0 0 25px #ffffff,
+                0 0 35px #ffffff;
+            width: 8px;
+            height: 8px;
+        }
+
+        .lightning {
+            position: absolute;
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent 0%, #ffffff 50%, transparent 100%);
+            opacity: 0;
+            animation: lightning 3s infinite ease-in-out;
+        }
+
+        .description {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            max-width: 80%;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .verse {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e6e6e6;
+            font-style: italic;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .center-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffd700 0%, transparent 70%);
+            box-shadow: 
+                0 0 50px #ffd700,
+                0 0 100px #ffd700,
+                0 0 150px #ffd700;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes rotateY {
+            0% { transform: rotateY(0deg) rotateX(-28deg); }
+            100% { transform: rotateY(360deg) rotateX(-28deg); }
+        }
+
+        @keyframes rotateX {
+            0% { transform: rotateX(-28deg) rotateZ(28deg); }
+            50% { transform: rotateX(28deg) rotateZ(28deg); }
+            100% { transform: rotateX(-28deg) rotateZ(28deg); }
+        }
+
+        @keyframes rotateZ {
+            0% { transform: rotateZ(0deg); }
+            100% { transform: rotateZ(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 0.6;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        @keyframes lightning {
+            0%, 90%, 100% { opacity: 0; }
+            5%, 10%, 15%, 85% { opacity: 1; }
+        }
+
+        .axes-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: #ffd700;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffd700;
+        }
+
+        .axis {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .axis-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 5px currentColor;
+        }
+
+        .axis-sw { background: #ff4500; }
+        .axis-ne { background: #00ffff; }
+        .axis-n { background: #ffffff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sphere-container">
+            <div class="center-glow"></div>
+            <div class="sphere" id="sphere">
+                <!-- Points will be generated by JavaScript -->
+            </div>
+            <!-- Lightning effects -->
+            <div class="lightning" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+            <div class="lightning" style="top: 80%; left: 70%; animation-delay: 1s;"></div>
+            <div class="lightning" style="top: 40%; left: 90%; animation-delay: 2s;"></div>
+            <div class="lightning" style="top: 60%; left: 10%; animation-delay: 1.5s;"></div>
+        </div>
+
+        <div class="axes-indicator">
+            <div class="title" style="font-size: 14px; margin-bottom: 10px;">Rotation Axes</div>
+            <div class="axis">
+                <div class="axis-color axis-sw"></div>
+                <span>Southwest (-28°)</span>
+            </div>
+            <div class="axis">
+                <div class="axis-color axis-ne"></div>
+                <span>Northeast (28°)</span>
+            </div>
+            <div class="axis">
+                <div class="axis-color axis-n"></div>
+                <span>True North</span>
+            </div>
+        </div>
+
+        <div class="description">
+            <div class="title">Ezekiel's Vision: The Living Sphere</div>
+            <div class="verse">
+                "I looked, and I saw a windstorm coming out of the north—an immense cloud with flashing lightning and surrounded by brilliant light. The center of the fire looked like glowing metal, and in the fire was what looked like four living creatures... As I looked at the living creatures, I saw a wheel on the ground beside each creature with its four faces. This was the appearance and structure of the wheels: They sparkled like topaz, and all four looked alike. Each appeared to be made like a wheel intersecting a wheel... Their rims were high and awesome, and all four rims were full of eyes all around... Above the vault over their heads was what looked like a throne of lapis lazuli, and high above on the throne was a figure like that of a man. I saw that from what appeared to be his waist up he looked like glowing metal, as if full of fire, and that from there down he looked like fire; and brilliant light surrounded him."
+                <br><br>
+                <strong>84 points distributed using the Fibonacci sphere algorithm, rotating continuously around three major axes: Southwest at -28°, Northeast at 28°, and True North.</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fibonacci sphere point distribution algorithm
+        function fibonacciSphere(samples) {
+            const points = [];
+            const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle in radians
+            
+            for (let i = 0; i < samples; i++) {
+                const y = 1 - (i / (samples - 1)) * 2; // y goes from 1 to -1
+                const radius = Math.sqrt(1 - y * y); // radius at y
+                
+                const theta = phi * i; // Golden angle increment
+                
+                const x = Math.cos(theta) * radius;
+                const z = Math.sin(theta) * radius;
+                
+                points.push({ x, y, z });
+            }
+            
+            return points;
+        }
+
+        // Convert 3D coordinates to sphere surface positions
+        function positionOnSphere(x, y, z, radius) {
+            const sphereRadius = radius || 300;
+            return {
+                x: x * sphereRadius,
+                y: y * sphereRadius,
+                z: z * sphereRadius
+            };
+        }
+
+        // Project 3D point to 2D screen coordinates
+        function project3DTo2D(x, y, z) {
+            const perspective = 1000;
+            const scale = perspective / (perspective + z);
+            return {
+                x: (x * scale) + 300, // Center X
+                y: (y * scale) + 300, // Center Y
+                scale: scale
+            };
+        }
+
+        // Generate and display the 84 points
+        function createSphere() {
+            const sphere = document.getElementById('sphere');
+            const points = fibonacciSphere(84);
+            
+            points.forEach((point, index) => {
+                const spherePos = positionOnSphere(point.x, point.y, point.z);
+                const screenPos = project3DTo2D(spherePos.x, spherePos.y, spherePos.z);
+                
+                const pointElement = document.createElement('div');
+                pointElement.className = 'point';
+                
+                // Position the point
+                pointElement.style.left = `${screenPos.x}px`;
+                pointElement.style.top = `${screenPos.y}px`;
+                
+                // Set transform for 3D positioning
+                pointElement.style.transform = `translate3d(${spherePos.x}px, ${spherePos.y}px, ${spherePos.z}px)`;
+                
+                // Add some variation in animation delay
+                pointElement.style.animationDelay = `${index * 0.1}s`;
+                
+                sphere.appendChild(pointElement);
+            });
+        }
+
+        // Add pulsing animation to certain points
+        function addSpecialEffects() {
+            const points = document.querySelectorAll('.point');
+            points.forEach((point, index) => {
+                // Every 7th point gets special treatment (representing the 'eyes')
+                if (index % 7 === 0) {
+                    point.style.animation += ', pulse 2s ease-in-out infinite';
+                }
+                
+                // Every 21st point (3 x 7) gets lightning effect
+                if (index % 21 === 0) {
+                    const lightning = document.createElement('div');
+                    lightning.className = 'lightning';
+                    lightning.style.position = 'absolute';
+                    lightning.style.left = '50%';
+                    lightning.style.top = '50%';
+                    lightning.style.animationDelay = `${index * 0.3}s`;
+                    point.appendChild(lightning);
+                }
+            });
+        }
+
+        // Animate the three rotation axes as specified
+        function animateAxes() {
+            const sphere = document.getElementById('sphere');
+            let time = 0;
+            
+            function updateRotation() {
+                time += 0.01;
+                
+                // Southwest axis (-28 degrees)
+                const swRotation = Math.sin(time * 0.8) * 28;
+                
+                // Northeast axis (28 degrees) 
+                const neRotation = Math.cos(time * 0.6) * 28;
+                
+                // True North (continuous rotation)
+                const northRotation = time * 20;
+                
+                // Apply combined transformations
+                sphere.style.transform = `
+                    rotateX(${swRotation - 28}deg) 
+                    rotateZ(${neRotation + 28}deg) 
+                    rotateY(${northRotation}deg)
+                `;
+                
+                requestAnimationFrame(updateRotation);
+            }
+            
+            updateRotation();
+        }
+
+        // Initialize the mystical sphere
+        document.addEventListener('DOMContentLoaded', function() {
+            createSphere();
+            addSpecialEffects();
+            
+            // Start the continuous rotation after a brief delay
+            setTimeout(() => {
+                animateAxes();
+            }, 1000);
+        });
+
+        // Add interaction - click to change rotation speed
+        let rotationSpeed = 1;
+        document.addEventListener('click', function() {
+            rotationSpeed = rotationSpeed === 1 ? 2 : rotationSpeed === 2 ? 0.5 : 1;
+            document.documentElement.style.setProperty('--rotation-speed', rotationSpeed);
+        });
+    </script>
+</body>
+</html>
+ 

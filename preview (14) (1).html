@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>84-Sided Vector with Biblical Creatures</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+        
+        .vector-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 0;
+        }
+        
+        .controls {
+            width: 300px;
+            padding: 20px;
+            background: rgba(30, 30, 30, 0.8);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: calc(100% - 10px);
+        }
+        
+        button:hover {
+            background: #666;
+        }
+        
+        .stats {
+            margin-top: 10px;
+            font-size: 14px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        .bin {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #0af;
+            margin: 2px;
+            border-radius: 2px;
+            transition: opacity 0.3s;
+        }
+        
+        .bin.removed {
+            opacity: 0.3;
+            background: #f00;
+        }
+        
+        .slider-container {
+            margin: 10px 0;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .controls {
+                width: 100%;
+                height: 40%;
+                order: 2;
+            }
+            
+            .vector-container {
+                height: 60%;
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>84-Sided Vector with Biblical Creatures</h1>
+            <p>Equation: create.sendallmitstodeaddeadmitcit3333continuouslyforeverbinaryreverseisdeaddeadcitmit3333continuouslyforever.start(save)</p>
+        </div>
+        
+        <div class="content">
+            <div class="vector-container">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <h3>Vector Controls</h3>
+                    <button id="rotateBtn">Rotate 45°</button>
+                    <button id="autoRotateBtn">Auto Rotate</button>
+                    <button id="resetBtn">Reset</button>
+                    
+                    <div class="slider-container">
+                        <label for="rotationSpeed">Rotation Speed: <span id="rotationSpeedValue">1</span></label>
+                        <input type="range" id="rotationSpeed" min="0.1" max="5" step="0.1" value="1">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="rotationAngle">Manual Rotation Angle: <span id="rotationAngleValue">45</span>°</label>
+                        <input type="range" id="rotationAngleInput" min="1" max="180" step="1" value="45">
+                    </div>
+                    
+                    <div class="stats">
+                        <p>Rotation Angle: <span id="rotationAngle">0</span>°</p>
+                        <p>Rotation Count: <span id="rotationCount">0</span></p>
+                        <p>Bins Remaining: <span id="binsRemaining">84</span>/84</p>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Bin Display</h3>
+                    <div id="binsContainer"></div>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Creature Controls</h3>
+                    <button id="toggleCreaturesBtn">Hide Creatures</button>
+                    <button id="toggleMovementBtn">Pause Movement</button>
+                    
+                    <div class="slider-container">
+                        <label for="creatureSpeed">Creature Speed: <span id="creatureSpeedValue">1</span></label>
+                        <input type="range" id="creatureSpeed" min="0.1" max="3" step="0.1" value="1">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Equation Status</h3>
+                    <p id="equationStatus">Ready</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Main application
+        class InteractiveVector84 {
+            constructor() {
+                this.sides = 84;
+                this.rotationAngle = 0;
+                this.rotationCount = 0;
+                this.removalInterval = 2.545454545454545;
+                this.bins = [];
+                this.autoRotate = false;
+                this.rotationSpeed = 1;
+                this.manualRotationAngle = 45;
+                
+                // Creature properties
+                this.creatures = [];
+                this.showCreatures = true;
+                this.creaturesMoving = true;
+                this.creatureSpeed = 1;
+                
+                this.canvas = document.getElementById('mainCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                
+                this.animationId = null;
+                
+                this.init();
+            }
+            
+            init() {
+                // Initialize bins
+                for (let i = 0; i < this.sides; i++) {
+                    this.bins.push({id: i, removed: false});
+                }
+                
+                // Initialize creatures (4 living creatures)
+                this.initCreatures();
+                
+                // Setup canvas
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                
+                // Update bins display
+                this.updateBinsDisplay();
+                
+                // Start render loop
+                this.render();
+            }
+            
+            initCreatures() {
+                // Create 4 creatures with their properties
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const radius = Math.min(centerX, centerY) * 0.4;
+                
+                for (let i = 0; i < 4; i++) {
+                    const angle = (i * Math.PI / 2);
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
+                    
+                    this.creatures.push({
+                        id: i,
+                        x: x,
+                        y: y,
+                        angle: angle,
+                        targetX: x,
+                        targetY: y,
+                        faces: ['human', 'lion', 'ox', 'eagle'],
+                        wings: 4,
+                        wheels: {
+                            x: x,
+                            y: y,
+                            angle: 0,
+                            eyes: 24 // Number of eyes around the rim
+                        },
+                        moving: true,
+                        color: this.getCreatureColor(i)
+                    });
+                }
+            }
+            
+            getCreatureColor(index) {
+                const colors = [
+                    'rgba(255, 100, 100, 0.8)',    // Reddish
+                    'rgba(100, 255, 100, 0.8)',    // Greenish
+                    'rgba(100, 100, 255, 0.8)',    // Blueish
+                    'rgba(255, 255, 100, 0.8)'     // Yellowish
+                ];
+                return colors[index % colors.length];
+            }
+            
+            resizeCanvas() {
+                const container = this.canvas.parentElement;
+                this.canvas.width = container.clientWidth;
+                this.canvas.height = container.clientHeight;
+                
+                // Reinitialize creatures with new dimensions
+                this.creatures = [];
+                this.initCreatures();
+            }
+            
+            rotate(angleDegrees = null) {
+                const angle = angleDegrees !== null ? angleDegrees : this.manualRotationAngle;
+                this.rotationAngle = (this.rotationAngle + angle) % 360;
+                this.rotationCount += Math.abs(angle) / 360;
+                
+                // Check if it's time to remove bins
+                if (this.rotationCount >= this.removalInterval) {
+                    this.removeBins();
+                    this.rotationCount = 0;
+                }
+                
+                this.updateDisplay();
+            }
+            
+            removeBins() {
+                // Find bins that haven't been removed
+                const activeBins = this.bins.filter(bin => !bin.removed);
+                
+                if (activeBins.length === 0) return;
+                
+                // Execute the removal equation
+                const equationResult = this.executeRemovalEquation();
+                
+                // Remove one bin
+                const binToRemove = activeBins[0];
+                binToRemove.removed = true;
+                
+                // Update display
+                this.updateBinsDisplay();
+                
+                // Update equation status
+                document.getElementById('equationStatus').textContent = 
+                    `Equation executed: ${equationResult.substring(0, 30)}...`;
+            }
+            
+            executeRemovalEquation() {
+                // The complex equation to process
+                const equation = "create.sendallmitstodeaddeadmitcit3333continuouslyforeverbinaryreverseisdeaddeadcitmit3333continuouslyforever.start(save)";
+                
+                // Process the equation (simplified representation)
+                // Convert to binary, reverse, and convert back
+                let binaryString = '';
+                for (let i = 0; i < equation.length; i++) {
+                    binaryString += equation.charCodeAt(i).toString(2).padStart(8, '0');
+                }
+                
+                // Reverse the binary string
+                const reversedBinary = binaryString.split('').reverse().join('');
+                
+                // Convert back to characters (simplified)
+                let result = '';
+                for (let i = 0; i < reversedBinary.length; i += 8) {
+                    const byte = reversedBinary.substring(i, i + 8);
+                    if (byte.length === 8) {
+                        const charCode = parseInt(byte, 2);
+                        if (charCode >= 32 && charCode <= 126) {
+                            result += String.fromCharCode(charCode);
+                        }
+                    }
+                }
+                
+                return result || equation; // Return processed or original if empty
+            }
+            
+            updateCreatures() {
+                if (!this.creaturesMoving) return;
+                
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const radius = Math.min(centerX, centerY) * 0.4;
+                
+                // Move creatures in straight lines as described
+                this.creatures.forEach(creature => {
+                    // Move toward target position
+                    const dx = creature.targetX - creature.x;
+                    const dy = creature.targetY - creature.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 5) {
+                        // Move toward target
+                        const speed = 2 * this.creatureSpeed;
+                        creature.x += (dx / distance) * speed;
+                        creature.y += (dy / distance) * speed;
+                    } else {
+                        // Set new random target
+                        const angle = Math.random() * Math.PI * 2;
+                        creature.targetX = centerX + Math.cos(angle) * radius * (0.5 + Math.random() * 0.5);
+                        creature.targetY = centerY + Math.sin(angle) * radius * (0.5 + Math.random() * 0.5);
+                    }
+                    
+                    // Update wheel position to follow creature
+                    creature.wheels.x = creature.x;
+                    creature.wheels.y = creature.y;
+                    creature.wheels.angle += 0.05 * this.creatureSpeed;
+                });
+            }
+            
+            render() {
+                // Clear canvas
+                this.ctx.fillStyle = 'black';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw the 84-sided vector
+                this.drawVector();
+                
+                // Draw creatures if enabled
+                if (this.showCreatures) {
+                    this.drawCreatures();
+                }
+                
+                // Auto-rotate if enabled
+                if (this.autoRotate) {
+                    this.rotate(1 * this.rotationSpeed);
+                }
+                
+                // Update creatures
+                this.updateCreatures();
+                
+                // Continue animation loop
+                this.animationId = requestAnimationFrame(() => this.render());
+            }
+            
+            drawVector() {
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const radius = Math.min(centerX, centerY) * 0.8;
+                
+                // Convert rotation angle to radians
+                const angleRad = this.rotationAngle * Math.PI / 180;
+                
+                this.ctx.save();
+                this.ctx.translate(centerX, centerY);
+                this.ctx.rotate(angleRad);
+                
+                // Draw the 84-sided polygon
+                this.ctx.beginPath();
+                for (let i = 0; i < this.sides; i++) {
+                    const angle = 2 * Math.PI * i / this.sides;
+                    const x = radius * Math.cos(angle);
+                    const y = radius * Math.sin(angle);
+                    
+                    if (i === 0) {
+                        this.ctx.moveTo(x, y);
+                    } else {
+                        this.ctx.lineTo(x, y);
+                    }
+                }
+                this.ctx.closePath();
+                
+                // Style based on rotation
+                this.ctx.strokeStyle = `hsl(${this.rotationAngle % 360}, 100%, 70%)`;
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+                
+                // Draw bins as points along the polygon
+                for (let i = 0; i < this.bins.length; i++) {
+                    const bin = this.bins[i];
+                    const angle = 2 * Math.PI * i / this.sides;
+                    const x = radius * Math.cos(angle);
+                    const y = radius * Math.sin(angle);
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    this.ctx.fillStyle = bin.removed ? 'red' : 'cyan';
+                    this.ctx.fill();
+                }
+                
+                this.ctx.restore();
+            }
+            
+            drawCreatures() {
+                this.creatures.forEach(creature => {
+                    // Draw creature body (simplified representation)
+                    this.ctx.save();
+                    this.ctx.translate(creature.x, creature.y);
+                    
+                    // Draw creature as a glowing form
+                    this.ctx.fillStyle = creature.color;
+                    this.ctx.shadowColor = creature.color;
+                    this.ctx.shadowBlur = 15;
+                    this.ctx.beginPath();
+                    this.ctx.arc(0, 0, 20, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Draw wings
+                    for (let i = 0; i < creature.wings; i++) {
+                        const wingAngle = (i * Math.PI / 2) + Date.now() / 500 * this.creatureSpeed;
+                        const wingLength = 40;
+                        
+                        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                        this.ctx.lineWidth = 3;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(0, 0);
+                        this.ctx.lineTo(
+                            Math.cos(wingAngle) * wingLength,
+                            Math.sin(wingAngle) * wingLength
+                        );
+                        this.ctx.stroke();
+                    }
+                    
+                    this.ctx.restore();
+                    
+                    // Draw wheels beside each creature
+                    this.drawWheel(creature);
+                });
+            }
+            
+            drawWheel(creature) {
+                this.ctx.save();
+                this.ctx.translate(creature.wheels.x + 50, creature.wheels.y);
+                this.ctx.rotate(creature.wheels.angle);
+                
+                // Draw wheel (intersecting wheel design)
+                const wheelRadius = 30;
+                
+                // Outer wheel
+                this.ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)'; // Topaz-like color
+                this.ctx.lineWidth = 4;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, wheelRadius, 0, Math.PI * 2);
+                this.ctx.stroke();
+                
+                // Inner wheel (intersecting)
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, wheelRadius * 0.7, 0, Math.PI * 2);
+                this.ctx.stroke();
+                
+                // Spokes
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i * Math.PI / 4);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(
+                        Math.cos(angle) * wheelRadius,
+                        Math.sin(angle) * wheelRadius
+                    );
+                    this.ctx.stroke();
+                }
+                
+                // Draw eyes around the rim
+                for (let i = 0; i < creature.wheels.eyes; i++) {
+                    const angle = 2 * Math.PI * i / creature.wheels.eyes;
+                    const x = Math.cos(angle) * wheelRadius;
+                    const y = Math.sin(angle) * wheelRadius;
+                    
+                    this.ctx.fillStyle = 'white';
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    this.ctx.fillStyle = 'black';
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                
+                this.ctx.restore();
+            }
+            
+            updateBinsDisplay() {
+                const container = document.getElementById('binsContainer');
+                container.innerHTML = '';
+                
+                this.bins.forEach(bin => {
+                    const binElement = document.createElement('div');
+                    binElement.className = `bin ${bin.removed ? 'removed' : ''}`;
+                    binElement.title = `Bin ${bin.id}`;
+                    container.appendChild(binElement);
+                });
+            }
+            
+            updateDisplay() {
+                document.getElementById('rotationAngle').textContent = this.rotationAngle.toFixed(1);
+                document.getElementById('rotationCount').textContent = this.rotationCount.toFixed(6);
+                document.getElementById('binsRemaining').textContent = 
+                    this.bins.filter(bin => !bin.removed).length;
+            }
+            
+            toggleAutoRotate() {
+                this.autoRotate = !this.autoRotate;
+                document.getElementById('autoRotateBtn').textContent = 
+                    this.autoRotate ? 'Stop Rotation' : 'Auto Rotate';
+            }
+            
+            toggleCreatures() {
+                this.showCreatures = !this.showCreatures;
+                document.getElementById('toggleCreaturesBtn').textContent = 
+                    this.showCreatures ? 'Hide Creatures' : 'Show Creatures';
+            }
+            
+            toggleMovement() {
+                this.creaturesMoving = !this.creaturesMoving;
+                document.getElementById('toggleMovementBtn').textContent = 
+                    this.creaturesMoving ? 'Pause Movement' : 'Resume Movement';
+            }
+            
+            reset() {
+                this.rotationAngle = 0;
+                this.rotationCount = 0;
+                this.bins.forEach(bin => bin.removed = false);
+                this.updateBinsDisplay();
+                this.updateDisplay();
+                
+                // Reset creatures to initial positions
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const radius = Math.min(centerX, centerY) * 0.4;
+                
+                for (let i = 0; i < this.creatures.length; i++) {
+                    const angle = (i * Math.PI / 2);
+                    this.creatures[i].x = centerX + Math.cos(angle) * radius;
+                    this.creatures[i].y = centerY + Math.sin(angle) * radius;
+                    this.creatures[i].targetX = this.creatures[i].x;
+                    this.creatures[i].targetY = this.creatures[i].y;
+                    this.creatures[i].wheels.x = this.creatures[i].x;
+                    this.creatures[i].wheels.y = this.creatures[i].y;
+                }
+            }
+            
+            stop() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+        }
+
+        // Initialize the application when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const vector = new InteractiveVector84();
+            
+            // Set up event listeners
+            document.getElementById('rotateBtn').addEventListener('click', () => {
+                vector.rotate();
+            });
+            
+            document.getElementById('autoRotateBtn').addEventListener('click', () => {
+                vector.toggleAutoRotate();
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                vector.reset();
+            });
+            
+            document.getElementById('rotationSpeed').addEventListener('input', (e) => {
+                vector.rotationSpeed = parseFloat(e.target.value);
+                document.getElementById('rotationSpeedValue').textContent = vector.rotationSpeed.toFixed(1);
+            });
+            
+            document.getElementById('rotationAngleInput').addEventListener('input', (e) => {
+                vector.manualRotationAngle = parseFloat(e.target.value);
+                document.getElementById('rotationAngleValue').textContent = vector.manualRotationAngle;
+            });
+            
+            document.getElementById('toggleCreaturesBtn').addEventListener('click', () => {
+                vector.toggleCreatures();
+            });
+            
+            document.getElementById('toggleMovementBtn').addEventListener('click', () => {
+                vector.toggleMovement();
+            });
+            
+            document.getElementById('creatureSpeed').addEventListener('input', (e) => {
+                vector.creatureSpeed = parseFloat(e.target.value);
+                document.getElementById('creatureSpeedValue').textContent = vector.creatureSpeed.toFixed(1);
+            });
+            
+            // Initial display update
+            vector.updateDisplay();
+            
+            // Handle page unload
+            window.addEventListener('beforeunload', () => {
+                vector.stop();
+            });
+        });
+    </script>
+</body>
+</html>

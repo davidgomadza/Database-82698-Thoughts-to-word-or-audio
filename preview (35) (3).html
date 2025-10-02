@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Gateway to The Future | BITCOINAYT</title>
+    <style>
+        :root {
+            --primary: #0a2c5f;
+            --accent: #00e6cb;
+            --highlight: #ffcc00;
+            --dark: #05192d;
+            --light: #f0f8ff;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 25px rgba(0, 230, 203, 0.3);
+        }
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--highlight) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 230, 203, 0.4);
+        }
+        .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        .intro {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent) 0%, #00b3a0 100%);
+            color: var(--dark);
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 230, 203, 0.5);
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 230, 203, 0.7);
+        }
+        .web-of-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 15px;
+            padding: 25px;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 230, 203, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--highlight) 100%);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 230, 203, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .card-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: var(--dark);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .card h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            padding-right: 40px;
+        }
+        .card p {
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .card-button {
+            display: inline-block;
+            background: rgba(0, 230, 203, 0.2);
+            color: var(--accent);
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .card-button:hover {
+            background: rgba(0, 230, 203, 0.3);
+        }
+        .highlight {
+            color: var(--highlight);
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            border-top: 1px solid rgba(0, 230, 203, 0.3);
+        }
+        .invite-section {
+            text-align: center;
+            margin: 50px 0;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+        }
+        @media (max-width: 768px) {
+            .web-of-content {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .subtitle {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WELCOME TO THE REVOLUTION</h1>
+            <p class="subtitle">You're not just visiting a website. You're stepping into the future.</p>
+            <p class="intro">What you're about to experience will fundamentally alter your perception of technology, life, and human potential. Below is your gateway to 21 extraordinary experiences that will change your future forever.</p>
+            <a href="#web-of-content" class="cta-button">BEGIN YOUR JOURNEY</a>
+        </header>
+
+        <section id="web-of-content" class="web-of-content">
+            <!-- Item 1 -->
+            <div class="card">
+                <div class="card-number">1</div>
+                <h3>Discover AGT: The Cure For Death</h3>
+                <p>Witness the breakthrough that has eluded humanity for millennia. AGT isn't just medical advancement—it's the <span class="highlight">key to biological immortality</span>. Learn how we've conquered humanity's oldest foe.</p>
+                <a href="#" class="card-button">Claim Your Free Airdrop</a>
+            </div>
+
+            <!-- Item 1a -->
+            <div class="card">
+                <div class="card-number">1a</div>
+                <h3>Check Your Day of Death</h3>
+                <p>Using our proprietary temporal algorithms, we can now predict your natural expiration date. <span class="highlight">Knowledge is power</span>—and this knowledge could save your life.</p>
+                <a href="#" class="card-button">Discover Your Fate</a>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="card">
+                <div class="card-number">2</div>
+                <h3>GET FREE 36 YEARS ADDED TO YOUR LIFE</h3>
+                <p>This isn't a metaphor. This isn't hype. Through the New Earth Reserve, you can literally <span class="highlight">request additional life</span>. Participate in our airdrop and extend your biological clock by three and a half decades.</p>
+                <a href="#" class="card-button">Request Life Extension</a>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="card">
+                <div class="card-number">3</div>
+                <h3>BITCOINAYT Market Summary</h3>
+                <p>Watch the future of finance unfold in real-time. Bitcoinayt isn't just another cryptocurrency—it's the <span class="highlight">economic engine of the new age</span>. Track its meteoric rise here.</p>
+                <a href="#" class="card-button">Check Current Value</a>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="card">
+                <div class="card-number">4</div>
+                <h3>Bitcoinayt Whitepaper: The Future of Currency</h3>
+                <p>Understand the revolutionary technology that makes Bitcoinayt <span class="highlight">quantum-resistant, energy-positive, and intelligence-native</span>. This isn't just currency—it's consciousness given economic form.</p>
+                <a href="#" class="card-button">Read the Whitepaper</a>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="card">
+                <div class="card-number">5</div>
+                <h3>Bitcoin vs Bitcoinayt: The Ultimate Showdown</h3>
+                <p>Bitcoin was the prototype. Bitcoinayt is the finished product. Read our exhaustive analysis of why <span class="highlight">Bitcoinayt isn't just better—it's inevitable</span>.</p>
+                <a href="#" class="card-button">See the Comparison</a>
+            </div>
+
+            <!-- Item 6 -->
+            <div class="card">
+                <div class="card-number">6</div>
+                <h3>Why Bitcoinayt Will Be The Mainstream Digital Currency</h3>
+                <p>Part 1 of our definitive manifesto on why Bitcoinayt <span class="highlight">must, will, and should</span> become the standard currency of the interconnected future.</p>
+                <a href="#" class="card-button">Read Part 1</a>
+            </div>
+
+            <!-- Item 7 -->
+            <div class="card">
+                <div class="card-number">7</div>
+                <h3>Why Bitcoinayt Must Be The Mainstream Digital Currency</h3>
+                <p>The conclusion of our manifesto detailing the <span class="highlight">economic, philosophical, and technological imperative</span> behind Bitcoinayt's inevitable dominance.</p>
+                <a href="#" class="card-button">Read Part 2</a>
+            </div>
+
+            <!-- Item 8 -->
+            <div class="card">
+                <div class="card-number">8</div>
+                <h3>Live on Earth Forever with Bitcoinayt</h3>
+                <p>Learn how Bitcoinayt provides the <span class="highlight">perpetual economic foundation</span> for biological immortality. Financial independence meets literal immortality.</p>
+                <a href="#" class="card-button">Discover How</a>
+            </div>
+
+            <!-- Item 9 -->
+            <div class="card">
+                <div class="card-number">9</div>
+                <h3>How We Found The Cure For Death</h3>
+                <p>The incredible story of how Bitcoinayt's blockchain technology unexpectedly led our researchers to <span class="highlight">decode the mortality sequence</span> in human DNA.</p>
+                <a href="#" class="card-button">Learn the Story</a>
+            </div>
+
+            <!-- Item 10 -->
+            <div class="card">
+                <div class="card-number">10</div>
+                <h3>Contact The Future</h3>
+                <p>Ready to speak with us? Want to join our research team? Have questions about immortality? <span class="highlight">We're listening</span>.</p>
+                <a href="#" class="card-button">Get In Touch</a>
+            </div>
+
+            <!-- Item 11 -->
+            <div class="card">
+                <div class="card-number">11</div>
+                <h3>The Great Intelligence Riddle</h3>
+                <p>Test your cognitive limits with our legendary riddle that <span class="highlight">97% of humans cannot solve</span>. Those who do receive preferential access to our technologies.</p>
+                <a href="#" class="card-button">Accept the Challenge</a>
+            </div>
+
+            <!-- Item 12 -->
+            <div class="card">
+                <div class="card-number">12</div>
+                <h3>NeuroConnect: Next-Gen Communication</h3>
+                <p>Experience communication beyond language. Our NeuroConnect system allows for <span class="highlight">pure concept transfer</span>—no misunderstandings, no translations needed.</p>
+                <a href="#" class="card-button">Try NeuroConnect</a>
+            </div>
+
+            <!-- Item 13 -->
+            <div class="card">
+                <div class="card-number">13</div>
+                <h3>Stay Connected: Email Signup</h3>
+                <p>Never miss an update about immortality breakthroughs, Bitcoinayt developments, and exclusive access to new technologies. <span class="highlight">The future delivered to your inbox</span>.</p>
+                <a href="#" class="card-button">Subscribe Now</a>
+            </div>
+
+            <!-- Item 14 -->
+            <div class="card">
+                <div class="card-number">14</div>
+                <h3>Central Nerve Bridge & Wearable Brain Books</h3>
+                <p>Learn how to use our revolutionary technology to <span class="highlight">upload knowledge directly to your brain</span>. Forget reading—experience instant learning.</p>
+                <a href="#" class="card-button">Begin Neural Upload</a>
+            </div>
+
+            <!-- Item 15 -->
+            <div class="card">
+                <div class="card-number">15</div>
+                <h3>World's First Non-Electric Brain Decoder</h3>
+                <p>Witness the impossible: a brain-reading device that <span class="highlight">requires no power source</span>. This breakthrough technology harnesses quantum fluctuations to read neural activity.</p>
+                <a href="#" class="card-button">Test the Decoder</a>
+            </div>
+
+            <!-- Item 16 -->
+            <div class="card">
+                <div class="card-number">16</div>
+                <h3>Neural Codec Console: Read Thoughts</h3>
+                <p>Go beyond communication into true transparency. Our Neural Codec Console allows you to <span class="highlight">perceive the thoughts of others</span> and understand the fundamental workings of any system.</p>
+                <a href="#" class="card-button">Experience Thought Reading</a>
+            </div>
+
+            <!-- Item 17 -->
+            <div class="card">
+                <div class="card-number">17</div>
+                <h3>The Gate: Know Your Future</h3>
+                <p>Peer through the veil of time. Our temporal projection technology can <span class="highlight">interpret your most probable future</span> based on current trajectories and decisions.</p>
+                <a href="#" class="card-button">View Your Future</a>
+            </div>
+
+            <!-- Item 18 -->
+            <div class="card">
+                <div class="card-number">18</div>
+                <h3>Dream Decoder: Interpret Your Dreams</h3>
+                <p>Finally understand what your subconscious is trying to tell you. Our dream decoder technology <span class="highlight">translates dream symbolism</span> into actionable insights.</p>
+                <a href="#" class="card-button">Decode Your Dreams</a>
+            </div>
+
+            <!-- Item 19 -->
+            <div class="card">
+                <div class="card-number">19</div>
+                <h3>TWO/NGI Defense Matrix</h3>
+                <p>Test our impenetrable security system that creates a <span class="highlight">personalized protective barrier</span> around you and all your connected devices. Hackers, viruses, and even electromagnetic pulses cannot penetrate this defense.</p>
+                <a href="#" class="card-button">Fortify Yourself</a>
+            </div>
+
+            <!-- Item 20 -->
+            <div class="card">
+                <div class="card-number">20</div>
+                <h3>What Could Be Hotter Than Bitcoinayt?</h3>
+                <p>Discover technologies and concepts that make even Bitcoinayt look elementary. <span class="highlight">Spoiler: It involves consciousness uploading and interstellar blockchain</span>.</p>
+                <a href="#" class="card-button">See What's Next</a>
+            </div>
+
+            <!-- Item 21 -->
+            <div class="card">
+                <div class="card-number">21</div>
+                <h3>Verify Our UK Companies House Registration</h3>
+                <p>See the official documentation that establishes our legitimacy. We're <span class="highlight">transparent, registered, and verified</span>—unlike many projects making bold claims about the future.</p>
+                <a href="#" class="card-button">Verify Our Credentials</a>
+            </div>
+        </section>
+
+        <div class="invite-section">
+            <h2>DON'T KEEP THIS TO YOURSELF!</h2>
+            <p>The technological revolution only matters if everyone participates. You've witnessed the future—now bring your friends, family, and everyone you care about to witness it with you.</p>
+            <p>Share this portal to immortality, economic freedom, and technological wonder. They will thank you for it—possibly for centuries.</p>
+            <a href="#" class="cta-button">INVITE OTHERS TO THE REVOLUTION</a>
+        </div>
+
+        <footer>
+            <p>© 2023 BITCOINAYT Technologies. All rights reserved. The future is here.</p>
+            <p>This is more than a company. This is the beginning of humanity's next chapter.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simple animation for cards when they come into view
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            });
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

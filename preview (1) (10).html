@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MGIS Enhanced - Multi-Popup System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Header with Popup Controls */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 1.6em;
+            color: #4c63d2;
+            margin-bottom: 10px;
+        }
+
+        .popup-launcher {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .popup-btn {
+            background: linear-gradient(45deg, #4c63d2, #6c7ce7);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(76, 99, 210, 0.3);
+        }
+
+        .popup-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 99, 210, 0.4);
+        }
+
+        .popup-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Dashboard Stats */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4c63d2;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Popup Overlay System */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .popup-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-window {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(76, 99, 210, 0.2);
+            position: relative;
+            min-width: 320px;
+            animation: popupSlideIn 0.3s ease-out;
+        }
+
+        @keyframes popupSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(76, 99, 210, 0.1);
+        }
+
+        .popup-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4c63d2;
+        }
+
+        .popup-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: none;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 5px 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+
+        .control-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .minimize-btn {
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+
+        .close-btn {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .suspend-btn {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+
+        /* Popup Content Areas */
+        .popup-content {
+            min-height: 200px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4c63d2;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4c63d2;
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4c63d2, #6c7ce7);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(76, 99, 210, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #34ce57);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #ffcd39);
+            color: #333;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #e85a6b);
+        }
+
+        /* Minimized Popup Dock */
+        .popup-dock {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dock-item {
+            background: rgba(76, 99, 210, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            max-width: 200px;
+            backdrop-filter: blur(10px);
+        }
+
+        .dock-item:hover {
+            background: rgba(76, 99, 210, 1);
+            transform: translateX(-5px);
+        }
+
+        /* Suspended Popup Indicators */
+        .suspended-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .suspended-item {
+            background: rgba(255, 193, 7, 0.9);
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            font-size: 0.8em;
+            backdrop-filter: blur(10px);
+        }
+
+        .suspended-item:hover {
+            background: rgba(255, 193, 7, 1);
+            transform: scale(1.05);
+        }
+
+        /* Java Console Output */
+        .java-console {
+            background: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .java-console .system-msg {
+            color: #00ff00;
+        }
+
+        .java-console .error-msg {
+            color: #ff6b6b;
+        }
+
+        .java-console .info-msg {
+            color: #74c0fc;
+        }
+
+        /* Grid Layouts for Different Popup Types */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        /* Social Media Layouts */
+        .social-post {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4c63d2;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4c63d2, #6c7ce7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .post-meta {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        /* Neural Interface Visualizations */
+        .neural-activity {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .brain-wave {
+            height: 60px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.3) 10px,
+                rgba(255, 255, 255, 0.3) 20px
+            );
+            margin: 10px 0;
+            border-radius: 30px;
+            animation: brainWave 2s infinite;
+        }
+
+        @keyframes brainWave {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .popup-window {
+                max-width: 95vw;
+                max-height: 95vh;
+                padding: 15px;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .popup-launcher {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .popup-dock {
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Notification System */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #28a745, #34ce57);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 10002;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            animation: notificationSlide 3s ease-in-out;
+        }
+
+        @keyframes notificationSlide {
+            0%, 100% { transform: translateX(-50%) translateY(-100%); }
+            10%, 90% { transform: translateX(-50%) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Header with Popup Launcher -->
+        <div class="header">
+            <h1>🧠 MGIS Enhanced - Multi-Popup System</h1>
+            <p>Advanced Neural Communication with Java Integration</p>
+            
+            <div class="popup-launcher">
+                <button class="popup-btn" onclick="openPopup('neural-interface')">🧠 Neural</button>
+                <button class="popup-btn" onclick="openPopup('social-media')">📱 Social</button>
+                <button class="popup-btn" onclick="openPopup('dating-app')">💕 Dating</button>
+                <button class="popup-btn" onclick="openPopup('crypto-wallet')">💰 Wallet</button>
+                <button class="popup-btn" onclick="openPopup('flight-system')">✈️ Flights</button>
+                <button class="popup-btn" onclick="openPopup('gift-shop')">🎁 Shop</button>
+                <button class="popup-btn" onclick="openPopup('accommodation')">🏨 Hotels</button>
+                <button class="popup-btn" onclick="openPopup('agt-enrollment')">🏛️ AGT</button>
+                <button class="popup-btn" onclick="openPopup('new-earth')">🌍 Earth</button>
+                <button class="popup-btn" onclick="openPopup('language-lab')">🔤 Language</button>
+                <button class="popup-btn" onclick="openPopup('analytics')">📊 Analytics</button>
+                <button class="popup-btn" onclick="openPopup('java-console')">☕ Java</button>
+                <button class="popup-btn" onclick="openPopup('user-management')">👥 Users</button>
+                <button class="popup-btn" onclick="openPopup('settings')">⚙️ Settings</button>
+                <button class="popup-btn" onclick="openPopup('help-center')">❓ Help</button>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="stat-card">
+                <div class="stat-value" id="balance-display">500.00</div>
+                <div class="stat-label">💰 Bitcoinayt Balance</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="active-popups">0</div>
+                <div class="stat-label">🖥️ Active Popups</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="neural-processes">0</div>
+                <div class="stat-label">🧠 Neural Processes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="social-connections">0</div>
+                <div class="stat-label">🤝 Connections</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="system-status">Online</div>
+                <div class="stat-label">🟢 System Status</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Overlays -->
+    <div class="popup-overlay" id="neural-interface-popup">
+        <div class="popup-window">
+            <div class="popup-header">
+                <div class="popup-title">🧠 Gomadza Neural Interface</div>
+                <div class="popup-controls">
+                    <button class="control-btn minimize-btn" onclick="minimizePopup('neural-interface')">−</button>
+                    <button class="control-btn suspend-btn" onclick="suspendPopup('neural-interface')">⏸</button>
+                    <button class="control-btn close-btn" onclick="closePopup('neural-interface')">×</button>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="neural-activity">
+                    <h3>Brain Wave Analysis</h3>
+                    <div class="brain-wave"></div>
+                    <p>Neural coherence: <span id="neural-coherence">94%</span></p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Thought Input:</label>
+                    <textarea id="thought-input" rows="3" placeholder="Think your message here..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Processing Mode:</label>
+                    <select id="neural-mode">
+                        <option value="basic">Basic Processing (50₿)</option>
+                        <option value="enhanced">7-Expression Analysis (100₿)</option>
+                        <option value="motor">Motor Commands (200₿)</option>
+                    </select>
+                </div>
+                
+                <button class="btn" onclick="processNeuralInput()">Process Neural Input</button>
+                <button class="btn btn-success" onclick="startNeuralTraining()">Start Training</button>
+                
+                <div id="neural-output" class="java-console" style="display: none;">
+                    <div class="system-msg">Neural processing started...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="social-media-popup">
+        <div class="popup-window">
+            <div class="popup-header">
+                <div class="popup-title">📱 Social Media Hub</div>
+                <div class="popup-controls">
+                    <button class="control-btn minimize-btn" onclick="minimizePopup('social-media')">−</button>
+                    <button class="control-btn suspend-btn" onclick="suspendPopup('social-media')">⏸</button>
+                    <button class="control-btn close-btn" onclick="closePopup('social-media')">×</button>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="grid-2">
+                    <div>
+                        <h3>🐦 Tweet Something</h3>
+                        <div class="form-group">
+                            <textarea id="tweet-content" rows="3" maxlength="280" placeholder="What's happening in the neural network?"></textarea>
+                            <small>Characters remaining: <span id="char-count">280</span></small>
+                        </div>
+                        <button class="btn" onclick="postTweet()">Tweet (15₿)</button>
+                    </div>
+                    <div>
+                        <h3>📘 Facebook Post</h3>
+                        <div class="form-group">
+                            <textarea id="fb-content" rows="3" placeholder="Share your neural thoughts..."></textarea>
+                        </div>
+                        <button class="btn" onclick="postFacebook()">Post (20₿)</button>
+                        <button class="btn btn-warning" onclick="addMedia()">Add Media (10₿)</button>
+                    </div>
+                </div>
+                
+                <div class="social-feed" id="social-feed">
+                    <div class="social-post">
+                        <div class="post-header">
+                            <div class="avatar">DG</div>
+                            <div>
+                                <strong>David Gomadza</strong>
+                                <div class="post-meta">2 hours ago</div>
+                            </div>
+                        </div>
+                        <p>The 7-expression brain language system is revolutionizing neural communication! 🧠✨</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="dating-app-popup">
+        <div class="popup-window">
+            <div class="popup-header">
+                <div class="popup-title">💕 Neural Love Connection</div>
+                <div class="popup-controls">
+                    <button class="control-btn minimize-btn" onclick="minimizePopup('dating-app')">−</button>
+                    <button class="control-btn suspend-btn" onclick="suspendPopup('dating-app')">⏸</button>
+                    <button class="control-btn close-btn" onclick="closePopup('dating-app')">×</button>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="neural-activity">
+                    <h3>🌟 Neural Compatibility Match</h3>
+                    <p><strong>Compatibility Score:</strong> <span id="compatibility-score">92%</span></p>
+                    <p><strong>Neural Frequency:</strong> Alpha waves synchronized</p>
+                    <p><strong>Interests:</strong> Brain-computer interfaces, 7-expression language</p>
+                </div>
+                
+                <div class="grid-3">
+                    <button class="btn btn-danger" onclick="swipeLeft()">❌ Pass (5₿)</button>
+                    <button class="btn btn-success" onclick="swipeRight()">💖 Like (15₿)</button>
+                    <button class="btn" onclick="superLike()">⭐ Super Like (50₿)</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Send Neural Message:</label>
+                    <textarea id="neural-message" rows="2" placeholder="Send a thought-based message..."></textarea>
+                    <button class="btn" onclick="sendNeuralMessage()">Send (25₿)</button>
+                </div>
+                
+                <h4>💕 Your Matches: <span id="match-count">3</span></h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="crypto-wallet-popup">
+        <div class="popup-window">
+            <div class="popup-header">
+                <div class="popup-title">💰 Bitcoinayt Wallet</div>
+                <div class="popup-controls">
+                    <button class="control-btn minimize-btn" onclick="minimizePopup('crypto-wallet')">−</button>
+                    <button class="control-btn suspend-btn" onclick="suspendPopup('crypto-wallet')">⏸</button>
+                    <button class="control-btn close-btn" onclick="closePopup('crypto-wallet')">×</button>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="neural-activity">
+                    <h3>💰 Balance: <span id="wallet-balance">500.00</span>₿</h3>
+                    <p>Mining Rate: 50₿/hour</p>
+                </div>
+                
+                <div class="grid-2">
+                    <div>
+                        <h4>💸 Send Payment</h4>
+                        <div class="form-group">
+                            <input type="text" id="send-to" placeholder="Recipient Neural ID">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="send-amount" placeholder="Amount in ₿">
+                        </div>
+                        <button class="btn" onclick="sendPayment()">Send ₿</button>
+                    </div>
+                    <div>
+                        <h4>⛏️ Mining Controls</h4>
+                        <button class="btn btn-success" onclick="startMining()">Start Mining</button>
+                        <button class="btn btn-danger" onclick="stopMining()">Stop Mining</button>
+                        <button class="btn" onclick="boostMining()">Boost (100₿)</button>
+                    </div>
+                </div>
+                
+                <div class="java-console" id="wallet-log">
+                    <div class="system-msg">[WALLET] System initialized</div>
+                    <div class="info-msg">[MINING] Ready to start</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="java-console-popup">
+        <div class="popup-window">
+            <div class="popup-header">
+                <div class="popup-title">☕ Java System Console</div>
+                <div class="popup-controls">
+                    <button class="control-btn minimize-btn" onclick="minimizePopup('java-console')">−</button>
+                    <button class="control-btn suspend-btn" onclick="suspendPopup('java-console')">⏸</button>
+                    <button class="control-btn close-btn" onclick="closePopup('java-console')">×</button>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="form-group">
+                    <label>Java Command Input:</label>
+                    <input type="text" id="java-command" placeholder="Enter Java command..." onkeypress="handleJavaCommand(event)">
+                </div>
+                
+                <div class="java-console" id="java-output">
+                    <div class="system-msg">🚀 MGIS Java System Started</div>
+                    <div class="system-msg">💰 Bitcoinayt Network: ONLINE</div>
+                    <div class="system-msg">🧠 Gomadza Neural System: ACTIVE</div>
+                    <div class="system-msg">📱 Social Networks: CONNECTED</div>
+                    <div class="system-msg">🌍 New Earth Reserves: LINKED</div>
+                    <div class="info-msg">Ready for commands...</div>
+                </div>
+                
+                <div class="grid-3">
+                    <button class="btn" onclick="executeJavaCommand('mgis.start()')">Start MGIS</button>
+                    <button class="btn" onclick="executeJavaCommand('bitcoinayt.balance()')">Check Balance</button>
+                    <button class="btn" onclick="executeJavaCommand('neural.process()')">Neural Process</button>
+                    <button class="btn" onclick="executeJavaCommand('social.connect()')">Social Connect</button>
+                    <button class="btn" onclick="executeJavaCommand('agt.enroll()')">AGT Enroll</button>
+                    <button class="btn" onclick="executeJavaCommand('earth.reserve()')">Earth Reserve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Popups (condensed for space) -->
+    <div class="popup-overlay" id="analytics-popup">
+        <div class="popup-window">
+            <div class="popup-header">
+                <div class="popup-title">📊 System Analytics</div>
+                <div class="popup-controls">
+                    <button class="control-btn minimize-btn" onclick="minimizePopup('analytics')">−</button>
+                    <button class="control-btn suspend-btn" onclick="suspendPopup('analytics')">⏸</button>
+                    <button class="control-btn close-btn" onclick="closePopup('analytics')">×</button>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="grid-2">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-users">1,247</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="neural-sessions">5,432</div>
+                        <div class="stat-label">Neural Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="transactions">12,890</div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="love-matches">892</div>
+                        <div class="stat-label">Love Matches</div>
+                    </div>
+                </div>
+                <canvas id="analytics-chart" width="400" height="200" style="border: 1px solid #ddd; margin-top: 20px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minimized Popup Dock -->
+    <div class="popup-dock" id="popup-dock"></div>
+
+    <!-- Suspended Popup Indicators -->
+    <div class="suspended-indicator" id="suspended-indicator">

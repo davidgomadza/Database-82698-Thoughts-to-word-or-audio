@@ -1,0 +1,379 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dreamland – Dream Interpretation Artifact</title>
+  <style>
+    :root{
+      --blue:#0b6fff;
+      --blue-600:#1e40af;
+      --blue-100:#e6f0ff;
+      --blue-50:#f5f9ff;
+      --border:#b3d1ff;
+      --text:#0b1a33;
+      --muted:#4b5b77;
+      --white:#ffffff;
+      --ok:#16a34a;
+      --warn:#b45309;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      color:var(--text); background:linear-gradient(180deg,var(--blue-50),var(--white));
+    }
+    header{
+      background:linear-gradient(120deg,var(--blue),var(--blue-600));
+      color:white; padding:48px 20px; text-align:center; border-bottom:8px solid var(--border);
+    }
+    header h1{font-size:clamp(28px,4vw,48px); margin:0 0 8px}
+    header p{margin:0; opacity:.95}
+    .container{max-width:1100px; margin:24px auto 80px; padding:0 16px}
+    .card{
+      background:var(--white); border:2px solid var(--border); border-radius:18px; padding:20px; box-shadow:0 10px 30px rgba(11,111,255,.08);
+      margin-bottom:18px;
+    }
+    .title{font-weight:700; font-size:20px; margin-bottom:8px; color:var(--blue-600)}
+    label{display:block; font-weight:600; margin:10px 0 6px}
+    input[type="text"], textarea{
+      width:100%; border:2px solid var(--border); border-radius:12px; padding:12px 14px; font-size:15px; outline:none; background:var(--blue-50);
+    }
+    textarea{min-height:140px; resize:vertical}
+    .row{display:grid; grid-template-columns:1fr; gap:16px}
+    @media(min-width:900px){.row{grid-template-columns:1.2fr .8fr}}
+    .muted{color:var(--muted); font-size:13px}
+    .badges{display:flex; gap:8px; flex-wrap:wrap}
+    .badge{background:var(--blue-100); color:var(--blue-600); border:1px solid var(--border); padding:6px 10px; border-radius:999px; font-size:12px}
+    .toolbar{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+    button{
+      border:none; background:var(--blue); color:white; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; transition:.2s transform ease, .2s opacity ease;
+      box-shadow:0 8px 20px rgba(11,111,255,.18);
+    }
+    button.secondary{background:var(--blue-600)}
+    button.ghost{background:transparent; color:var(--blue-600); border:2px solid var(--border)}
+    button:disabled{opacity:.5; cursor:not-allowed}
+    .flex{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+    .pill{padding:8px 12px; border-radius:999px; border:2px solid var(--border); background:var(--white)}
+    .status{font-weight:700}
+    .ok{color:var(--ok)}
+    .warn{color:var(--warn)}
+    .grid{display:grid; gap:14px}
+    .two{grid-template-columns:1fr}
+    @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
+    .result{border:2px dashed var(--border); border-radius:16px; padding:16px; background:var(--blue-50)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:13px}
+    .footer{margin-top:10px; font-size:12px}
+    .hl{background:linear-gradient(120deg,#fff, var(--blue-100)); border-bottom:2px solid var(--border)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome to Dreamland Where Your Dreams Are Interpretated</h1>
+    <p>Dream Interpretation & Interaction Artifact · White & Blue Edition</p>
+  </header>  <div class="container">
+    <div class="card hl">
+      <div class="title">About</div>
+      <p class="muted">This tool builds a personal <strong>Dream Interpretation Artifact</strong> from your dream text, optional DNA sequence, and selected interpretation codecs. It includes symbolic mapping, emotional tone analysis, narrative motifs, and a Brain–Dream Map–style synthesis. For educational/entertainment use only.</p>
+      <div class="badges">
+        <span class="badge">Symbolic Codec</span>
+        <span class="badge">Emotional Codec</span>
+        <span class="badge">Narrative Codec</span>
+        <span class="badge">Brain–Dream Map Synthesis</span>
+      </div>
+    </div><div class="row">
+  <section class="card">
+    <div class="title">1) Start · DNA Seed (optional)</div>
+    <label for="dna">Paste DNA sequence (A/C/G/T only)</label>
+    <input id="dna" type="text" placeholder="e.g., ACTGTTACG..." />
+    <p class="muted">Used as a personalization seed. Nothing is uploaded; runs entirely in your browser.</p>
+  </section>
+
+  <section class="card">
+    <div class="title">2) Honor Fee · Bitcoinayt</div>
+    <div class="grid two">
+      <div>
+        <label for="payAddr">Your Bitcoinayt address (fictional)</label>
+        <input id="payAddr" type="text" placeholder="Enter your Bitcoinayt address" />
+      </div>
+      <div>
+        <label for="txId">Payment Tx (optional)</label>
+        <input id="txId" type="text" placeholder="Paste a tx reference (mock)" />
+      </div>
+    </div>
+    <div class="flex" style="margin-top:10px">
+      <label class="pill"><input type="checkbox" id="feeAck" /> I acknowledge the fee of <strong>1 Bitcoinayt</strong> (mock).</label>
+      <span class="status warn" id="feeStatus">Pending payment</span>
+    </div>
+    <p class="muted">This is a demonstration UI with no real blockchain connection.</p>
+  </section>
+</div>
+
+<section class="card">
+  <div class="title">3) Describe Your Dream</div>
+  <label for="dream">Dream narrative</label>
+  <textarea id="dream" placeholder="Write as much detail as you remember..."></textarea>
+  <div class="toolbar" style="margin-top:10px">
+    <div class="pill"><input type="checkbox" id="codecSymbolic" checked> Symbolic</div>
+    <div class="pill"><input type="checkbox" id="codecEmotional" checked> Emotional</div>
+    <div class="pill"><input type="checkbox" id="codecNarrative" checked> Narrative</div>
+    <div class="pill"><input type="checkbox" id="codecBrainMap" checked> Brain–Dream Map</div>
+    <button id="btnDemo" class="ghost">Insert Demo Dream</button>
+    <button id="btnInterpret">Interpret Dream</button>
+  </div>
+</section>
+
+<section class="card">
+  <div class="title">4) Interpretation & Artifact</div>
+  <div id="output" class="result">
+    <p class="muted">Your interpretation will appear here.</p>
+  </div>
+  <div class="toolbar" style="margin-top:12px">
+    <button id="btnExport" class="secondary" disabled>Export Artifact (JSON)</button>
+    <button id="btnCopy" class="ghost" disabled>Copy Summary</button>
+  </div>
+  <div class="footer muted">Heuristics only. Not medical advice.</div>
+</section>
+
+  </div>  <script>
+  // ————————————————————————————————
+  // Utilities
+  // ————————————————————————————————
+  const el = (id)=>document.getElementById(id);
+  const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+
+  // Simple non-crypto hash for deterministic seeding
+  function strHash(s){
+    let h=0; for(let i=0;i<s.length;i++){ h = (h<<5)-h + s.charCodeAt(i); h|=0; }
+    return Math.abs(h);
+  }
+
+  // Tokenize dream text
+  function tokenize(text){
+    return text
+      .toLowerCase()
+      .replace(/[^a-z\s]/g,' ')
+      .split(/\s+/)
+      .filter(Boolean);
+  }
+
+  // Rough sentiment (naive wordlist)
+  const posWords = new Set(["love","joy","calm","safe","light","found","win","friend","gift","blue","ocean","warm","home","laugh","relief","free"]);
+  const negWords = new Set(["fear","fall","lost","chase","late","dark","cry","alone","storm","break","hurt","death","trap","anger","cold"]);
+
+  function scoreSentiment(tokens){
+    let pos=0, neg=0; tokens.forEach(t=>{ if(posWords.has(t)) pos++; if(negWords.has(t)) neg++;});
+    const total = pos+neg || 1; const raw = (pos-neg)/total; // -1..+1
+    return clamp(raw, -1, 1);
+  }
+
+  // Symbol dictionary (illustrative only)
+  const symbolMap = {
+    "water": ["emotions", "adaptability", "cleansing"],
+    "ocean": ["vast feelings", "the unconscious"],
+    "river": ["change in motion", "life stream"],
+    "house": ["self/psyche", "boundaries"],
+    "room": ["compartmentalized memory", "privacy"],
+    "window": ["perspective", "opportunity"],
+    "door": ["transition", "choices"],
+    "flight": ["ambition", "escape"],
+    "falling": ["loss of control", "grounding needed"],
+    "teeth": ["appearance/agency", "communication"],
+    "snake": ["transformation", "hidden energy"],
+    "cat": ["independence", "intuition"],
+    "dog": ["loyalty", "protection"],
+    "car": ["direction", "life path"],
+    "train": ["collective journey", "timing"],
+    "school": ["learning", "evaluation"],
+    "exam": ["self-assessment", "pressure"],
+    "baby": ["new beginnings", "vulnerability"],
+    "money": ["value", "exchange"],
+    "gift": ["opportunity", "self-acceptance"],
+    "blue": ["clarity", "calm"],
+    "white": ["purity", "new slate"],
+  };
+
+  const motifs = [
+    { id:"pursuit", keys:["chase","run","hide","escape"], meaning:"Avoidance or pressure catching up" },
+    { id:"examination", keys:["exam","test","late","unprepared"], meaning:"Performance anxiety / readiness" },
+    { id:"travel", keys:["car","train","plane","road","map"], meaning:"Life direction and momentum" },
+    { id:"loss", keys:["lost","forget","search","missing"], meaning:"Identity or purpose uncertainty" },
+    { id:"transcendence", keys:["fly","flight","float","sky"], meaning:"Aspiration or escape into possibility" },
+  ];
+
+  // Brain–Dream Map synthesizer (heuristic):
+  function brainDreamMapSynthesis(tokens, sentiment, dnaSeed){
+    // Project onto simple axes: agency, safety, novelty (0..100)
+    const agency = clamp(50 + (tokens.includes('flight')?12:0) - (tokens.includes('falling')?14:0) + (dnaSeed%17 - 8), 0, 100);
+    const safety = clamp(50 + Math.round(sentiment*30) + (tokens.includes('home')?10:0) - (tokens.includes('chase')?12:0), 0, 100);
+    const novelty = clamp(50 + (new Set(tokens).size%23 - 11) + (tokens.includes('ocean')?6:0), 0, 100);
+    const quadrant = (agency>50? (safety>50? "growth": "risk-taking") : (safety>50? "recovery": "recalibration"));
+    return { agency, safety, novelty, quadrant };
+  }
+
+  function extractSymbols(tokens){
+    const found = {};
+    Object.keys(symbolMap).forEach(sym=>{
+      if(tokens.includes(sym)) found[sym] = symbolMap[sym];
+    });
+    return found;
+  }
+
+  function detectMotifs(tokens){
+    return motifs.filter(m => m.keys.some(k=>tokens.includes(k)));
+  }
+
+  function personalizeWithDNA(dna){
+    const clean = (dna||"").toUpperCase().replace(/[^ACGT]/g,'');
+    const seed = strHash(clean);
+    const profile = {
+      seed,
+      
+      // Lightweight traits derived from base ratios
+      a: (clean.match(/A/g)||[]).length,
+      c: (clean.match(/C/g)||[]).length,
+      g: (clean.match(/G/g)||[]).length,
+      t: (clean.match(/T/g)||[]).length,
+    };
+    const total = Math.max(1, profile.a+profile.c+profile.g+profile.t);
+    profile.ratios = {
+      purines: (profile.a+profile.g)/total, // A/G
+      pyrimidines: (profile.c+profile.t)/total, // C/T
+      gc: (profile.g+profile.c)/total,
+      at: (profile.a+profile.t)/total,
+    };
+    return profile;
+  }
+
+  function narrativeSummary(tokens){
+    const firsts = Object.keys(symbolMap).filter(k=>tokens.includes(k)).slice(0,5);
+    const themes = firsts.flatMap(k=>symbolMap[k]).slice(0,6);
+    return { symbols:firsts, themes };
+  }
+
+  function interpret(){
+    const feeOK = el('feeAck').checked;
+    el('feeStatus').textContent = feeOK? 'Fee acknowledged' : 'Pending payment';
+    el('feeStatus').className = feeOK? 'status ok' : 'status warn';
+
+    const dream = el('dream').value.trim();
+    if(!dream){ alert('Please paste your dream narrative.'); return; }
+
+    const useSymbolic = el('codecSymbolic').checked;
+    const useEmotional = el('codecEmotional').checked;
+    const useNarrative = el('codecNarrative').checked;
+    const useBrainMap = el('codecBrainMap').checked;
+
+    const tokens = tokenize(dream);
+    const dnaProfile = personalizeWithDNA(el('dna').value);
+    const sentiment = useEmotional? scoreSentiment(tokens) : 0;
+    const symbols = useSymbolic? extractSymbols(tokens) : {};
+    const motifList = useNarrative? detectMotifs(tokens) : [];
+    const brain = useBrainMap? brainDreamMapSynthesis(tokens, sentiment, dnaProfile.seed) : null;
+    const summary = narrativeSummary(tokens);
+
+    // Confidence (toy): weighted by data richness
+    const richness = (Object.keys(symbols).length*0.3) + (motifList.length*0.3) + (Math.abs(sentiment)*0.2) + (dream.length/500);
+    const confidence = clamp(Math.round(richness*25 + 30), 5, 95);
+
+    const meanings = [];
+    Object.entries(symbols).forEach(([k,vals])=>{
+      meanings.push({ symbol:k, possible: vals });
+    });
+    motifList.forEach(m=> meanings.push({ symbol:`motif:${m.id}`, possible:[m.meaning] }));
+
+    const recs = [];
+    if(sentiment<-0.3) recs.push('Try a calming routine before sleep (breathing, warm shower, journaling).');
+    if(sentiment>0.3) recs.push('Note what supported positive emotion; consider repeating helpful habits.');
+    if(Object.keys(symbols).includes('door')) recs.push('Consider a deliberate small change this week to “open a door.”');
+    if(motifList.some(m=>m.id==='examination')) recs.push('Plan a low-stakes practice session to reduce performance anxiety.');
+    if(motifList.some(m=>m.id==='pursuit')) recs.push('List one avoided task and do a 10-minute starter to reduce avoidance.');
+
+    const artifact = {
+      version: "1.0",
+      timestamp: new Date().toISOString(),
+      codecs: { symbolic:useSymbolic, emotional:useEmotional, narrative:useNarrative, brainDreamMap:useBrainMap },
+      dna: { seed: dnaProfile.seed, ratios: dnaProfile.ratios },
+      dream: dream,
+      tokens,
+      sentiment,
+      brain,
+      summary,
+      meanings,
+      recommendations: recs,
+      confidence
+    };
+
+    renderResult(artifact);
+
+    // Enable exports
+    el('btnExport').disabled = false;
+    el('btnCopy').disabled = false;
+    el('btnExport').onclick = () => exportJSON(artifact);
+    el('btnCopy').onclick = () => copySummary(artifact);
+  }
+
+  function renderResult(a){
+    const out = el('output');
+    const sentimentLabel = a.sentiment>0? 'positive' : (a.sentiment<0? 'negative' : 'balanced');
+    const symChips = a.summary.symbols.map(s=>`<span class="badge">${s}</span>`).join(' ');
+
+    out.innerHTML = `
+      <div class="grid two">
+        <div>
+          <h3 style="margin:6px 0 8px">Synthesis</h3>
+          <p><strong>Overall tone:</strong> ${sentimentLabel} (${(a.sentiment*100).toFixed(0)}%) · <strong>Confidence:</strong> ${a.confidence}%</p>
+          ${a.brain ? `<p><strong>Brain–Dream Map:</strong> Agency <b>${a.brain.agency}</b>, Safety <b>${a.brain.safety}</b>, Novelty <b>${a.brain.novelty}</b> → <b>${a.brain.quadrant}</b></p>` : ''}
+          <p><strong>Salient symbols:</strong> ${symChips || '<span class="muted">none detected</span>'}</p>
+          <div style="margin-top:8px">
+            <h4 style="margin:6px 0">Possible meanings</h4>
+            <ul>
+              ${a.meanings.slice(0,10).map(m=>`<li><b>${m.symbol}</b>: ${m.possible.join('; ')}</li>`).join('') || '<li class="muted">No symbol-based meanings found. Consider adding concrete imagery.</li>'}
+            </ul>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin:6px 0 8px">Personalization</h3>
+          <p class="mono">DNA seed: ${a.dna.seed} · gc=${(a.dna.ratios.gc*100).toFixed(1)}% · at=${(a.dna.ratios.at*100).toFixed(1)}%</p>
+          <h4 style="margin:6px 0">Narrative motifs</h4>
+          <ul>
+            ${a.summary.themes.slice(0,6).map(t=>`<li>${t}</li>`).join('') || '<li class="muted">No motifs derived.</li>'}
+          </ul>
+          <h4 style="margin:6px 0">Suggested actions</h4>
+          <ul>
+            ${a.recommendations.map(r=>`<li>${r}</li>`).join('') || '<li class="muted">No specific actions suggested.</li>'}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  function exportJSON(artifact){
+    const blob = new Blob([JSON.stringify(artifact,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `dreamland_artifact_${Date.now()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+
+  function copySummary(a){
+    const txt = `Dreamland Interpretation\nTone: ${a.sentiment>0?'positive':(a.sentiment<0?'negative':'balanced')} (${(a.sentiment*100).toFixed(0)}%)\nConfidence: ${a.confidence}%\nSymbols: ${a.summary.symbols.join(', ')||'none'}\nBrain–Dream Map: ${a.brain?`Agency ${a.brain.agency}, Safety ${a.brain.safety}, Novelty ${a.brain.novelty} → ${a.brain.quadrant}`:'n/a'}\nActions: ${(a.recommendations||[]).join(' | ')}`;
+    navigator.clipboard.writeText(txt).then(()=>{
+      alert('Summary copied to clipboard.');
+    });
+  }
+
+  // Demo content
+  el('btnDemo').addEventListener('click', ()=>{
+    el('dream').value = `I was in a blue house by the ocean. A door kept opening to a dark room and a cat ran past. I felt late for an exam and started to run. Then I could fly over a river and felt relief.`;
+  });
+
+  // Fee checkbox updates status
+  el('feeAck').addEventListener('change', ()=>{
+    el('feeStatus').textContent = el('feeAck').checked? 'Fee acknowledged' : 'Pending payment';
+    el('feeStatus').className = el('feeAck').checked? 'status ok' : 'status warn';
+  });
+
+  // Interpret button
+  el('btnInterpret').addEventListener('click', interpret);
+  </script></body>
+</html>

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Language Decoder System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #f0f8ff;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #6dd5fa;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin: 20px 0 15px;
+            color: #6dd5fa;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            margin: 15px 0 10px;
+            color: #6dd5fa;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            color: #a1e0ff;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: rgba(0, 30, 60, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(100, 180, 246, 0.3);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .brain-model {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #0a1929;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .brain-region {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(109, 213, 250, 0.2);
+            border: 2px solid rgba(109, 213, 250, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .brain-region:hover {
+            background: rgba(109, 213, 250, 0.4);
+            transform: scale(1.05);
+        }
+        
+        .brain-region.active {
+            background: rgba(255, 100, 100, 0.4);
+            border: 2px solid rgba(255, 100, 100, 0.8);
+            box-shadow: 0 0 15px rgba(255, 100, 100, 0.5);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #6dd5fa, #2980b9);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        select, input, textarea {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #6dd5fa;
+            background: rgba(10, 25, 41, 0.8);
+            color: white;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .visualization {
+            width: 100%;
+            height: 300px;
+            background: #0a1929;
+            border-radius: 15px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: rgba(109, 213, 250, 0.1);
+            border-top: 2px solid #6dd5fa;
+        }
+        
+        .wave-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(109, 213, 250, 0.5);
+        }
+        
+        .wave-peak {
+            position: absolute;
+            bottom: 50%;
+            width: 4px;
+            background: #6dd5fa;
+            border-radius: 2px;
+        }
+        
+        .result-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+            border-left: 4px solid #6dd5fa;
+        }
+        
+        .language-element {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px;
+            background: rgba(109, 213, 250, 0.2);
+            border-radius: 20px;
+            border: 1px solid rgba(109, 213, 250, 0.5);
+        }
+        
+        .step-list {
+            list-style-type: none;
+            counter-reset: step-counter;
+        }
+        
+        .step-list li {
+            margin-bottom: 15px;
+            padding-left: 40px;
+            position: relative;
+        }
+        
+        .step-list li:before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: #6dd5fa;
+            color: #0f2027;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .codec-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .codec-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(109, 213, 250, 0.3);
+        }
+        
+        .propeller {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 200, 100, 0.3);
+            border: 2px solid rgba(255, 200, 100, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate 5s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .thought-bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: #0f2027;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            max-width: 200px;
+            text-align: center;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(109, 213, 250, 0.3);
+            font-size: 0.9rem;
+            color: #a1e0ff;
+        }
+        
+        .slider-container {
+            margin: 20px 0;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 10px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(109, 213, 250, 0.2);
+            outline: none;
+            border-radius: 5px;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6dd5fa;
+            cursor: pointer;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Brain Language Decoder System</h1>
+            <p class="subtitle">Based on David Gomadza's "Thoughts to Word or Audio" Research</p>
+            <p>Complete Brain Decoding with Electromagnetic Wave Propagation</p>
+        </header>
+
+        <div class="card">
+            <h2>Understanding Brain Language Construction</h2>
+            <p>According to the research, the brain organizes thoughts using a specific language pattern with multiple components:</p>
+            
+            <div class="controls">
+                <div class="language-element">1. Brain Region Activation</div>
+                <div class="language-element">2. Electromagnetic Wave Emission</div>
+                <div class="language-element">3. Binary Encoding</div>
+                <div class="language-element">4. Acoustic Conversion</div>
+                <div class="language-element">5. Reverse Reading</div>
+                <div class="language-element">6. Final Revelation</div>
+            </div>
+            
+            <p>This interactive tool demonstrates how thoughts are decoded using electromagnetic wave propagation and specialized codecs.</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Brain Region Mapping</h2>
+                <p>Select a brain region to see what types of thoughts are processed there:</p>
+                
+                <select id="region-select">
+                    <option value="right-back">Right Back Side</option>
+                    <option value="left-back">Left Back Side</option>
+                    <option value="right-front">Right Front Side</option>
+                    <option value="left-front">Left Front Side</option>
+                    <option value="center">Center</option>
+                </select>
+                
+                <div class="result-box">
+                    <div id="region-info">Right Back Side processes: I, he, numbers, commands, actions, man-related words</div>
+                </div>
+                
+                <h3>Configure Decoding Parameters</h3>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Magnetic Field Strength</span>
+                        <span id="magnetic-value">50%</span>
+                    </div>
+                    <input type="range" min="0" max="100" value="50" class="slider" id="magnetic-slider">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Wave Propagation Angle</span>
+                        <span id="angle-value">90°</span>
+                    </div>
+                    <input type="range" min="0" max="180" value="90" class="slider" id="angle-slider">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Thought Depth Analysis</span>
+                        <span id="depth-value">2 cm</span>
+                    </div>
+                    <input type="range" min="2" max="10" value="2" class="slider" id="depth-slider">
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Brain Model & EM Wave Propagation</h2>
+                <p>Interact with the brain regions and observe electromagnetic wave propagation:</p>
+                
+                <div class="brain-model">
+                    <div class="brain-region" style="width: 160px; height: 160px; top: 60px; right: 60px;" data-region="right-back">Right Back<br>Commands & Actions</div>
+                    <div class="brain-region" style="width: 160px; height: 160px; top: 60px; left: 60px;" data-region="left-back">Left Back<br>Emotions & Creativity</div>
+                    <div class="brain-region" style="width: 140px; height: 140px; top: 180px; right: 100px;" data-region="right-front">Right Front<br>Logic & Analysis</div>
+                    <div class="brain-region" style="width: 140px; height: 140px; top: 180px; left: 100px;" data-region="left-front">Left Front<br>Language & Speech</div>
+                    <div class="brain-region" style="width: 100px; height: 100px; top: 150px; left: 150px;" data-region="center">Center<br>Core Functions</div>
+                    
+                    <div class="propeller" style="top: 30px; left: 170px;"></div>
+                    <div class="propeller" style="bottom: 30px; right: 30px;"></div>
+                    
+                    <div class="thought-bubble" style="top: 20px; left: 200px; display: none;" id="thought-bubble">Thinking...</div>
+                </div>
+                
+                <div class="controls">
+                    <button id="start-propagation">Start EM Propagation</button>
+                    <button id="decode-thought">Decode Thought</button>
+                </div>
+                
+                <div class="result-box">
+                    <div id="region-details">Click on a brain region or start EM propagation to begin decoding</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Thought Wave Visualization</h2>
+            <p>Simulation of electromagnetic waves produced by brain thoughts, converted to acoustic waves for decoding:</p>
+            
+            <div class="visualization">
+                <div class="wave">
+                    <div class="wave-line"></div>
+                    <!-- Wave peaks will be generated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="play-wave">Play Thought Wave</button>
+                <button id="analyze-wave">Analyze Wave Pattern</button>
+            </div>
+            
+            <div class="result-box">
+                <div id="wave-result">Wave analysis will appear here. The system operates at -45dB with frequencies between 21-42Hz.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Brain Language Codecs</h2>
+            <p>These codecs translate brain electromagnetic patterns into understandable language:</p>
+            
+            <div class="codec-display">
+                <div class="codec-box">
+                    <h3>Binary-to-Alphabet Codec</h3>
+                    <p>Converts binary neural patterns to alphabetical representations:</p>
+                    <div class="result-box">
+                        <div id="binary-codec">11bb → bb1 → b</div>
+                    </div>
+                </div>
+                
+                <div class="codec-box">
+                    <h3>EM-to-Acoustic Codec</h3>
+                    <p>Transforms electromagnetic waves to acoustic signals:</p>
+                    <div class="result-box">
+                        <div id="acoustic-codec">EM Waves → Acoustic Waves → Sound</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="test-codecs">Test Codecs</button>
+                <button id="calibrate">Calibrate System</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Thought Input & Decoding</h2>
+            <p>Enter a thought or select from examples to decode using the brain language system:</p>
+            
+            <select id="thought-examples">
+                <option value="clap">Clap Hands</option>
+                <option value="love">I Love You</option>
+                <option value="run">Run</option>
+                <option value="think">Think</option>
+                <option value="drive">Drive Car</option>
+                <option value="mother">Mother</option>
+                <option value="father">Father</option>
+            </select>
+            
+            <textarea id="custom-thought" placeholder="Or enter your own thought to decode..." rows="3"></textarea>
+            
+            <div class="controls">
+                <button id="process-thought">Process Thought</button>
+                <button id="deep-analyze">Deep Motive Analysis</button>
+            </div>
+            
+            <div class="result-box">
+                <div id="decode-result">Decoding results will appear here. Use motive analysis to understand deeper intentions.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Motive Analysis System</h2>
+            <p>Using the method of analyzing energy fields 2-10 cm above the head to determine true motives:</p>
+            
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Analysis Depth</span>
+                    <span id="motive-depth">5 cm</span>
+                </div>
+                <input type="range" min="2" max="10" value="5" class="slider" id="motive-depth-slider">
+            </div>
+            
+            <div class="controls">
+                <button id="analyze-motive">Analyze Motive</button>
+                <button id="full-scan">Complete Brain & Motive Scan</button>
+            </div>
+            
+            <div class="result-box">
+                <div id="motive-result">Motive analysis results will appear here. This system detects true intentions by reading energy patterns above the head.</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Based on "Thoughts to Word or Audio" and "Detailed Specifications of The Brain Decoding Device" by David Gomadza</p>
+            <p>This is a simulation of the concepts presented in the research. For complete details, refer to the original publications.</p>
+            <p>ISBN-13: 978-1-4477-9760-9 | ISBN-13: 9798862571875 | ISBN-13: 9798862041217</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Brain region information
+            const regionInfo = {
+                'right-back': 'Right Back Side processes: I, he, numbers, commands, actions, man-related words, clapping, driving, and most everyday functions. Exit point for thoughts.',
+                'left-back': 'Left Back Side processes: You, she, woman-related words, mother, beautiful, sweet, and emotional concepts. Creative and intuitive thoughts.',
+                'right-front': 'Right Front Side processes: Analytical tasks, logic, problem-solving, mathematics, and scientific thinking. Sequential processing.',
+                'left-front': 'Left Front Side processes: Language, speech, reading, writing, and detailed verbal communication. Language center.',
+                'center': 'Center processes: Basic biological functions, core identity, survival instincts, and autonomic processes. Central coordination.'
+            };
+            
+            // Thought patterns and their decoding
+            const thoughtPatterns = {
+                'clap': {
+                    pattern: ['Right back side activation', 'Right ear vibrations', 'Elbow command points', 'Hands together motion', 'Downward sound deflection'],
+                    result: 'Thought decoded: CLAP HANDS - Motor cortex engaged with rhythmic hand movement patterns detected.',
+                    motive: 'Intent: Expression of approval or rhythm keeping'
+                },
+                'love': {
+                    pattern: ['Right back side activation', 'Left chest pressure', 'Right chest pressure', 'Emotional resonance'],
+                    result: 'Thought decoded: I LOVE YOU - Emotional centers activated with verified heart resonance patterns.',
+                    motive: 'Intent: Emotional connection or affection expression'
+                },
+                'run': {
+                    pattern: ['Right back side activation', 'Right ear vibrations', 'Leg motor activation', 'Foot tapping sequences'],
+                    result: 'Thought decoded: RUN - Motor cortex engaged with rhythmic leg movement patterns detected.',
+                    motive: 'Intent: Desire for movement or escape'
+                },
+                'think': {
+                    pattern: ['Right back side activation', 'Prefrontal cortex activation', 'Neural network patterns'],
+                    result: 'Thought decoded: THINK - Higher cognitive functions activated with complex neural sequencing.',
+                    motive: 'Intent: Cognitive processing or problem-solving'
+                },
+                'drive': {
+                    pattern: ['Right back side activation', 'Right ear vibrations', 'Chest vibrations', 'Right side slide'],
+                    result: 'Thought decoded: DRIVE - Spatial awareness and motor control centers activated for vehicle operation.',
+                    motive: 'Intent: Transportation or movement need'
+                },
+                'mother': {
+                    pattern: ['Left back side activation', 'Emotional center engagement', 'Memory recall patterns'],
+                    result: 'Thought decoded: MOTHER - Emotional and memory centers activated with nurturing patterns.',
+                    motive: 'Intent: Familial connection or care need'
+                },
+                'father': {
+                    pattern: ['Right back side activation', 'Authority center engagement', 'Protection patterns'],
+                    result: 'Thought decoded: FATHER - Authority and protection centers activated with guidance patterns.',
+                    motive: 'Intent: Guidance seeking or authority reference'
+                }
+            };
+            
+            // Set up brain region interactions
+            const brainRegions = document.querySelectorAll('.brain-region');
+            const regionDetails = document.getElementById('region-details');
+            const regionInfoDisplay = document.getElementById('region-info');
+            
+            brainRegions.forEach(region => {
+                region.addEventListener('click', function() {
+                    // Remove active class from all regions
+                    brainRegions.forEach(r => r.classList.remove('active'));
+                    
+                    // Add active class to clicked region
+                    this.classList.add('active');
+                    
+                    // Show region information
+                    const regionType = this.getAttribute('data-region');
+                    regionDetails.textContent = regionInfo[regionType];
+                });
+            });
+            
+            // Set up region select
+            const regionSelect = document.getElementById('region-select');
+            
+            regionSelect.addEventListener('change', function() {
+                regionInfoDisplay.textContent = regionInfo[this.value];
+            });
+            
+            // Set up sliders
+            const magneticSlider = document.getElementById('magnetic-slider');
+            const magneticValue = document.getElementById('magnetic-value');
+            const angleSlider = document.getElementById('angle-slider');
+            const angleValue = document.getElementById('angle-value');
+            const depthSlider = document.getElementById('depth-slider');
+            const depthValue = document.getElementById('depth-value');
+            const motiveDepthSlider = document.getElementById('motive-depth-slider');
+            const motiveDepth = document.getElementById('motive-depth');
+            
+            magneticSlider.addEventListener('input', function() {
+                magneticValue.textContent = this.value + '%';
+            });
+            
+            angleSlider.addEventListener('input', function() {
+                angleValue.textContent = this.value + '°';
+            });
+            
+            depthSlider.addEventListener('input', function() {
+                depthValue.textContent = this.value + ' cm';
+            });
+            
+            motiveDepthSlider.addEventListener('input', function() {
+                motiveDepth.textContent = this.value + ' cm';
+            });
+            
+            // Set up wave visualization
+            const waveContainer = document.querySelector('.wave');
+            
+            function generateWavePeaks() {
+                waveContainer.querySelectorAll('.wave-peak').forEach(peak => peak.remove());
+                
+                for (let i = 0; i < 50; i++) {
+                    const peak = document.createElement('div');
+                    peak.className = 'wave-peak';
+                    peak.style.left = `${i * 20}px`;
+                    peak.style.height = `${Math.random() * 100 + 20}px`;
+                    waveContainer.appendChild(peak);
+                }
+            }
+            
+            generateWavePeaks();
+            
+            // Set up buttons
+            const startPropagationBtn = document.getElementById('start-propagation');
+            const decodeThoughtBtn = document.getElementById('decode-thought');
+            const playWaveBtn = document.getElementById('play-wave');
+            const analyzeWaveBtn = document.getElementById('analyze-wave');
+            const testCodecsBtn = document.getElementById('test-codecs');
+            const calibrateBtn = document.getElementById('calibrate');
+            const processThoughtBtn = document.getElementById('process-thought');
+            const deepAnalyzeBtn = document.getElementById('deep-analyze');
+            const analyzeMotiveBtn = document.getElementById('analyze-motive');
+            const fullScanBtn = document.getElementById('full-scan');
+            
+            const waveResult = document.getElementById('wave-result');
+            const decodeResult = document.getElementById('decode-result');
+            const motiveResult = document.getElementById('motive-result');
+            const thoughtBubble = document.getElementById('thought-bubble');
+            const binaryCodec = document.getElementById('binary-codec');
+            const acousticCodec = document.getElementById('acoustic-codec');
+            
+            let currentThought = '';
+            
+            startPropagationBtn.addEventListener('click', function() {
+                waveResult.textContent = "Electromagnetic wave propagation started. Generating fields at " + magneticSlider.value + "% strength and " + angleSlider.value + "° angle.";
+                
+                // Show thought bubble
+                thoughtBubble.style.display = 'block';
+                thoughtBubble.textContent = "Thinking about...";
+                
+                // Animate the wave
+                const peaks = document.querySelectorAll('.wave-peak');
+                peaks.forEach((peak, index) => {
+                    setTimeout(() => {
+                        peak.style.backgroundColor = '#ff6464';
+                        setTimeout(() => {
+                            peak.style.backgroundColor = '#6dd5fa';
+                        }, 300);
+                    }, index * 50);
+                });
+            });
+            
+            decodeThoughtBtn.addEventListener('click', function() {
+                const activeRegion = document.querySelector('.brain-region.active');
+                if (!activeRegion) {
+                    regionDetails.textContent = "Please select a brain region first.";
+                    return;
+                }
+                
+                const regionType = activeRegion.getAttribute('data-region');
+                regionDetails.textContent = "Decoding thoughts from " + regionType + "... " + regionInfo[regionType];
+                
+                // Simulate decoding process
+                setTimeout(() => {
+                    thoughtBubble.textContent = "Decoded: " + regionType + " activity";
+                    waveResult.textContent = "Thought pattern decoded successfully. EM waves converted to acoustic signals at -45dB.";
+                }, 1500);
+            });
+            
+            playWaveBtn.addEventListener('click', function() {
+                waveResult.textContent = "Playing thought wave pattern... Listening for the unique acoustic signature at -45dB.";
+                
+                // Animate the wave
+                const peaks = document.querySelectorAll('.wave-peak');
+                peaks.forEach((peak, index) => {
+                    setTimeout(() => {
+                        peak.style.backgroundColor = '#64ff64';
+                        setTimeout(() => {
+                            peak.style.backgroundColor = '#6dd5fa';
+                        }, 300);
+                    }, index * 30);
+                });
+            });
+            
+            analyzeWaveBtn.addEventListener('click', function() {
+                waveResult.textContent = "Analyzing wave pattern... Pattern matches 'Clap Hands' sequence with 92% confidence. Right back side activation detected. Frequency: 32Hz, Amplitude: -45dB.";
+            });
+            
+            testCodecsBtn.addEventListener('click', function() {
+                binaryCodec.textContent = "11bb → bb1 → b | 00ll → ll0 → l | 11uu → uu1 → u | 00ee → ee0 → e";
+                acousticCodec.textContent = "EM Waves → Acoustic Waves → Sound | Frequency: 21-42Hz | Sample Rate: 44100Hz";
+                
+                waveResult.textContent = "Codecs tested successfully. Binary-to-Alphabet and EM-to-Acoustic conversions operational.";
+            });
+            
+            calibrateBtn.addEventListener('click', function() {
+                waveResult.textContent = "Calibrating system... Adjusting to optimal parameters: Magnetic field at 65%, Angle at 87°, Depth at 3cm. Calibration complete.";
+            });
+            
+            processThoughtBtn.addEventListener('click', function() {
+                const thoughtExample = document.getElementById('thought-examples').value;
+                const customThought = document.getElementById('custom-thought').value.trim();
+                
+                if (customThought) {
+                    currentThought = customThought;
+                    decodeResult.textContent = "Processing thought: '" + customThought + "'... This may take a few moments.";
+                } else {
+                    currentThought = thoughtExample;
+                    decodeResult.textContent = "Processing thought: '" + thoughtExample + "'... Accessing brain patterns.";
+                }
+                
+                // Simulate processing
+                setTimeout(() => {
+                    if (thoughtPatterns[currentThought]) {
+                        decodeResult.textContent = thoughtPatterns[currentThought].result;
+                    } else {
+                        decodeResult.textContent = "Thought decoded: '" + currentThought + "' - Right back side activation detected with emotional resonance. Pattern analysis complete.";
+                    }
+                }, 2000);
+            });
+            
+            deepAnalyzeBtn.addEventListener('click', function() {
+                if (!currentThought) {
+                    decodeResult.textContent = "Please process a thought first before deep analysis.";
+                    return;
+                }
+                
+                decodeResult.textContent = "Performing deep analysis on: '" + currentThought + "'... Accessing subconscious patterns.";
+                
+                // Simulate deep analysis
+                setTimeout(() => {
+                    if (thoughtPatterns[currentThought]) {
+                        decodeResult.textContent = thoughtPatterns[currentThought].result + " | Deep Analysis: " + thoughtPatterns[currentThought].motive;
+                    } else {
+                        decodeResult.textContent = "Deep Analysis: Thought '" + currentThought + "' shows genuine intent with emotional authenticity. No deceptive patterns detected.";
+                    }
+                }, 2500);
+            });
+            
+            analyzeMotiveBtn.addEventListener('click', function() {
+                const depth = motiveDepthSlider.value;
+                motiveResult.textContent = "Analyzing motive at " + depth + " cm above head... Reading energy patterns and intention fields.";
+                
+                // Simulate motive analysis
+                setTimeout(() => {
+                    motiveResult.textContent = "Motive Analysis Complete: True intentions detected with 89% accuracy. Energy patterns indicate genuine emotional state with no deceptive signals.";
+                }, 2000);
+            });
+            
+            fullScanBtn.addEventListener('click', function() {
+                waveResult.textContent = "Initiating full brain and motive scan... This will take approximately 15 seconds.";
+                decodeResult.textContent = "Preparing comprehensive thought analysis...";
+                motiveResult.textContent = "Calibrating motive detection system...";
+                
+                // Simulate full scan
+                setTimeout(() => {
+                    waveResult.textContent = "Full EM scan complete: All brain regions active with normal patterns. Wave propagation optimal.";
+                    decodeResult.textContent = "Thought analysis: Multiple thought patterns detected with primary focus on problem-solving and future planning.";
+                    motiveResult.textContent = "Motive analysis: True intentions verified with 94% confidence. No hidden agendas detected. Energy field integrity: 92%.";
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
